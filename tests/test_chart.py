@@ -6,7 +6,12 @@ import anywidget_instruments as ai
 
 def capture(chart):
     sent = []
-    chart.send = lambda content, buffers=None: sent.append((content, buffers))
+
+    def send(content, buffers=None):
+        if content.get("type") != "hb":  # liveness heartbeats (ROB-001) may arrive any time
+            sent.append((content, buffers))
+
+    chart.send = send
     return sent
 
 

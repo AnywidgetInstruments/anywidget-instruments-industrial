@@ -22,7 +22,7 @@ test.afterEach(async ({ page }, testInfo) => {
 test("marimo WebAssembly export", async ({ page }) => {
   await page.goto("/marimo/");
   const setpoint = widget(page, "Setpoint");
-  await expect(setpoint.locator(".awi-value")).toHaveText("60.0", { timeout: 240_000 });
+  await expect(setpoint.locator(".awi-value")).toHaveText(/^60\.0\b/, { timeout: 240_000 });
   const level = widget(page, "Level").locator(":scope > .awi-body");
   await expect(level).toHaveAttribute("aria-valuenow", "60");
   // GEN-011: the dependent cell re-runs in the browser

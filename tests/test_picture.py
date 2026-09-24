@@ -4,11 +4,17 @@ import numpy as np
 import pytest
 
 import anywidget_instruments as ai
+from anywidget_instruments import _liveness
 
 
 def capture(w):
     sent = []
-    w.send = lambda content, buffers=None: sent.append((content, buffers or []))
+
+    def send(content, buffers=None):
+        if content.get("type") != "hb":  # liveness heartbeats (ROB-001) may arrive any time
+            sent.append((content, buffers or []))
+
+    w.send = send
     return sent
 
 
@@ -38,6 +44,15 @@ def test_auto_flush_outside_ipython():
     assert len(sent) == 1
     assert [c["op"] for c in sent[0][0]["commands"]] == ["polygon", "polygon"]
     assert sent[0][0]["commands"][1]["closed"] is False
+
+
+def test_capture_ignores_heartbeats():
+    pic = ai.PictureControl()
+    sent = capture(pic)
+    pic.circle(1, 1, 1)
+    _liveness.beat()  # the heartbeat thread may beat through the widget meanwhile
+    pic.flush()
+    assert [m["type"] for m, _ in sent] == ["draw"]
 
 
 def test_images_travel_as_binary_buffers():

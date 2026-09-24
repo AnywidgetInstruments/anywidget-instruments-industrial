@@ -9,7 +9,12 @@ import anywidget_instruments as ai
 
 def capture(w):
     sent = []
-    w.send = lambda content, buffers=None: sent.append((content, buffers or []))
+
+    def send(content, buffers=None):
+        if content.get("type") != "hb":  # liveness heartbeats (ROB-001) may arrive any time
+            sent.append((content, buffers or []))
+
+    w.send = send
     return sent
 
 
