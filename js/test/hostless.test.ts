@@ -26,7 +26,7 @@ function hostModel(state: State) {
     off: (ev: string, cb: (...a: unknown[]) => void) => {
       handlers[ev] = (handlers[ev] || []).filter((h) => h !== cb);
     },
-    send: () => {},
+    send: (_content: unknown): void => {},
     /** A value pushed by the host (e.g. a Julia cell re-run). */
     push(k: string, v: unknown) {
       traits[k] = v;
@@ -273,6 +273,53 @@ describe("Operator objects without a kernel", () => {
     const { body } = mount({ ...defaults("StackLight"), tiers: ["red", "amber", "green", "blue"], value: ["on", "purple"], label: "Line" });
     await frame();
     expect(body.getAttribute("aria-label")).toBe("Line: red on, amber off, green off, blue off");
+  });
+});
+
+describe("Alarms and indicators without a kernel", () => {
+  test("ACK acknowledges the alarm and still tells the host", async () => {
+    const sent: unknown[] = [];
+    const { model, el } = mount({ ...defaults("AlarmIndicator"), value: "active_unacknowledged", alarm_id: "TAH-101", message: "High temperature" });
+    model.send = (msg: unknown) => {
+      sent.push(msg);
+    };
+    await frame();
+    (el.querySelector(".awi-ack") as HTMLButtonElement).click();
+    expect(sent).toEqual([{ type: "ack" }]);
+    expect(model.get("value")).toBe("active_acknowledged");
+    expect(model.saved.at(-1)).toMatchObject({ value: "active_acknowledged" });
+    model.push("value", "cleared_unacknowledged");
+    await frame();
+    (el.querySelector(".awi-ack") as HTMLButtonElement).click();
+    expect(model.get("value")).toBe("normal");
+  });
+
+  test("with a kernel, ACK is only sent: the kernel applies it", async () => {
+    const sent: unknown[] = [];
+    const { model, el } = mount({ ...defaults("AlarmIndicator"), _session: "kernel", value: "active_unacknowledged" });
+    model.send = (msg: unknown) => {
+      sent.push(msg);
+    };
+    await frame();
+    (el.querySelector(".awi-ack") as HTMLButtonElement).click();
+    expect(sent).toEqual([{ type: "ack" }]);
+    expect(model.get("value")).toBe("active_unacknowledged");
+  });
+
+  test("a deviation bar reads an invalid span as its default", async () => {
+    const { root } = mount({ ...defaults("DeviationIndicator"), value: 53, setpoint: 50, tolerance: 1, span: 0 });
+    await frame();
+    expect(root.querySelector(".awi-badge")?.textContent).toBe("▲ HIGH");
+  });
+
+  test("a pipe and a theme switch render from their defaults", async () => {
+    const pipe = mount({ ...defaults("Pipe"), value: true, rotation: 45 });
+    await frame();
+    expect(pipe.root.classList.contains("awi-indicator")).toBe(true);
+    const sw = mount({ ...defaults("ThemeSwitch") });
+    await frame();
+    (sw.el.querySelector('button[data-value="dark"]') as HTMLButtonElement).click();
+    expect(sw.model.get("value")).toBe("dark");
   });
 });
 

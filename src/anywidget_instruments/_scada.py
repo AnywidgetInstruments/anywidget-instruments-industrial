@@ -11,7 +11,7 @@ from typing import Any
 
 import traitlets as t
 
-from ._base import Callback, InstrumentWidget, _report_callback_error
+from ._base import Callback, InstrumentWidget, _report_callback_error, size_trait
 
 ALARM_STATES: tuple[str, ...] = (
     "normal",
@@ -53,6 +53,7 @@ class AlarmIndicator(InstrumentWidget):
 
     _kind = t.Unicode("alarmindicator").tag(sync=True)
     _default_size = (260, 64)
+    size = size_trait(*_default_size)
 
     value = t.Enum(list(ALARM_STATES), default_value="normal").tag(sync=True)
     alarm_id = t.Unicode("").tag(sync=True)

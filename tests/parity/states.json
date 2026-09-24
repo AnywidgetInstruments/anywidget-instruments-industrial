@@ -332,6 +332,44 @@
         ],
         "buzzer": true
       }
+    },
+    {
+      "widget": "ThemeSwitch",
+      "traits": {
+        "value": "system",
+        "page_theme": false
+      }
+    },
+    {
+      "widget": "Pipe",
+      "traits": {
+        "value": true,
+        "shape": "tee",
+        "rotation": 270,
+        "flow_direction": "reverse",
+        "fluid_color": "#1f77b4",
+        "thickness": 2
+      }
+    },
+    {
+      "widget": "AlarmIndicator",
+      "traits": {
+        "value": "cleared_unacknowledged",
+        "alarm_id": "TAH-101",
+        "priority": "critical",
+        "message": "Reactor temperature high"
+      }
+    },
+    {
+      "widget": "DeviationIndicator",
+      "traits": {
+        "value": 52.3,
+        "setpoint": 50,
+        "tolerance": 1.5,
+        "span": 5,
+        "unit": "°C",
+        "format": "%.1f"
+      }
     }
   ]
 }

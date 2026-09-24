@@ -10,7 +10,7 @@ import numpy as np
 import traitlets as t
 
 from ._alarm_logic import ALARM_LEVELS, compute_alarm_level
-from ._base import InstrumentWidget, float_serializers
+from ._base import InstrumentWidget, float_serializers, mode_trait, size_trait
 
 _NAN = float("nan")
 
@@ -41,6 +41,8 @@ class DeviationIndicator(InstrumentWidget):
     _kind = t.Unicode("deviation").tag(sync=True)
     _default_mode = "indicator"
     _default_size = (220, 44)
+    mode = mode_trait(_default_mode)
+    size = size_trait(*_default_size)
     value = t.Float(_NAN).tag(sync=True, **float_serializers)
     setpoint = t.Float(0.0).tag(sync=True)
     tolerance = t.Float(1.0, min=0.0).tag(sync=True)

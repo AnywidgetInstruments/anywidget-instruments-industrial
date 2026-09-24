@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://s-celles.github.io/anywidget-instruments/schema/pipe.schema.json",
+  "title": "Pipe",
+  "description": "Pipe segment: straight, elbow, tee or cross, rotated by 0, 90, 180 or 270 degrees (SCADA-004).",
+  "type": "object",
+  "x-awi-class": "Pipe",
+  "allOf": [
+    {
+      "$ref": "instrument.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "pipe",
+      "default": "pipe",
+      "x-awi-writer": "host"
+    },
+    "flow_animation": {
+      "type": "boolean",
+      "description": "Animate a moving pattern while flowing (off when reduced motion is requested).",
+      "default": true,
+      "x-awi-writer": "host"
+    },
+    "flow_direction": {
+      "enum": [
+        "forward",
+        "reverse"
+      ],
+      "description": "Direction of the moving pattern.",
+      "default": "forward",
+      "x-awi-writer": "host"
+    },
+    "fluid_color": {
+      "type": "string",
+      "description": "CSS color of the fluid; unsafe colors are ignored (SEC-002).",
+      "default": "",
+      "x-awi-writer": "host"
+    },
+    "mode": {
+      "default": "indicator"
+    },
+    "rotation": {
+      "enum": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "description": "Rotation in degrees.",
+      "default": 0,
+      "x-awi-writer": "host"
+    },
+    "shape": {
+      "enum": [
+        "straight",
+        "elbow",
+        "tee",
+        "cross"
+      ],
+      "description": "Unrotated: straight left to right, elbow left to bottom, tee left to right with a branch to the bottom, cross all four sides.",
+      "default": "straight",
+      "x-awi-writer": "host"
+    },
+    "size": {
+      "default": [
+        80,
+        80
+      ]
+    },
+    "thickness": {
+      "type": "number",
+      "minimum": 2.0,
+      "description": "Pipe thickness in pixels.",
+      "default": 14.0,
+      "x-awi-writer": "host"
+    },
+    "value": {
+      "type": "boolean",
+      "description": "True while the fluid flows.",
+      "default": false,
+      "x-awi-writer": "host"
+    }
+  }
+}

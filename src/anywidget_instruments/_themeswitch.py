@@ -6,7 +6,7 @@ from typing import Any
 
 import traitlets as t
 
-from ._base import InstrumentWidget
+from ._base import InstrumentWidget, size_trait
 from ._style import get_default_theme, set_theme
 
 #: Positions of the theme switch, left to right.
@@ -27,6 +27,7 @@ class ThemeSwitch(InstrumentWidget):
 
     _kind = t.Unicode("themeswitch").tag(sync=True)
     _default_size = (240, 30)
+    size = size_trait(*_default_size)
     value = t.Enum(["auto", *THEME_SWITCH_POSITIONS], default_value="auto").tag(sync=True)
     page_theme = t.Bool(True).tag(sync=True)
 

@@ -79,6 +79,10 @@ MIGRATED = {
     "EmergencyStop",
     "SelectorSwitch",
     "StackLight",
+    "ThemeSwitch",
+    "Pipe",
+    "AlarmIndicator",
+    "DeviationIndicator",
 }
 
 
@@ -194,3 +198,11 @@ def test_schemas_are_valid_json_schemas() -> None:
     jsonschema = pytest.importorskip("jsonschema")
     for f in SCHEMA_DIR.glob("*.schema.json"):
         jsonschema.Draft202012Validator.check_schema(json.loads(f.read_text()))
+
+
+def test_transition_tables() -> None:
+    """x-awi-transitions of a schema equal the table of the Python class."""
+    from anywidget_instruments import _scada
+
+    table = CONTRACT["widgets"]["AlarmIndicator"]["traits"]["value"]["transitions"]
+    assert {(a, e): b for a, e, b in table} == _scada._TRANSITIONS

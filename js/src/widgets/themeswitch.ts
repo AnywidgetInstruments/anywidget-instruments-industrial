@@ -1,16 +1,22 @@
 // Light / system / dark theme switch (STYLE-007, STYLE-008).
 import { html } from "../core/dom.js";
+import type { AnyModel } from "../core/model.js";
 import { applyPageTheme } from "../core/pagetheme.js";
 import { BaseView } from "../core/view.js";
+import type { ThemeSwitchTraits } from "../generated/contract.js";
 
-export const THEME_POSITIONS = [
+type Theme = ThemeSwitchTraits["value"];
+
+export const THEME_POSITIONS: Array<[Theme, string]> = [
   ["light", "☀ Light"],
   ["system", "◐ System"],
   ["dark", "☾ Dark"],
 ];
 
-export class ThemeSwitchView extends BaseView {
-  constructor(model, el) {
+export class ThemeSwitchView extends BaseView<ThemeSwitchTraits> {
+  readonly buttons: HTMLButtonElement[];
+
+  constructor(model: AnyModel<ThemeSwitchTraits>, el: HTMLElement) {
     super(model, el, ["value", "page_theme"]);
     const b = this.body;
     b.setAttribute("role", "radiogroup");
@@ -23,7 +29,7 @@ export class ThemeSwitchView extends BaseView {
     });
     b.append(...this.buttons);
     b.addEventListener("keydown", (e) => {
-      const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+      const step = ({ ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 } as Record<string, number>)[e.key];
       if (!step) return;
       e.preventDefault();
       const k = Math.max(0, THEME_POSITIONS.findIndex(([v]) => v === this.get("value")));
@@ -37,18 +43,18 @@ export class ThemeSwitchView extends BaseView {
     this.schedule();
   }
 
-  applyPage() {
+  applyPage(): void {
     if (this.get("page_theme") && this.get("value") !== "auto") applyPageTheme(this.el.ownerDocument, this.get("value"));
   }
 
-  choose(value) {
+  choose(value: Theme): void {
     if (!this.interactive || value === this.get("value")) return;
     this.sendValue(value, true);
     this.applyPage();
     this.schedule();
   }
 
-  draw() {
+  override draw(): void {
     const value = this.get("value");
     const on = this.interactive;
     this.buttons.forEach((btn, k) => {

@@ -9,7 +9,7 @@ import ipywidgets
 import traitlets as t
 
 from . import _dispatch
-from ._base import Callback, InstrumentWidget
+from ._base import Callback, InstrumentWidget, mode_trait, size_trait
 
 
 class ProcessObject(InstrumentWidget):
@@ -174,6 +174,8 @@ class Pipe(InstrumentWidget):
     _kind = t.Unicode("pipe").tag(sync=True)
     _default_mode = "indicator"
     _default_size = (80, 80)
+    mode = mode_trait(_default_mode)
+    size = size_trait(*_default_size)
     value = t.Bool(False).tag(sync=True)
     shape = t.Enum(list(PIPE_SHAPES), default_value="straight").tag(sync=True)
     rotation = t.Enum([0, 90, 180, 270], default_value=0).tag(sync=True)

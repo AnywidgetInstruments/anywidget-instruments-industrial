@@ -50,6 +50,8 @@ export interface TraitSpec extends ValueSpec {
    * value means the default position).
    */
   resolved?: boolean;
+  /** State transitions of an enum trait: [state, event, next state]; other pairs keep the state. */
+  transitions?: Array<[string, string, string]>;
   description?: string;
 }
 

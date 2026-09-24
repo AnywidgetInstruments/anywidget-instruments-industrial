@@ -122,6 +122,7 @@ function traitSpec(name, p, where, nested = false) {
   spec.writer = writer;
   if (p.readOnly) spec.readOnly = true;
   if (p["x-awi-resolved"]) spec.resolved = true;
+  if (p["x-awi-transitions"]) spec.transitions = p["x-awi-transitions"];
   if (p.description) spec.description = p.description;
   return spec;
 }

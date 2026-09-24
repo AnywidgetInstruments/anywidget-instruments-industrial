@@ -210,3 +210,13 @@ describe("derived peak (HOST-004, NUM-110)", () => {
     expect(host.get("peak")).toBe(20);
   });
 });
+
+describe("transitions", () => {
+  test("applyTransition follows the table and keeps the state otherwise", async () => {
+    const { applyTransition } = await import("../src/contract/transitions.js");
+    const table = CONTRACTS.AlarmIndicator.traits.value.transitions;
+    expect(applyTransition(table, "active_unacknowledged", "acknowledge")).toBe("active_acknowledged");
+    expect(applyTransition(table, "normal", "acknowledge")).toBe("normal");
+    expect(applyTransition(undefined, "x", "y")).toBe("x");
+  });
+});

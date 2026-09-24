@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://s-celles.github.io/anywidget-instruments/schema/themeswitch.schema.json",
+  "title": "ThemeSwitch",
+  "description": "Three-position switch for the theme: light, system, dark (STYLE-007, STYLE-008).",
+  "type": "object",
+  "x-awi-class": "ThemeSwitch",
+  "allOf": [
+    {
+      "$ref": "instrument.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "themeswitch",
+      "default": "themeswitch",
+      "x-awi-writer": "host"
+    },
+    "page_theme": {
+      "type": "boolean",
+      "description": "Also switch the notebook page theme where the host allows it (marimo).",
+      "default": true,
+      "x-awi-writer": "host"
+    },
+    "size": {
+      "default": [
+        240,
+        30
+      ]
+    },
+    "value": {
+      "enum": [
+        "auto",
+        "light",
+        "system",
+        "dark"
+      ],
+      "description": "Selected theme; auto until a position is chosen. With a Python kernel, every widget of the kernel follows it; other hosts apply the page theme only (STYLE-008).",
+      "default": "auto",
+      "x-awi-writer": "both"
+    }
+  }
+}
