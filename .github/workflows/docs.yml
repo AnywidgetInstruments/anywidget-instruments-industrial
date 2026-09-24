@@ -28,7 +28,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install build -e ".[docs]"
+      - run: pip install build uv -e ".[docs]" # uv: import analysis of the marimo export
       - run: python -m build --wheel -o dist
       - name: MkDocs (offline-capable, strict)
         run: mkdocs build --strict -d site
