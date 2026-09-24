@@ -48,13 +48,17 @@ test("performance", async ({ page }, testInfo) => {
       for (const e of list.getEntries()) if (e.name === "keydown") window.__events.push(e.duration);
     }).observe({ type: "event", durationThreshold: 16, buffered: false });
   });
-  // long enough for ~40 key presses: the p95 must not be the maximum
-  await kernelExec(page, NB, "indicators_run(8.0)");
+  // Sample ~40 key presses under load, so that the p95 is not the maximum.
+  // The load runs long enough for a slow runner, where one press round trip
+  // (evaluate + keyboard.press) can take ~0.7 s; the sampling stops at 40
+  // presses. The thresholds below are unchanged.
+  const LOAD_S = 20;
+  await kernelExec(page, NB, `indicators_run(${LOAD_S}.0)`);
   let t0 = Date.now();
   await widget(page, "Perf knob").locator(":scope > .awi-body").focus();
   const inputDelays = [];
   let presses = 0;
-  while (Date.now() - t0 < 7500) {
+  while (presses < 40 && Date.now() - t0 < (LOAD_S - 1) * 1000) {
     const d = await page.evaluate(() => new Promise((resolve) => {
       const start = performance.now();
       const el = document.activeElement;
@@ -66,6 +70,7 @@ test("performance", async ({ page }, testInfo) => {
     presses++;
     await page.waitForTimeout(50);
   }
+  await kernelExec(page, NB, "indicators_stop.set()"); // the chart is measured without this load
   const eventDurations = await page.evaluate(() => window.__events);
   // the observer only reports events longer than 16 ms: the other presses
   // count as 16 ms (Event Timing durations are rounded to 8 ms)
