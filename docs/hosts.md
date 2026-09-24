@@ -30,6 +30,13 @@ chart data, heartbeats) does not run.
   shown clamped when `coerce` is set, and `alarm_level` (and `peak` with
   peak hold) is computed by the front end and written back to the trait
   dictionary (HOST-002, HOST-004).
+- The Boolean widgets, `SelectorSwitch`, `StackLight`, `Pipe`,
+  `DeviationIndicator` and `ThemeSwitch` read their traits through their
+  schema; a selector resolves its position and a stack light its states as
+  the Python classes do. `AlarmIndicator` applies an acknowledgement itself
+  and still sends the `ack` message. Latches are host logic: a latched
+  push button stays set until the host resets it, and so does the
+  emergency stop. The theme switch changes the page theme only.
 - The other widgets are being migrated (see the
   [migration inventory](dev/frontend-migration-inventory.md)): until then,
   their derived traits and chart data need a host
