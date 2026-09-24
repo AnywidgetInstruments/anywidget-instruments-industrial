@@ -16,7 +16,7 @@ by default; every widget switches with `mode`.
 | Graphs, time | `WaveformChart`, `IntensityChart`, `DigitalWaveformGraph`, `MixedSignalGraph` (I) | |
 | Graphs, trends | `TrendChart` | ISA-101 |
 | Graphs, specialized | `PolarPlot`, `SmithChart`, `RadarChart`, `PictureControl` | |
-| Alarms and events | `AlarmIndicator`, `AlarmBanner`, `AlarmList`, `Annunciator` | ISA-18.1, ISA-18.2 / IEC 62682 |
+| Alarms and events | `AlarmIndicator`, `AlarmBanner`, `AlarmList`, `Annunciator`, `EventLog` | ISA-18.1, ISA-18.2 / IEC 62682 |
 | Process symbols | `Valve`, `Pump`, `Motor`, `Pipe` (faceplates) | ISA-5.1 (symbols) |
 | Field instruments | `Transmitter` (I) | ISA-5.1, NAMUR NE 107 |
 | Supervisory objects | `PIDFaceplate` with `PID`, `StateMachine` | ISA-101, ISA-TR88.00.02 |
@@ -215,5 +215,21 @@ lt.status = "maintenance"
 lt.status_text = "sensor drift"
 if lt.valid:  # False while the status is "failure"
     level = lt.value
+```
+
+### EventLog
+
+A journal of events, newest first, with time, category (`operator`,
+`state`, `alarm`, `system`, shown as text chips), source and message; the
+operator filters it by category and text and downloads it as CSV. At most
+`max_events` events are kept. `connect()` records every change of the named
+traits of other widgets: an audit trail of operator actions.
+
+```python
+log = ai.EventLog(max_events=1000)
+log.log("Pump P-101 started", source="P-101", category="state")
+log.connect(setpoint, category="operator")  # "value: 2.2 → 2.4"
+log.connect(pump_mode, category="operator", source="Pump mode")
+log.events  # list of dicts, oldest first
 ```
 

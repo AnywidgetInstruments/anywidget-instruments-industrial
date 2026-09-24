@@ -84,6 +84,7 @@ Generated from the docstrings (DOC-001).
 
 ::: anywidget_instruments.TrendChart
 ::: anywidget_instruments.Transmitter
+::: anywidget_instruments.EventLog
 
 ## Utilities
 

@@ -18,6 +18,7 @@ from ._boolean import (
 )
 from ._chart import WaveformChart
 from ._dispatch import batch
+from ._eventlog import EVENT_CATEGORIES, EventLog
 from ._graph import GraphWidget
 from ._graphs import (
     COLORMAPS,
@@ -74,6 +75,7 @@ __all__ = [
     "BUTTON_COLORS",
     "COLORMAPS",
     "DEVICE_STATUSES",
+    "EVENT_CATEGORIES",
     "LAMP_COLORS",
     "LED",
     "MECHANICAL_ACTIONS",
@@ -97,6 +99,7 @@ __all__ = [
     "Dial",
     "DigitalWaveformGraph",
     "EmergencyStop",
+    "EventLog",
     "FillSlide",
     "Gauge",
     "GraphWidget",

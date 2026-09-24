@@ -125,6 +125,17 @@ test.describe("every widget", () => {
     await expect(w.locator(".awi-tx-status")).toHaveText("OK");
   });
 
+  test("EventLog: kernel -> front, filter in the front end (IND-091, IND-092)", async () => {
+    const w = widget(page, "EventLog");
+    await w.scrollIntoViewIfNeeded();
+    await py('W["EventLog"].log("Pump started", source="P-101", category="state"); W["EventLog"].log("Level high", source="LT-101", category="alarm")');
+    await expect(w.locator("tbody tr")).toHaveCount(2);
+    await expect(w.locator("tbody tr").first()).toContainText("Level high");
+    await w.getByRole("combobox", { name: "Category" }).selectOption("state");
+    await expect(w.locator("tbody tr")).toHaveCount(1);
+    await expect(w.locator("tbody tr")).toContainText("Pump started");
+  });
+
   test("TrendChart: both directions (IND-071, IND-072)", async () => {
     const w = widget(page, "TrendChart");
     await w.scrollIntoViewIfNeeded();

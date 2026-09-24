@@ -663,3 +663,10 @@
 .awi-root .awi-tx-status { font-size: 10px; font-weight: 700; color: var(--awi-fg); text-align: center; max-width: var(--awi-w); }
 .awi-root.awi-ne107-ok .awi-tx-status { color: var(--awi-muted); font-weight: 400; }
 .awi-root.awi-ne107-failure .awi-value { color: var(--awi-alarm-hihi); font-weight: 700; }
+
+/* event log (IND-090..093) */
+.awi-root.awi-eventlog .awi-body { display: flex; flex-direction: column; border: 1px solid var(--awi-face-stroke); background: var(--awi-face); font-size: 12px; cursor: default; }
+.awi-root .awi-ev-cat { display: inline-block; padding: 0 4px; border: 1px solid var(--awi-face-stroke); border-radius: 3px; font-size: 10px; font-weight: 700; color: var(--awi-fg); }
+.awi-root .awi-ev-alarm { border-color: var(--awi-danger); border-left-width: 4px; }
+.awi-root .awi-ev-operator { border-color: var(--awi-accent); border-left-width: 4px; }
+.awi-root .awi-ev-state { border-left-width: 4px; }
