@@ -4,6 +4,7 @@ import { expect, test } from "@playwright/test";
 import { kernelExec, runNotebook, widget } from "./helpers.js";
 
 const NB = "perf.ipynb";
+const PROBE_N = 100;
 const pct = (xs, p) => {
   const s = [...xs].sort((a, b) => a - b);
   return s[Math.min(s.length - 1, Math.floor((p / 100) * s.length))];
@@ -30,9 +31,11 @@ test("performance", async ({ page }, testInfo) => {
       if (!(v in window.__seen)) window.__seen[v] = Date.now();
     }).observe(value, { childList: true, characterData: true, subtree: true });
   });
-  await kernelExec(page, NB, "probe_run()");
+  // 100 samples: with fewer, p95 is set by the one or two slowest updates
+  // and a single scheduler hiccup on a shared CI runner decides the result
+  await kernelExec(page, NB, `probe_run(${PROBE_N})`);
   // updates arriving within one frame are coalesced (PERF-003): wait for the last value
-  await expect.poll(() => page.evaluate(() => 40 in window.__seen), { timeout: 20_000 }).toBe(true);
+  await expect.poll(() => page.evaluate((n) => n in window.__seen, PROBE_N), { timeout: 30_000 }).toBe(true);
   const stamps = JSON.parse(await kernelExec(page, NB, "import json; print(json.dumps(stamps))"));
   const seen = await page.evaluate(() => window.__seen);
   const latencies = Object.entries(stamps).map(([i, t]) => seen[i] - t).filter(Number.isFinite);
@@ -86,7 +89,7 @@ test("performance", async ({ page }, testInfo) => {
   console.log(JSON.stringify(results, null, 1));
   await testInfo.attach("perf.json", { body: JSON.stringify(results, null, 2), contentType: "application/json" });
 
-  expect(latencies.length).toBeGreaterThanOrEqual(10);
+  expect(latencies.length).toBeGreaterThanOrEqual(PROBE_N / 4);
   expect(pct(latencies, 95)).toBeLessThan(50); // PERF-001
   expect(pct(inputDelays, 95)).toBeLessThan(100); // PERF-002
   expect(Math.max(0, ...eventDurations)).toBeLessThan(100); // PERF-002

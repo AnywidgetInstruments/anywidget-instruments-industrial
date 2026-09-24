@@ -31,10 +31,24 @@ export async function runNotebook(page, name) {
       { timeout: 90_000, intervals: [250, 500, 1000] },
     )
     .toBe(true);
-  await page.locator(".jp-Notebook").click();
-  await page.keyboard.press("Escape");
-  await page.getByRole("menuitem", { name: "Run", exact: true }).click();
-  await page.getByRole("menuitem", { name: "Run All Cells", exact: true }).click();
+  // On a freshly started server, "Run All Cells" can be issued before the
+  // kernel accepts it (or a late kernel dialog swallows it): nothing runs.
+  // Check that execution started and issue it again otherwise.
+  const prompts = page.locator(".jp-CodeCell .jp-InputPrompt");
+  const started = async () => (await prompts.allTextContents()).some((t) => /\[(\d+|\*)\]/.test(t));
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await page.locator(".jp-Notebook").click();
+    await page.keyboard.press("Escape");
+    await page.getByRole("menuitem", { name: "Run", exact: true }).click();
+    await page.getByRole("menuitem", { name: "Run All Cells", exact: true }).click();
+    const deadline = Date.now() + 15_000;
+    while (Date.now() < deadline) {
+      if (await select.isVisible().catch(() => false)) await select.click();
+      if (await started()) return;
+      await page.waitForTimeout(250);
+    }
+  }
+  throw new Error(`runNotebook: cells of ${name} never started running`);
 }
 
 /**
