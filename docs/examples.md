@@ -4,6 +4,11 @@ The notebooks live in the `examples/` folder of the repository. Each one runs a
 live simulation in a background thread (set the environment variable
 `AWI_EXAMPLE_SECONDS` to limit its duration).
 
+!!! note
+    The demos and examples simulate processes and machines; they are not
+    meant to control real equipment (see the [safety notice](safety.md)).
+
+
 ## Gallery — `examples/gallery.ipynb`
 
 Every widget in control and indicator modes.

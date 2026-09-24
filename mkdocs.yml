@@ -20,6 +20,7 @@ nav:
   - Widget catalog: widgets.md
   - Examples: examples.md
   - Try it in the browser: try.md
+  - Safety notice: safety.md
   - Guides:
       - Alarm conventions: alarm-conventions.md
       - Hosts and liveness: hosts.md

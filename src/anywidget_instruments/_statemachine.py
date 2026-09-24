@@ -139,6 +139,12 @@ class StateMachine(InstrumentWidget):
     dict ``{"states": [{"name", "x", "y", "acting"}], "transitions":
     [[from, command, to], ...], "initial": name}`` where the command ``"SC"``
     marks the completion of an acting state (IND-063).
+
+    Warnings
+    --------
+    Enforces a state model in software; it is not a safety function and does
+    not replace the machine's control system.
+    See the safety notice of the documentation (DOC-007).
     """
 
     _kind = t.Unicode("statemachine").tag(sync=True)

@@ -60,6 +60,13 @@ with nothing to install (marimo apps, also as JupyterLite notebooks).
 
 Contributing: see [development](docs/development.md) and `AGENTS.md`.
 
+## Safety
+
+The library is for visualization, teaching, simulation and supervision in
+notebooks. It is **not a safety-related system**, and the `EmergencyStop`
+widget is not an emergency stop device: see the
+[safety notice](docs/safety.md).
+
 ## License
 
 MIT

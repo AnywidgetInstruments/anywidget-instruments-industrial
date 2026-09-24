@@ -7,7 +7,7 @@
 | Project | anywidget-instruments (working name) |
 | Document type | Software requirements specification |
 | Notation | EARS (Easy Approach to Requirements Syntax) |
-| Version | 0.3 |
+| Version | 0.4 |
 | Date | 2026-09-24 |
 | Status | Baseline for version 1.0 |
 
@@ -326,6 +326,7 @@ Requirements use identifiers `<GROUP>-<NNN>` with priorities:
 | DOC-004 | S | The documentation shall include at least three complete example panels: a first-order process simulation with PID tuning, a tank level supervision with alarms, and a real-time signal acquisition display. |
 | DOC-005 | S | The documentation shall be buildable offline and deployable as a static site. |
 | DOC-006 | C | The documentation shall include live examples running in the browser (JupyterLite or marimo WASM). |
+| DOC-007 | M | The documentation shall state that the library is not a safety-related system, that the EmergencyStop widget is not an emergency stop device, and that safety functions must be implemented independently of the library; the README and the docstrings of the EmergencyStop, alarm, controller and state model classes shall refer to this statement. |
 
 ---
 
@@ -470,3 +471,4 @@ state model).
 | 0.1 | Initial draft. |
 | 0.2 | Moved into the repository; DOC-003 withdrawn; component traceability table made product-neutral. |
 | 0.3 | Industrial operator objects (IND): analog indicator, selector switch, stack light, PID faceplate, annunciator, alarm list, state machine. |
+| 0.4 | DOC-007: safety notice. |

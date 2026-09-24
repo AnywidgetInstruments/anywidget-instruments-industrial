@@ -67,6 +67,12 @@ class Annunciator(InstrumentWidget):
     With ``first_out=True`` the first window to alarm is marked until reset
     (IND-042). ``horn`` is ``True`` while an alert or ringback is not silenced;
     the library never plays sound.
+
+    Warnings
+    --------
+    Presents alarms; it is not an alarm management system nor a safety
+    function. Critical alarms need independent annunciation.
+    See the safety notice of the documentation (DOC-007).
     """
 
     _kind = t.Unicode("annunciator").tag(sync=True)

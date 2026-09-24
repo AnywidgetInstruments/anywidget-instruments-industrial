@@ -111,3 +111,22 @@ def test_on_change_decorator_with_arguments():
 
     g.value = 90
     assert seen == ["hi"]
+
+
+# -- DOC-007: safety notice -------------------------------------------------------------
+@pytest.mark.parametrize(
+    "name",
+    [
+        "EmergencyStop",
+        "AlarmIndicator",
+        "AlarmBanner",
+        "Annunciator",
+        "AlarmList",
+        "PID",
+        "PIDFaceplate",
+        "StateMachine",
+    ],
+)
+def test_safety_related_classes_refer_to_the_safety_notice(name):
+    doc = getattr(ai, name).__doc__
+    assert "safety notice" in doc and "DOC-007" in doc

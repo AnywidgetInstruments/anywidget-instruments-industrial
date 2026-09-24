@@ -30,6 +30,12 @@ class AlarmList(InstrumentWidget):
     choices, in seconds) and unshelves it automatically (IND-051). Expiry runs
     on a timer thread; where threads are not available (Pyodide), it happens
     on the next call to any method, or to :meth:`refresh`.
+
+    Warnings
+    --------
+    Presents alarms; it is not an alarm management system nor a safety
+    function. Critical alarms need independent annunciation.
+    See the safety notice of the documentation (DOC-007).
     """
 
     _kind = t.Unicode("alarmlist").tag(sync=True)

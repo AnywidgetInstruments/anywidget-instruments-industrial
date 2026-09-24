@@ -35,6 +35,12 @@ class PID:
 
     >>> pid = PID(kp=2.0, ti=10.0, sp=50.0)
     >>> op = pid.step(pv=48.0, dt=0.1)
+
+    Warnings
+    --------
+    For teaching, simulation and prototyping; a real process needs a
+    validated controller and independent protection.
+    See the safety notice of the documentation (DOC-007).
     """
 
     def __init__(
@@ -144,6 +150,12 @@ class PIDFaceplate(InstrumentWidget):
 
     >>> loop = PIDFaceplate(tag="TIC-101", unit="°C", pv_max=150, controller=PID(kp=2, ti=30))
     >>> op = loop.step(pv=72.4, dt=0.5)
+
+    Warnings
+    --------
+    For teaching, simulation and prototyping; a real process needs a
+    validated controller and independent protection.
+    See the safety notice of the documentation (DOC-007).
     """
 
     _kind = t.Unicode("pidfaceplate").tag(sync=True)

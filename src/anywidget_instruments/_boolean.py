@@ -167,6 +167,12 @@ class EmergencyStop(BooleanWidget):
     to ``False``. Its callbacks have the highest priority: inside a batch
     (every front-end update, or :func:`anywidget_instruments.batch`) they run
     before any other pending widget callback (BOOL-013).
+
+    Warnings
+    --------
+    This widget draws an emergency stop; it is not an emergency stop device
+    (ISO 13850, IEC 60204-1) and must never be the means of stopping a machine.
+    See the safety notice of the documentation (DOC-007).
     """
 
     _kind = t.Unicode("emergencystop").tag(sync=True)

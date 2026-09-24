@@ -125,6 +125,7 @@ example `examples/filling_line.ipynb`.
 | DOC-004 | S | ✅ | PID tuning, tank supervision, signal acquisition (executed by pytest and e2e) |
 | DOC-005 | S | ✅ | Offline-capable static site (no web fonts / CDN), `docs.yml` deploys to GitHub Pages from `main` |
 | DOC-006 | C | ✅ | Four demos (gallery, PID tuning, operator station, signal analysis), each as a marimo WebAssembly app and a JupyterLite notebook with the package wheel; the Docs workflow opens all eight in a browser and checks that an input drives a computed output (`e2e-site/`) |
+| DOC-007 | M | ✅ | [Safety notice](safety.md), linked from the home page, the README, the widget catalog, the examples and the demos, and from the docstrings (py test) |
 | QA-001, QA-002 | M | ✅ | pytest, vitest |
 | QA-003 | M | ✅ | e2e JupyterLab (every widget, both directions), marimo, Notebook 7 |
 | QA-004 | S | ✅ | Screenshot comparison of every widget per style |

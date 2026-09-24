@@ -74,6 +74,10 @@ animated pipe runs on a background image.
 
 ## Industrial operator objects
 
+!!! warning
+    These objects present and simulate operator functions; they do not
+    implement safety functions. See the [safety notice](safety.md).
+
 Objects for control rooms and machine panels (IND-001 .. IND-063). They follow
 ISA-101 (grey scale in normal operation, color for abnormal situations),
 ISA-18.1 (annunciator sequences), ISA-18.2 / IEC 62682 (alarm management),

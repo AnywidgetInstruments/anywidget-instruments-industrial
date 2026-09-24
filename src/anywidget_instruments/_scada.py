@@ -43,6 +43,12 @@ class AlarmIndicator(InstrumentWidget):
 
     ``value`` is the alarm state. Use :meth:`activate`, :meth:`clear` and
     :meth:`acknowledge` (or the ACK button in control mode) to drive it.
+
+    Warnings
+    --------
+    Presents alarms; it is not an alarm management system nor a safety
+    function. Critical alarms need independent annunciation.
+    See the safety notice of the documentation (DOC-007).
     """
 
     _kind = t.Unicode("alarmindicator").tag(sync=True)
@@ -104,6 +110,12 @@ class AlarmBanner(InstrumentWidget):
     ``{"id", "timestamp", "source", "priority", "message", "state"}``, sorted
     by priority then time on the front end. Acknowledgements from the ACK
     buttons call :meth:`on_acknowledge` callbacks with the alarm id (SCADA-007).
+
+    Warnings
+    --------
+    Presents alarms; it is not an alarm management system nor a safety
+    function. Critical alarms need independent annunciation.
+    See the safety notice of the documentation (DOC-007).
     """
 
     _kind = t.Unicode("alarmbanner").tag(sync=True)

@@ -11,6 +11,12 @@ toolchain and no network access at runtime.
 
 ![Widget gallery](img/gallery-modern.png)
 
+!!! warning "Safety"
+    The library is for visualization, teaching, simulation and supervision.
+    It is **not a safety-related system**, and the `EmergencyStop` widget is
+    not an emergency stop device. Read the [safety notice](safety.md) before
+    connecting widgets to real equipment.
+
 ```python
 import anywidget_instruments as ai
 

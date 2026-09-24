@@ -6,6 +6,11 @@ first load downloads the Python runtime and takes a few seconds. Each demo is
 also available as a notebook in [JupyterLite](https://jupyterlite.readthedocs.io)
 (DOC-006).
 
+!!! note
+    The demos and examples simulate processes and machines; they are not
+    meant to control real equipment (see the [safety notice](safety.md)).
+
+
 | Demo (marimo) | What it shows | Also in JupyterLite |
 |---|---|---|
 | <a href="../marimo/gallery/">**Gallery**</a> | Every widget family: knobs and indicators, Boolean controls, charts, alarms, styles | <a href="../lite/lab/index.html?path=gallery.ipynb">notebook</a> |
