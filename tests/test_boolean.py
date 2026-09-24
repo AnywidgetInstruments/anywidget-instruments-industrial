@@ -137,3 +137,21 @@ def test_led_defaults():
     led = ai.LED(True, on_color="red", blink=True)
     assert led.mode == "indicator"
     assert led.value is True
+
+
+def test_push_button_lamp_and_caps() -> None:
+    """BOOL-015: a push button may have a built-in lamp, independent of its value."""
+    b = ai.PushButton(text="RUN", shape="round", lamp=False, lamp_color="green")
+    assert b.size == (90, 90)
+    assert b.lamp is False and b.value is False
+    b.lamp = True
+    b.lamp_blink = True
+    assert b.value is False  # the lamp does not change the button state
+    assert ai.PushButton().lamp is None  # no lamp by default
+    assert ai.PushButton(shape="round", size=(60, 60)).size == (60, 60)
+    with pytest.raises(t.TraitError):
+        ai.PushButton(color="purple")
+    with pytest.raises(t.TraitError):
+        ai.PushButton(lamp_color="black")
+    assert set(ai.LAMP_COLORS) <= {"green", "red", "amber", "blue", "white"}
+    assert "grey" in ai.BUTTON_COLORS

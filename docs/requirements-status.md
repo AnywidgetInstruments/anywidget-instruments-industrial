@@ -49,6 +49,7 @@ JupyterLab / Notebook 7 / marimo (`e2e/`).
 | BOOL-001 … BOOL-012 | M/S | ✅ | LED (blink), 4 switches, push button, six mechanical actions, `read_latched()`, `latch_timeout`, `EmergencyStop` |
 | BOOL-013 | M | ✅ | Callback dispatcher: in a batch (every front-end update, `ai.batch()`) EmergencyStop callbacks run first (py) |
 | BOOL-014 | S | ✅ | Two-step confirmation |
+| BOOL-015 | S | ✅ | `PushButton(lamp=…, lamp_color=…, lamp_blink=…)`, cap `color`, `shape="round"`; lamp state in the ARIA description and a ring when lit (py, js, e2e) |
 
 ## CHART – Graphs
 | ID | Pri | Status | Notes |

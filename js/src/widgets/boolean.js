@@ -4,7 +4,7 @@ import { BaseView } from "../core/view.js";
 
 const BOOL_TRAITS = [
   "value", "default_state", "mechanical_action", "confirm", "shape", "on_color", "off_color",
-  "blink", "blink_hz", "orientation", "text", "_pressed",
+  "blink", "blink_hz", "orientation", "text", "_pressed", "color", "lamp", "lamp_color", "lamp_blink",
 ];
 
 /**
@@ -144,6 +144,9 @@ export class BooleanView extends BaseView {
       b.setAttribute("aria-pressed", String(on));
       b.removeAttribute("aria-label");
       if (!this.get("label")) b.setAttribute("aria-label", this.kind === "pushbutton" ? this.get("text") : "Emergency stop");
+      const lamp = this.get("lamp");
+      if (this.kind === "pushbutton" && (lamp === true || lamp === false)) b.setAttribute("aria-description", `lamp ${lamp ? "on" : "off"}${lamp && this.get("lamp_blink") ? ", flashing" : ""}`);
+      else b.removeAttribute("aria-description");
     } else {
       b.setAttribute("role", "switch");
       b.setAttribute("aria-checked", String(on));
@@ -213,10 +216,28 @@ export class BooleanView extends BaseView {
 
   drawPush(w, h, on, armed) {
     const s = this.svgEl;
-    s.appendChild(svg("rect", { class: "awi-button", x: 2, y: 2, width: w - 4, height: h - 4, rx: 8 }));
+    const lamp = this.get("lamp");
+    const hasLamp = lamp === true || lamp === false;
+    // an illuminated button has a translucent cap in the lamp color (BOOL-015)
+    const cap = hasLamp ? `awi-lamp-${this.get("lamp_color")}` : `awi-cap-${this.get("color") || "grey"}`;
+    const lit = hasLamp && lamp;
+    const cls = `awi-button ${cap}${lit ? " awi-lit" : ""}${lit && this.get("lamp_blink") ? " awi-lamp-blink" : ""}${this._pressed || on ? " awi-down" : ""}`;
     const text = armed ? "Confirm?" : this.get("text");
-    s.appendChild(svgText(text, { class: "awi-button-text", x: w / 2, y: h / 2, "text-anchor": "middle", "dominant-baseline": "central" }));
-    if (on) s.appendChild(svg("rect", { class: "awi-button-lamp", x: 8, y: h - 8, width: w - 16, height: 3, rx: 1.5 }));
+    if (this.get("shape") === "round") {
+      const cx = w / 2;
+      const cy = h / 2;
+      const R = Math.min(w, h) / 2 - 2;
+      s.appendChild(svg("circle", { class: "awi-bezel", cx, cy, r: R }));
+      s.appendChild(svg("circle", { class: cls, cx, cy, r: R * (this._pressed || on ? 0.7 : 0.76) }));
+      // A11Y-003: a lit lamp also shows a ring, not only a color
+      if (lit) s.appendChild(svg("circle", { class: "awi-lamp-ring", cx, cy, r: R * 0.88 }));
+    } else {
+      s.appendChild(svg("rect", { class: cls, x: 2, y: 2, width: w - 4, height: h - 4, rx: 8 }));
+      if (lit) s.appendChild(svg("rect", { class: "awi-lamp-ring", x: 5, y: 5, width: w - 10, height: h - 10, rx: 6 }));
+    }
+    const ink = hasLamp ? (lit ? `awi-ink-lamp ${cap}` : "awi-ink-dark") : cap;
+    s.appendChild(svgText(text, { class: `awi-button-text ${ink}`, x: w / 2, y: h / 2, "text-anchor": "middle", "dominant-baseline": "central" }));
+    if (on && !hasLamp && this.get("shape") !== "round") s.appendChild(svg("rect", { class: "awi-button-lamp", x: 8, y: h - 8, width: w - 16, height: 3, rx: 1.5 }));
   }
 
   drawEstop(w, h, on) {

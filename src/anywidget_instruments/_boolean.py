@@ -149,15 +149,39 @@ class SlideSwitch(BooleanWidget):
     _default_size = (90, 44)
 
 
+BUTTON_COLORS: tuple[str, ...] = ("grey", "green", "red", "black", "yellow", "blue", "white")
+LAMP_COLORS: tuple[str, ...] = ("green", "red", "amber", "blue", "white")
+
+
 class PushButton(BooleanWidget):
-    """Push button with a text (or emoji/icon) caption (BOOL-006)."""
+    """Push button with a text (or emoji/icon) caption (BOOL-006, BOOL-015).
+
+    ``color`` is the cap color (IEC 60073: green to start, red to stop...),
+    ``shape`` is ``"rect"`` or ``"round"`` (panel operator).
+
+    Illuminated push button: set ``lamp`` to ``True`` / ``False`` to give the
+    button a built-in lamp, lit or not, in ``lamp_color`` (``lamp_blink`` to
+    flash it). The lamp is feedback set by the program (for example START lit
+    while the machine runs), independent of the button ``value``; ``None``
+    (the default) means no lamp.
+    """
 
     _kind = t.Unicode("pushbutton").tag(sync=True)
     _default_size = (110, 44)
     text = t.Unicode("OK").tag(sync=True)
+    color = t.Enum(list(BUTTON_COLORS), default_value="grey").tag(sync=True)
+    shape = t.Enum(["rect", "round"], default_value="rect").tag(sync=True)
+    lamp = t.Bool(None, allow_none=True).tag(sync=True)
+    lamp_color = t.Enum(list(LAMP_COLORS), default_value="green").tag(sync=True)
+    lamp_blink = t.Bool(False).tag(sync=True)
     mechanical_action = t.Enum(list(MECHANICAL_ACTIONS), default_value="latch_when_released").tag(
         sync=True
     )
+
+    def __init__(self, value: bool | None = None, **kwargs: Any) -> None:
+        if kwargs.get("shape") == "round":
+            kwargs.setdefault("size", (90, 90))
+        super().__init__(value, **kwargs)
 
 
 class EmergencyStop(BooleanWidget):

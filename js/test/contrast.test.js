@@ -55,6 +55,11 @@ const TEXT = [
   ["--awi-fg", "--awi-face"], ["--awi-fg", "--awi-plot-bg"], ["--awi-muted", "--awi-face"],
   ["--awi-alarm-hi", "--awi-face"], ["--awi-alarm-hihi", "--awi-face"],
   ["--awi-alarm-lo", "--awi-face"], ["--awi-alarm-lolo", "--awi-face"],
+  ["--awi-ink-on-light", "--awi-cap-green"], ["--awi-ink-on-dark", "--awi-cap-red"], ["--awi-ink-on-dark", "--awi-cap-black"],
+  ["--awi-ink-on-light", "--awi-cap-yellow"], ["--awi-ink-on-dark", "--awi-cap-blue"], ["--awi-ink-on-light", "--awi-cap-white"],
+  ["--awi-lamp-ink-green", "--awi-stack-green"], ["--awi-lamp-ink-red", "--awi-stack-red"], ["--awi-lamp-ink-amber", "--awi-stack-amber"],
+  ["--awi-lamp-ink-blue", "--awi-stack-blue"], ["--awi-lamp-ink-white", "--awi-stack-white"],
+  ["--awi-ink-on-dark", "--awi-lamp-off"],
   ["--awi-ann-off-ink", "--awi-ann-off"], ["--awi-ann-horn", "--awi-ann-bg"], ["--awi-ann-ink-dark", "--awi-ann-btn"],
   ["--awi-ann-ink-light", "--awi-stack-red"], ["--awi-ann-ink-dark", "--awi-stack-amber"], ["--awi-ann-ink-dark", "--awi-stack-white"],
 ];
@@ -99,5 +104,24 @@ describe("hidden elements", () => {
   // disappear when their hidden attribute is set
   it("the hidden attribute overrides display rules", () => {
     expect(css).toMatch(/\.awi-root \[hidden\] \{ display: none !important; \}/);
+  });
+});
+
+describe("push button caps (BOOL-015)", () => {
+  // an unlit lamp cap is a mix of the lamp color and --awi-lamp-off, labelled
+  // with --awi-ink-on-dark
+  const pct = Number(css.match(/color-mix\(in srgb, var\(--awi-lamp\) (\d+)%, var\(--awi-lamp-off\)\)/)[1]) / 100;
+  const mix = (a, b) => {
+    const [x, y] = [parse(a), parse(b)];
+    return `rgb(${[0, 1, 2].map((k) => Math.round(x[k] * pct + y[k] * (1 - pct))).join(",")})`;
+  };
+  describe.each([["modern", modern], ["system (dark)", darkSystem], ["theme dark", darkTheme], ["theme light", lightTheme]])("%s palette", (_name, t) => {
+    it.each(["green", "red", "amber", "blue", "white"])("unlit %s cap text >= 4.5", (lamp) => {
+      const cap = mix(resolve(t, `--awi-stack-${lamp}`), resolve(t, "--awi-lamp-off"));
+      expect(contrast(resolve(t, "--awi-ink-on-dark"), cap)).toBeGreaterThanOrEqual(4.5);
+    });
+  });
+  it("the grey cap keeps the face text color (its fill follows the palette)", () => {
+    expect(css).not.toMatch(/\.awi-button-text:is\([^)]*\.awi-cap-grey/);
   });
 });

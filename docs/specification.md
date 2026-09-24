@@ -7,7 +7,7 @@
 | Project | anywidget-instruments (working name) |
 | Document type | Software requirements specification |
 | Notation | EARS (Easy Approach to Requirements Syntax) |
-| Version | 0.5 |
+| Version | 0.6 |
 | Date | 2026-09-24 |
 | Status | Baseline for version 1.0 |
 
@@ -171,6 +171,7 @@ Requirements use identifiers `<GROUP>-<NNN>` with priorities:
 | BOOL-012 | M | The library shall provide an **EmergencyStop** widget: a red mushroom button that latches to true when pressed and requires an explicit reset action to return to false. |
 | BOOL-013 | M | When the EmergencyStop value becomes true, the library shall invoke all callbacks registered on it before any other pending widget callback in the same event batch. |
 | BOOL-014 | S | Where `confirm` is enabled on a Boolean control, the control shall request a second user confirmation before changing its value. |
+| BOOL-015 | S | Where a PushButton has a built-in lamp, the button shall show the lamp state (on, off, flashing) independently of its pressed state, and shall convey the lamp state by text or shape as well as color. |
 
 ---
 
@@ -433,7 +434,7 @@ state model).
 | Toggle Switch | ToggleSwitch | BOOL-003 |
 | Rocker | RockerSwitch | BOOL-004 |
 | Slide Switch | SlideSwitch | BOOL-005 |
-| OK / Stop / push button | PushButton | BOOL-006 |
+| OK / Stop / push button, illuminated push button | PushButton | BOOL-006, BOOL-015 |
 | Mechanical action | `mechanical_action` trait | BOOL-007 to BOOL-011 |
 | Waveform Chart | WaveformChart | CHART-001 to CHART-009 |
 | Intensity Chart | IntensityChart | CHART-101 |
@@ -478,3 +479,4 @@ state model).
 | 0.3 | Industrial operator objects (IND): analog indicator, selector switch, stack light, PID faceplate, annunciator, alarm list, state machine. |
 | 0.4 | DOC-007: safety notice. |
 | 0.5 | API-014 (graphic and form entry for every control), NUM-010 (numeric entry field with range check), CHART-108 (axis ranges set by the user), STYLE-007 (light / dark theme). |
+| 0.6 | BOOL-015 (push button with a built-in lamp). |

@@ -23,6 +23,18 @@
 `SlideSwitch`, `PushButton`, `EmergencyStop` (latches, `reset()`), all with
 `mechanical_action`, `confirm` (two-step confirmation) and `latch_timeout`.
 
+`PushButton` takes a cap `color` (`BUTTON_COLORS`) and `shape="round"` for a
+panel operator. An illuminated push button has a built-in lamp: `lamp=True`
+or `False` (lit or not, `None` for no lamp), `lamp_color` (`LAMP_COLORS`)
+and `lamp_blink`. The program drives the lamp, independently of the button
+value (BOOL-015):
+
+```python
+start = ai.PushButton(text="START", shape="round", color="green")
+running = ai.PushButton(text="RUN", shape="round", lamp=False, lamp_color="green")
+start.observe(lambda ch: setattr(running, "lamp", True) if ch["new"] else None, "value")
+```
+
 ## Graphs
 
 All graphs share cursors (`add_cursor`, `cursor_values`), annotations

@@ -36,6 +36,15 @@ test.describe("every widget", () => {
     });
   }
 
+  test("PushButton lamp: kernel -> front (BOOL-015)", async () => {
+    await widget(page, "PushButton").scrollIntoViewIfNeeded();
+    await py(`W["PushButton"].lamp_color = "amber"; W["PushButton"].lamp = True`);
+    await expect(widget(page, "PushButton").locator(".awi-button.awi-lit.awi-lamp-amber")).toHaveCount(1);
+    await expect(body("PushButton")).toHaveAttribute("aria-description", "lamp on");
+    await py(`W["PushButton"].lamp = None`);
+    await expect(widget(page, "PushButton").locator(".awi-lit")).toHaveCount(0);
+  });
+
   test("LED: kernel -> front", async () => {
     await widget(page, "LED").scrollIntoViewIfNeeded(); // off-screen widgets skip drawing (PERF-005)
     await py('W["LED"].value = True');

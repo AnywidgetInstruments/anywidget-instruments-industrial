@@ -106,6 +106,31 @@ describe("rendering", () => {
     expect(model.get("value")).toBe(true);
   });
 
+  it("illuminated push button shows its lamp by class, ring and description (BOOL-015)", async () => {
+    const model = fakeModel({ ...common, _kind: "pushbutton", value: false, default_state: false, mechanical_action: "switch_when_pressed", confirm: false, text: "RUN", _pressed: false, color: "grey", shape: "round", lamp: false, lamp_color: "green", lamp_blink: false });
+    const el = document.createElement("div");
+    widget.render({ model, el });
+    await new Promise((r) => setTimeout(r, 30));
+    const body = el.querySelector(".awi-body");
+    expect(el.querySelector("circle.awi-button").classList.contains("awi-lamp-green")).toBe(true);
+    expect(el.querySelector(".awi-lit")).toBeNull();
+    expect(el.querySelector(".awi-lamp-ring")).toBeNull();
+    expect(body.getAttribute("aria-description")).toBe("lamp off");
+    model.set("lamp", true);
+    model.set("lamp_blink", true);
+    model.emit("change:lamp");
+    await new Promise((r) => setTimeout(r, 30));
+    expect(el.querySelector(".awi-button").classList.contains("awi-lit")).toBe(true);
+    expect(el.querySelector(".awi-button").classList.contains("awi-lamp-blink")).toBe(true);
+    expect(el.querySelector(".awi-lamp-ring")).not.toBeNull();
+    expect(body.getAttribute("aria-description")).toBe("lamp on, flashing");
+    model.set("lamp", null);
+    model.emit("change:lamp");
+    await new Promise((r) => setTimeout(r, 30));
+    expect(body.hasAttribute("aria-description")).toBe(false);
+    expect(el.querySelector(".awi-button").classList.contains("awi-cap-grey")).toBe(true);
+  });
+
   it("chart requests history and consumes binary buffers", () => {
     const model = fakeModel({ ...common, _kind: "waveformchart", mode: "indicator", history: 8, n_traces: 1, update_mode: "strip", y_min: -1, y_max: 1, autoscale_y: false, paused: false, dt: 1, x_unit: "", unit: "", traces: [], show_legend: true, size: [300, 150] });
     const el = document.createElement("div");

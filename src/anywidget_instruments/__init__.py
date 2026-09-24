@@ -5,6 +5,8 @@ from ._alarmlist import AlarmList
 from ._annunciator import ANN_COLORS, ANN_SEQUENCES, ANN_STATES, Annunciator, annunciator_transition
 from ._base import InstrumentWidget
 from ._boolean import (
+    BUTTON_COLORS,
+    LAMP_COLORS,
     LED,
     MECHANICAL_ACTIONS,
     BooleanWidget,
@@ -66,7 +68,9 @@ __all__ = [
     "ANN_COLORS",
     "ANN_SEQUENCES",
     "ANN_STATES",
+    "BUTTON_COLORS",
     "COLORMAPS",
+    "LAMP_COLORS",
     "LED",
     "MECHANICAL_ACTIONS",
     "PACKML_COMMANDS",
