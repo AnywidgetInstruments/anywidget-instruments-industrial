@@ -18,6 +18,7 @@ by default; every widget switches with `mode`.
 | Graphs, specialized | `PolarPlot`, `SmithChart`, `RadarChart`, `PictureControl` | |
 | Alarms and events | `AlarmIndicator`, `AlarmBanner`, `AlarmList`, `Annunciator` | ISA-18.1, ISA-18.2 / IEC 62682 |
 | Process symbols | `Valve`, `Pump`, `Motor`, `Pipe` (faceplates) | ISA-5.1 (symbols) |
+| Field instruments | `Transmitter` (I) | ISA-5.1, NAMUR NE 107 |
 | Supervisory objects | `PIDFaceplate` with `PID`, `StateMachine` | ISA-101, ISA-TR88.00.02 |
 | Layout and session | `Panel`, `SynopticCanvas`, `ThemeSwitch` | |
 
@@ -197,5 +198,22 @@ trend.add("LT-101", 2.31)  # now
 trend.add_many({"LT-101": 2.32, "FT-101": 24.0})
 trend.add("FT-101", values, time=timestamps)  # arrays
 times, values = trend.data("LT-101")
+```
+
+### Transmitter
+
+An instrument bubble in the manner of ISA-5.1 (function letters above the
+line, loop number below), with the value, and the device status after the
+NAMUR NE 107 categories, each with its own symbol and text: `ok`,
+`failure` (✕, the value shows **✕ BAD**), `check` (▲ function check),
+`out_of_spec` (? out of specification) and `maintenance` (◆ maintenance
+required). Alarm limits work as on the other numeric widgets.
+
+```python
+lt = ai.Transmitter(2.41, tag="LT-101", unit="m", max=4, hi=3.0, hihi=3.5)
+lt.status = "maintenance"
+lt.status_text = "sensor drift"
+if lt.valid:  # False while the status is "failure"
+    level = lt.value
 ```
 

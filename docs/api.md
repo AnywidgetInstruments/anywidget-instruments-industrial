@@ -83,6 +83,7 @@ Generated from the docstrings (DOC-001).
 ## Trends, instruments and compact indicators
 
 ::: anywidget_instruments.TrendChart
+::: anywidget_instruments.Transmitter
 
 ## Utilities
 

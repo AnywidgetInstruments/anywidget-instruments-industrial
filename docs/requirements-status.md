@@ -118,7 +118,7 @@ JupyterLab / Notebook 7 / marimo (`e2e/`).
 | IND-050 … IND-053 | S | ✅ | AlarmList: sort and filter, timed shelving with automatic unshelving, suppressed / out of service |
 | IND-060 … IND-063 | S/C | ✅ | StateMachine: PackML model (17 states), valid commands only, `state_complete()`, custom models |
 | IND-070 … IND-075 | S/C | ✅ | `TrendChart`: pens with own scales, float64 times over binary buffers, live / history (◀ ▶, zoom, span, Live), limit and setpoint lines, `history` bound, cursors, time entry, CSV / PNG / SVG (py, js, e2e) |
-| IND-080 … IND-083 | S/C | ⬜ | Transmitter |
+| IND-080 … IND-083 | S/C | ✅ | `Transmitter`: ISA-5.1 style bubble, NE 107 status by shape and text, **✕ BAD** and no `aria-valuenow` on failure, alarm limits (py, js, e2e) |
 | IND-090 … IND-093 | S/C | ⬜ | EventLog |
 | IND-100 … IND-104 | S | ⬜ | DeviationIndicator, Sparkline, BarGraph, KPITile, NumericEntry |
 

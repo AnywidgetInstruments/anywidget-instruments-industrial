@@ -72,6 +72,10 @@ const GRAPHICS = [
   ["--awi-trace-6", "--awi-plot-bg"], ["--awi-trace-7", "--awi-plot-bg"],
   ["--awi-hp-pointer", "--awi-hp-track"], ["--awi-hp-pointer", "--awi-face"],
   ["--awi-stack-red", "--awi-face"], ["--awi-stack-green", "--awi-face"], ["--awi-stack-blue", "--awi-face"],
+  // device status symbols (IND-081); the yellow one relies on its outline (test below)
+  ["--awi-ne107-failure", "--awi-face"], ["--awi-ne107-check", "--awi-face"], ["--awi-ne107-maintenance", "--awi-face"],
+  ["--awi-ink-on-dark", "--awi-ne107-failure"], ["--awi-ink-on-dark", "--awi-ne107-check"], ["--awi-ink-on-dark", "--awi-ne107-maintenance"],
+  ["--awi-ink-on-light", "--awi-ne107-out-of-spec"],
 ];
 
 describe.each([["modern", modern], ["system (dark)", darkSystem], ["theme dark", darkTheme], ["theme light", lightTheme]])("%s palette", (_name, t) => {
@@ -123,5 +127,11 @@ describe("push button caps (BOOL-015)", () => {
   });
   it("the grey cap keeps the face text color (its fill follows the palette)", () => {
     expect(css).not.toMatch(/\.awi-button-text:is\([^)]*\.awi-cap-grey/);
+  });
+});
+
+describe("device status symbols (IND-081)", () => {
+  it("are outlined in the text color, so that a light fill stays visible", () => {
+    expect(css).toMatch(/\.awi-ne107-symbol > :first-child \{ stroke: var\(--awi-fg\);/);
   });
 });

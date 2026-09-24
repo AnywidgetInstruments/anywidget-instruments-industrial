@@ -5,7 +5,7 @@ import { kernelExec, runNotebook, widget } from "./helpers.js";
 
 const NB = "allwidgets.ipynb";
 const numericControls = ["Knob", "Dial", "FillSlide"];
-const numericIndicators = ["Gauge", "Meter", "VUMeter", "Tank", "Thermometer", "SevenSegment", "Compass", "AnalogIndicator"];
+const numericIndicators = ["Gauge", "Meter", "VUMeter", "Tank", "Thermometer", "SevenSegment", "Compass", "AnalogIndicator", "Transmitter"];
 const booleans = ["ToggleSwitch", "RockerSwitch", "SlideSwitch", "PushButton", "EmergencyStop"];
 
 test.describe.configure({ mode: "serial" });
@@ -114,6 +114,16 @@ test.describe("every widget", () => {
       await page.keyboard.press("Escape");
     });
   }
+
+  test("Transmitter: device status, kernel -> front (IND-081, IND-082)", async () => {
+    const w = widget(page, "Transmitter");
+    await w.scrollIntoViewIfNeeded();
+    await py('W["Transmitter"].status = "failure"');
+    await expect(w.locator(".awi-value")).toHaveText("✕ BAD");
+    await expect(w.locator(".awi-tx-status")).toHaveText("✕ FAILURE");
+    await py('W["Transmitter"].status = "ok"');
+    await expect(w.locator(".awi-tx-status")).toHaveText("OK");
+  });
 
   test("TrendChart: both directions (IND-071, IND-072)", async () => {
     const w = widget(page, "TrendChart");

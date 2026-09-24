@@ -83,6 +83,11 @@
   --awi-lamp-ink-amber: #111827;
   --awi-lamp-ink-blue: #ffffff;
   --awi-lamp-ink-white: #111827;
+  /* device status symbols (IND-081): a distinct shape each, outlined in --awi-fg */
+  --awi-ne107-failure: #dc2626;
+  --awi-ne107-check: #ea580c;
+  --awi-ne107-out-of-spec: #facc15;
+  --awi-ne107-maintenance: #2563eb;
   --awi-font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --awi-anim: 0ms;
   --awi-blink-period: 0.5s;
@@ -151,7 +156,8 @@
     --awi-hp-normal: #6b7280;
     --awi-hp-pointer: #e5e7eb;
     --awi-stack-blue: #3b82f6;
-  --awi-lamp-ink-blue: #111827;
+    --awi-ne107-maintenance: #3b82f6;
+    --awi-lamp-ink-blue: #111827;
   }
 }
 :is([data-jp-theme-light="false"], .vscode-dark, .vscode-high-contrast, [data-theme="dark"], .dark-mode) .awi-root.awi-style-system {
@@ -174,6 +180,7 @@
   --awi-hp-normal: #6b7280;
   --awi-hp-pointer: #e5e7eb;
   --awi-stack-blue: #3b82f6;
+  --awi-ne107-maintenance: #3b82f6;
   --awi-lamp-ink-blue: #111827;
 }
 :is([data-jp-theme-light="true"], .vscode-light, [data-theme="light"]) .awi-root.awi-style-system {
@@ -213,6 +220,7 @@
   --awi-hp-normal: #6b7280;
   --awi-hp-pointer: #e5e7eb;
   --awi-stack-blue: #3b82f6;
+  --awi-ne107-maintenance: #3b82f6;
   --awi-lamp-ink-blue: #111827;
   --awi-proc-off: #1f2937;
   --awi-pipe: #6b7280;
@@ -639,3 +647,19 @@
 .awi-root .awi-trend-nav .awi-choice { font-size: 10px; }
 .awi-root button.awi-pen { font: inherit; font-size: 11px; padding: 1px 6px; border: 1px solid transparent; border-radius: 3px; background: none; color: var(--awi-fg); cursor: pointer; }
 .awi-root button.awi-pen[aria-pressed="true"] { border-color: var(--awi-face-stroke); font-weight: 700; }
+
+/* transmitter (IND-080..083) */
+.awi-root .awi-tx-bubble { fill: var(--awi-face); stroke: var(--awi-fg); stroke-width: 1.5; }
+.awi-root .awi-tx-line { stroke: var(--awi-fg); stroke-width: 1.2; }
+.awi-root .awi-tx-letters { fill: var(--awi-fg); font-size: 15px; font-weight: 700; }
+.awi-root .awi-tx-loop { fill: var(--awi-fg); font-size: 12px; }
+.awi-root .awi-ne107-symbol > :first-child { stroke: var(--awi-fg); stroke-width: 1; }
+.awi-root .awi-ne107-symbol-failure > :first-child { fill: var(--awi-ne107-failure); }
+.awi-root .awi-ne107-symbol-check > :first-child { fill: var(--awi-ne107-check); }
+.awi-root .awi-ne107-symbol-out_of_spec > :first-child { fill: var(--awi-ne107-out-of-spec); }
+.awi-root .awi-ne107-symbol-maintenance > :first-child { fill: var(--awi-ne107-maintenance); }
+.awi-root .awi-ne107-glyph { font-size: 10px; font-weight: 700; fill: var(--awi-ink-on-dark); }
+.awi-root .awi-ne107-symbol-out_of_spec .awi-ne107-glyph { fill: var(--awi-ink-on-light); }
+.awi-root .awi-tx-status { font-size: 10px; font-weight: 700; color: var(--awi-fg); text-align: center; max-width: var(--awi-w); }
+.awi-root.awi-ne107-ok .awi-tx-status { color: var(--awi-muted); font-weight: 400; }
+.awi-root.awi-ne107-failure .awi-value { color: var(--awi-alarm-hihi); font-weight: 700; }

@@ -59,6 +59,7 @@ from ._style import (
     theme_switch,
 )
 from ._themeswitch import THEME_SWITCH_POSITIONS, ThemeSwitch
+from ._transmitter import DEVICE_STATUSES, Transmitter
 from ._trend import TrendChart
 
 __version__ = "0.1.0.dev0"
@@ -72,6 +73,7 @@ __all__ = [
     "ANN_STATES",
     "BUTTON_COLORS",
     "COLORMAPS",
+    "DEVICE_STATUSES",
     "LAMP_COLORS",
     "LED",
     "MECHANICAL_ACTIONS",
@@ -126,6 +128,7 @@ __all__ = [
     "ThemeSwitch",
     "Thermometer",
     "ToggleSwitch",
+    "Transmitter",
     "TrendChart",
     "VUMeter",
     "Valve",
