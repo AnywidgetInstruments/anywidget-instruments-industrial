@@ -1,0 +1,12 @@
+{
+  "description": "Faceplate commands of the process objects (SCADA-009). Each step is a command name, or [\"position\", percent] for a control valve demand, followed by the expected traits.",
+  "cases": [
+    { "name": "manual then auto", "widget": "Pump", "traits": {}, "steps": [["manual", { "auto": false, "value": "stopped" }], ["auto", { "auto": true }]] },
+    { "name": "commands without simulate change nothing", "widget": "Pump", "traits": { "auto": false }, "steps": [["start", { "value": "stopped" }]] },
+    { "name": "simulated pump", "widget": "Pump", "traits": { "simulate": true, "auto": false }, "steps": [["start", { "value": "running" }], ["stop", { "value": "stopped" }]] },
+    { "name": "simulated motor", "widget": "Motor", "traits": { "simulate": true, "auto": false }, "steps": [["reverse", { "value": "reverse" }], ["forward", { "value": "forward" }], ["stop", { "value": "stopped" }]] },
+    { "name": "simulated on/off valve", "widget": "Valve", "traits": { "simulate": true, "auto": false }, "steps": [["open", { "value": "open", "position": null }], ["close", { "value": "closed", "position": null }]] },
+    { "name": "simulated control valve", "widget": "Valve", "traits": { "simulate": true, "auto": false, "position": 30 }, "steps": [["open", { "value": "open", "position": 100 }], [["position", 42], { "value": "open", "position": 42 }], [["position", 0], { "value": "closed", "position": 0 }]] },
+    { "name": "position demand without simulate", "widget": "Valve", "traits": { "auto": false, "position": 30 }, "steps": [[["position", 42], { "value": "closed", "position": 30 }]] }
+  ]
+}

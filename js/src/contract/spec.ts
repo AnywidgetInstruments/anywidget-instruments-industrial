@@ -52,6 +52,8 @@ export interface TraitSpec extends ValueSpec {
   resolved?: boolean;
   /** State transitions of an enum trait: [state, event, next state]; other pairs keep the state. */
   transitions?: Array<[string, string, string]>;
+  /** Simulated state after each command of a process object (x-awi-simulated). */
+  simulated?: Record<string, string>;
   description?: string;
 }
 

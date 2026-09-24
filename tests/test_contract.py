@@ -18,7 +18,7 @@ import pytest
 import traitlets as t
 
 import anywidget_instruments as ai
-from anywidget_instruments import _base, _boolean, _numeric
+from anywidget_instruments import _base, _boolean, _numeric, _process
 
 PKG = pathlib.Path(ai.__file__).parent
 SCHEMA_DIR = PKG / "schema"
@@ -38,6 +38,7 @@ CLASSES: dict[str, type] = {
     "NumericWidget": _numeric.NumericWidget,
     "_PeakMixin": _numeric._PeakMixin,
     "BooleanWidget": _boolean.BooleanWidget,
+    "ProcessObject": _process.ProcessObject,
 }
 WIDGETS = sorted(CONTRACT["widgets"].items())
 IDS = [title for title, _ in WIDGETS]
@@ -86,6 +87,9 @@ MIGRATED = {
     "Sparkline",
     "BarGraph",
     "KPITile",
+    "Valve",
+    "Pump",
+    "Motor",
 }
 
 
@@ -213,3 +217,11 @@ def test_transition_tables() -> None:
 
     table = CONTRACT["widgets"]["AlarmIndicator"]["traits"]["value"]["transitions"]
     assert {(a, e): b for a, e, b in table} == _scada._TRANSITIONS
+
+
+@pytest.mark.parametrize("name", ["Valve", "Pump", "Motor"])
+def test_simulated_tables(name: str) -> None:
+    """x-awi-simulated of the commands equals the simulation table of the Python class."""
+    spec = CONTRACT["widgets"][name]["traits"]["commands"]
+    assert spec["simulated"] == getattr(ai, name)._simulated
+    assert spec["default"] == list(getattr(ai, name)._commands)

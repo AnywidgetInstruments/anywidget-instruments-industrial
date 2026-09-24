@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://s-celles.github.io/anywidget-instruments/schema/process.schema.json",
+  "title": "Process",
+  "description": "Process objects with a faceplate: Valve, Pump, Motor (SCADA-001 .. SCADA-003, SCADA-009).",
+  "type": "object",
+  "x-awi-abstract": true,
+  "x-awi-class": "ProcessObject",
+  "allOf": [
+    {
+      "$ref": "instrument.schema.json"
+    }
+  ],
+  "properties": {
+    "size": {
+      "default": [
+        90,
+        90
+      ]
+    },
+    "tag": {
+      "type": "string",
+      "description": "Instrument tag shown on the faceplate (e.g. P-101).",
+      "default": "",
+      "x-awi-writer": "host"
+    },
+    "auto": {
+      "type": "boolean",
+      "description": "Automatic mode: the commands are disabled on the faceplate. The faceplate AUTO / MANUAL buttons send auto and manual commands; without a host owning the state, the front end applies them itself (HOST-004).",
+      "default": true,
+      "x-awi-writer": "both"
+    },
+    "simulate": {
+      "type": "boolean",
+      "description": "A command sets the state itself (teaching, simulations): see the x-awi-simulated table of commands. Applied by the host when it owns the state, otherwise by the front end.",
+      "default": false,
+      "x-awi-writer": "host"
+    },
+    "commands": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Commands offered on the faceplate (a constant of each widget).",
+      "default": [],
+      "readOnly": true,
+      "x-awi-writer": "host"
+    }
+  },
+  "x-awi-messages": [
+    {
+      "type": "command",
+      "direction": "front-to-host",
+      "description": "Operator command from the faceplate: one of commands, or auto / manual. Also sent when the front end applies it itself.",
+      "fields": {
+        "command": {
+          "type": "string"
+        }
+      },
+      "buffers": []
+    }
+  ]
+}

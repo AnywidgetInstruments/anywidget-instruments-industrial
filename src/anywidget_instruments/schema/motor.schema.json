@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://s-celles.github.io/anywidget-instruments/schema/motor.schema.json",
+  "title": "Motor",
+  "description": "Motor with stopped, forward, reverse and fault states (SCADA-003).",
+  "type": "object",
+  "x-awi-class": "Motor",
+  "allOf": [
+    {
+      "$ref": "process.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "motor",
+      "default": "motor",
+      "x-awi-writer": "host"
+    },
+    "commands": {
+      "default": [
+        "forward",
+        "reverse",
+        "stop"
+      ],
+      "x-awi-simulated": {
+        "forward": "forward",
+        "reverse": "reverse",
+        "stop": "stopped"
+      }
+    },
+    "value": {
+      "enum": [
+        "stopped",
+        "forward",
+        "reverse",
+        "fault"
+      ],
+      "description": "Motor state (feedback from the process).",
+      "default": "stopped",
+      "x-awi-writer": "host"
+    },
+    "animate": {
+      "type": "boolean",
+      "description": "Animate while turning (off when reduced motion is requested).",
+      "default": true,
+      "x-awi-writer": "host"
+    }
+  }
+}

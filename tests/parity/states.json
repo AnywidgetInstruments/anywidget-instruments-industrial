@@ -403,6 +403,32 @@
         "history": 2,
         "unit": "%"
       }
+    },
+    {
+      "widget": "Valve",
+      "traits": {
+        "value": "transit",
+        "position": 55.5,
+        "orientation": "vertical",
+        "tag": "FV-101",
+        "auto": false,
+        "simulate": true
+      }
+    },
+    {
+      "widget": "Pump",
+      "traits": {
+        "value": "fault",
+        "direction": "up",
+        "animate": false
+      }
+    },
+    {
+      "widget": "Motor",
+      "traits": {
+        "value": "reverse",
+        "tag": "M-3"
+      }
     }
   ]
 }

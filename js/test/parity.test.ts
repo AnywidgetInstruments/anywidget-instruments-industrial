@@ -5,6 +5,7 @@ import alarmCases from "../../tests/parity/alarm_level.json";
 import barCases from "../../tests/parity/bars.json";
 import numericCases from "../../tests/parity/numeric.json";
 import peakCases from "../../tests/parity/peak.json";
+import processCases from "../../tests/parity/process.json";
 import resolvedCases from "../../tests/parity/resolved.json";
 import stateCases from "../../tests/parity/states.json";
 import { type AlarmLevel, type AlarmLimits, computeAlarmLevel } from "../src/contract/alarm.js";
@@ -12,6 +13,7 @@ import { barLevels, normalizeBars } from "../src/contract/bars.js";
 import { selectorValue, stackStates } from "../src/contract/industrial.js";
 import { coerceValue, validScale } from "../src/contract/numeric.js";
 import { nextPeak, type PeakState } from "../src/contract/peak.js";
+import { positionDemand, processCommand, type ProcessState } from "../src/contract/process.js";
 import { readTrait } from "../src/contract/traits.js";
 import { parseNumber } from "../src/core/scale.js";
 import { CONTRACTS } from "../src/generated/contract.js";
@@ -105,6 +107,27 @@ describe("bar graph", () => {
       for (const [values, expected] of c.steps as Array<[Array<number | string>, string[]]>) {
         levels = barLevels(values.map(parseNumber), bars, c.deadband, levels);
         expect(levels, `${c.name} at ${JSON.stringify(values)}`).toEqual(expected);
+      }
+    });
+  }
+});
+
+describe("process object commands", () => {
+  for (const c of processCases.cases) {
+    test(c.name, () => {
+      const spec = CONTRACTS[c.widget as keyof typeof CONTRACTS].traits;
+      const state: Record<string, unknown> = Object.fromEntries(Object.entries(spec).map(([k, s]) => [k, s.default]));
+      Object.assign(state, c.traits);
+      for (const [command, expected] of c.steps as Array<[string | [string, number], Record<string, unknown>]>) {
+        const s: ProcessState = {
+          auto: !!state.auto,
+          simulate: !!state.simulate,
+          commands: state.commands as string[],
+          simulated: spec.commands.simulated ?? {},
+          position: (state.position as number | null) ?? null,
+        };
+        Object.assign(state, Array.isArray(command) ? positionDemand(command[1], s) : processCommand(command, s));
+        for (const [name, v] of Object.entries(expected)) expect(state[name], `${c.name}: ${String(command)} ${name}`).toEqual(v);
       }
     });
   }

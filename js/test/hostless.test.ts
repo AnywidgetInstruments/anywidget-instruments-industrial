@@ -359,6 +359,52 @@ describe("Compact indicators without a kernel", () => {
   });
 });
 
+describe("Process objects without a kernel", () => {
+  const faceplate = async (m: ReturnType<typeof mount>) => {
+    m.body.click();
+    await frame();
+    return (text: string) => [...m.el.querySelectorAll(".awi-faceplate button")].find((b) => b.textContent === text) as HTMLButtonElement;
+  };
+
+  test("a simulated pump follows its faceplate", async () => {
+    const m = mount({ ...defaults("Pump"), tag: "P-101", simulate: true, mode: "control" });
+    const sent: unknown[] = [];
+    m.model.send = (msg: unknown) => {
+      sent.push(msg);
+    };
+    await frame();
+    const button = await faceplate(m);
+    expect(button("Start").disabled).toBe(true); // auto: commands disabled
+    button("Manual").click();
+    expect(m.model.get("auto")).toBe(false);
+    await frame();
+    button("Start").click();
+    expect(m.model.get("value")).toBe("running");
+    expect(sent).toEqual([{ type: "command", command: "manual" }, { type: "command", command: "start" }]);
+    expect(m.model.saved.at(-1)).toMatchObject({ auto: false, value: "running" });
+  });
+
+  test("with a kernel, the faceplate only sends commands", async () => {
+    const m = mount({ ...defaults("Pump"), _session: "kernel", simulate: true, mode: "control" });
+    await frame();
+    const button = await faceplate(m);
+    button("Manual").click();
+    expect(m.model.get("auto")).toBe(true);
+    expect(m.model.saved).toHaveLength(0);
+  });
+
+  test("a simulated control valve takes a position demand", async () => {
+    const m = mount({ ...defaults("Valve"), simulate: true, auto: false, position: 30, mode: "control" });
+    await frame();
+    await faceplate(m);
+    const field = m.el.querySelector(".awi-fp-position .awi-entry") as HTMLInputElement;
+    field.value = "42";
+    field.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    expect(m.model.get("position")).toBe(42);
+    expect(m.model.get("value")).toBe("open");
+  });
+});
+
 describe("Tank without a kernel", () => {
   test("indicator by default, markers read through the schema", async () => {
     const { root, body, el } = mount({ ...defaults("Tank"), value: 3.2, max: 4, unit: "m", markers: [0.5, "x", 3.5], hi: 3, hihi: 3.5 });

@@ -156,3 +156,18 @@ def test_bar_levels(case: dict[str, Any]) -> None:
     for values, expected in case["steps"]:
         g.value = [_num(v) for v in values]
         assert g.alarm_levels == expected, (case["name"], values)
+
+
+PROCESS = _load("process.json")["cases"]
+
+
+@pytest.mark.parametrize("case", PROCESS, ids=[c["name"] for c in PROCESS])
+def test_process_commands(case: dict[str, Any]) -> None:
+    w = getattr(ai, case["widget"])(**case["traits"])
+    for command, expected in case["steps"]:
+        if isinstance(command, list):
+            w.demand_position(command[1])
+        else:
+            w.command(command)
+        for name, v in expected.items():
+            assert getattr(w, name) == v, (case["name"], command, name)

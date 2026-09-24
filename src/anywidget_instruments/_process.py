@@ -23,6 +23,7 @@ class ProcessObject(InstrumentWidget):
     """
 
     _default_size = (90, 90)
+    size = size_trait(*_default_size)
     _commands: ClassVar[tuple[str, ...]] = ()
     _simulated: ClassVar[dict[str, str]] = {}
 
@@ -86,6 +87,7 @@ class Valve(ProcessObject):
 
     _kind = t.Unicode("valve").tag(sync=True)
     _commands = ("open", "close")
+    commands = t.List(t.Unicode(), default_value=list(_commands), read_only=True).tag(sync=True)
     _simulated: ClassVar[dict[str, str]] = {"open": "open", "close": "closed"}
     value = t.Enum(["open", "closed", "transit", "fault"], default_value="closed").tag(sync=True)
     position = t.Float(None, allow_none=True, min=0.0, max=100.0).tag(sync=True)
@@ -137,6 +139,7 @@ class Pump(ProcessObject):
 
     _kind = t.Unicode("pump").tag(sync=True)
     _commands = ("start", "stop")
+    commands = t.List(t.Unicode(), default_value=list(_commands), read_only=True).tag(sync=True)
     _simulated: ClassVar[dict[str, str]] = {"start": "running", "stop": "stopped"}
     value = t.Enum(["stopped", "running", "fault"], default_value="stopped").tag(sync=True)
     animate = t.Bool(True).tag(sync=True)
@@ -148,6 +151,7 @@ class Motor(ProcessObject):
 
     _kind = t.Unicode("motor").tag(sync=True)
     _commands = ("forward", "reverse", "stop")
+    commands = t.List(t.Unicode(), default_value=list(_commands), read_only=True).tag(sync=True)
     _simulated: ClassVar[dict[str, str]] = {
         "forward": "forward",
         "reverse": "reverse",
