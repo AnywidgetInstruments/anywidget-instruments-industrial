@@ -42,9 +42,19 @@ chart data, heartbeats) does not run.
   stop. The theme switch changes the page theme only. `Sparkline` and
   `KPITile` draw the history the host sends (`snapshot` and `append`
   messages of float32 values, described in `contract.json`).
+- The supervisory objects work without a kernel: `StateMachine` (PackML
+  model by default) applies operator commands through its transition table;
+  `PIDFaceplate` applies SP / OP entries and mode changes with its rules
+  (clamping, confirmation, setpoint tracking) and derives its PV alarm;
+  `Annunciator` runs the ISA-18.1 sequence on the process conditions the
+  host writes (`active` of each window) and applies the operator buttons;
+  `AlarmBanner` and `AlarmList` apply acknowledgements and shelving (with
+  its expiry). Every operator action is still sent to the host. Process
+  events stay host events: the completion of an acting state, a PV value,
+  a new alarm.
 - The other widgets are being migrated (see the
   [migration inventory](dev/frontend-migration-inventory.md)): until then,
-  their derived traits and chart data need a host
+  the graphs draw the data a host sends
   that provides them.
 
 ## Stale-data indication (ROB-001)
