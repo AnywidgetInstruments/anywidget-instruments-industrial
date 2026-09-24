@@ -106,3 +106,13 @@ test("marimo: the former address redirects to the gallery", async ({ page }) => 
   await page.goto("/marimo/");
   await expect(page).toHaveURL(/\/marimo\/gallery\/$/);
 });
+
+test("the Examples page links each demo directly", async ({ page }) => {
+  await page.goto("/examples/");
+  for (const name of Object.keys(DEMOS)) {
+    const link = page.locator(`a[href="../marimo/${name}/"]`);
+    await expect(link).toHaveCount(1);
+    const response = await page.request.get(new URL(await link.getAttribute("href"), page.url()).href);
+    expect(response.ok(), name).toBe(true);
+  }
+});
