@@ -33,3 +33,16 @@ test("marimo: the theme switch sets the page theme (STYLE-008)", async ({ page }
   await expect(page.locator("body")).toHaveClass(/\blight-theme\b/);
   await expect(widget(page, "Marimo knob")).toHaveClass(/awi-theme-light/);
 });
+
+test("marimo: one press of a latched button is counted once (BOOL-010)", async ({ page }) => {
+  await page.goto("http://localhost:2718/");
+  const button = widget(page, "Marimo press").locator(".awi-body");
+  await expect(button).toBeVisible({ timeout: 30_000 });
+  await button.click();
+  const count = widget(page, "Marimo presses").locator(".awi-body");
+  await expect(count).toHaveAttribute("aria-valuenow", "1");
+  await page.waitForTimeout(1000); // a duplicated update would arrive meanwhile
+  await expect(count).toHaveAttribute("aria-valuenow", "1");
+  await button.click();
+  await expect(count).toHaveAttribute("aria-valuenow", "2");
+});

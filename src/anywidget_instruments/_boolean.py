@@ -41,6 +41,8 @@ class BooleanWidget(InstrumentWidget):
     confirm = t.Bool(False).tag(sync=True)
     #: True while the pointer (or Space/Enter key) is held down on the control.
     _pressed = t.Bool(False).tag(sync=True)
+    #: Sequence number of the front end's last press / release update.
+    _seq = t.Int(0).tag(sync=True)
 
     def __init__(self, value: bool | None = None, **kwargs: Any) -> None:
         if value is not None:
@@ -48,7 +50,19 @@ class BooleanWidget(InstrumentWidget):
         super().__init__(**kwargs)
         self._latch_timer: threading.Timer | None = None
         self._read_pending = False
+        self._seen_seq = 0
         self._expired_callbacks: list[Callback] = []
+
+    def set_state(self, sync_data: Any) -> None:
+        # Each press / release carries a sequence number: an update applied a
+        # second time (marimo re-applies it through its UI element) is ignored,
+        # so a latched press is counted once (BOOL-010).
+        seq = sync_data.get("_seq") if isinstance(sync_data, dict) else None
+        if isinstance(seq, int):
+            if seq <= self._seen_seq:
+                return
+            self._seen_seq = seq
+        super().set_state(sync_data)
 
     @property
     def is_latch(self) -> bool:

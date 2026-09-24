@@ -51,6 +51,31 @@ const DEMOS = {
     // Resetting completes by itself on the simulation clock
     await expect(machine.locator(".awi-sm-label-current")).toHaveText("▶ Idle", { timeout: 30_000 });
   },
+  lift_station: async (page) => {
+    await expect(body(page, "Wet well level")).toHaveAttribute("aria-valuenow", /\d/, LOAD);
+    await body(page, "Simulate a pump fault").click();
+    await expect(widget(page, "Fault reset").locator(".awi-lit")).toHaveCount(1, { timeout: 30_000 });
+    await body(page, "Fault reset").click();
+    await expect(widget(page, "Fault reset").locator(".awi-lit")).toHaveCount(0, { timeout: 30_000 });
+  },
+  push_buttons: async (page) => {
+    await expect(body(page, "Start presses")).toHaveAttribute("aria-valuenow", "0", LOAD);
+    await body(page, "Start").click();
+    // one press, counted once (BOOL-010)
+    await expect(body(page, "Start presses")).toHaveAttribute("aria-valuenow", "1", { timeout: 30_000 });
+    await body(page, "Run").click();
+    await expect(widget(page, "Run").locator(".awi-lit")).toHaveCount(1, { timeout: 30_000 });
+  },
+  switches: async (page) => {
+    await expect(body(page, "Fan speed (rpm)")).toHaveAttribute("aria-valuenow", "0", LOAD);
+    await widget(page, "Fan speed").locator("select").selectOption("2");
+    await expect(body(page, "Fan speed (rpm)")).toHaveAttribute("aria-valuenow", "1200", { timeout: 30_000 });
+  },
+  virtual_instrument: async (page) => {
+    await expect(body(page, "Multimeter reading")).toHaveAttribute("aria-valuenow", "0", LOAD);
+    await body(page, "Output").click();
+    await expect(body(page, "Multimeter reading")).toHaveAttribute("aria-valuenow", /^0\.707/, { timeout: 30_000 });
+  },
   signal_analysis: async (page) => {
     await expect(body(page, "Dominant frequency (Hz)")).toHaveAttribute("aria-valuenow", "50", LOAD);
     await nudge(page, "Frequency");

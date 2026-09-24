@@ -151,6 +151,15 @@ knob = mo.ui.anywidget(ai.Knob(label="Gain"))
 knob  # other cells that read knob.value re-run when it changes
 ```
 
+Callbacks (`on_change`) run after their cell has finished, when marimo has
+already dropped the cell's private names (those starting with `_`): refer to
+the widget through `change["owner"]` or a public name.
+
+```python
+_button = ai.PushButton(text="OUTPUT", mechanical_action="switch_when_pressed", lamp=False)
+_button.on_change(lambda change: setattr(change["owner"], "lamp", change["new"]))
+```
+
 ## Kernel loss
 
 If the kernel is restarted or lost, the widgets show a **STALE** badge and

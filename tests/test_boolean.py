@@ -155,3 +155,24 @@ def test_push_button_lamp_and_caps() -> None:
         ai.PushButton(lamp_color="black")
     assert set(ai.LAMP_COLORS) <= {"green", "red", "amber", "blue", "white"}
     assert "grey" in ai.BUTTON_COLORS
+
+
+def test_duplicated_front_end_update_counts_one_press() -> None:
+    """A host that applies the same front-end update twice (marimo re-applies
+    it through its UI element) must not turn one press into two."""
+    b = ai.PushButton(text="GO")
+    presses = []
+
+    @b.on_change
+    def _(change):
+        if b.read_latched():
+            presses.append(1)
+
+    press = {"value": True, "_pressed": False, "_seq": 2}
+    b.set_state({"_pressed": True, "_seq": 1})
+    b.set_state(dict(press))
+    b.set_state(dict(press))  # the same update, applied a second time
+    assert presses == [1]
+    b.set_state({"_pressed": True, "_seq": 3})
+    b.set_state({"value": True, "_pressed": False, "_seq": 4})  # a new press counts
+    assert presses == [1, 1]

@@ -15,10 +15,11 @@ local Jupyter or marimo.
 | Sector | Local example | In the browser |
 |---|---|---|
 | All sectors (tour) | Gallery, marimo panel | [Gallery](try.md) |
-| Water and wastewater | Tank level supervision | |
+| Water and wastewater | Tank level supervision | [Lift station](try.md) |
 | Chemical and process control | First-order process with PID tuning | [PID tuning](try.md) |
 | Food, beverage and packaging | Filling line operator station | [Operator station](try.md) |
-| Laboratory, test and measurement | Real-time signal acquisition | [Signal analysis](try.md) |
+| Laboratory, test and measurement | Real-time signal acquisition | [Signal analysis](try.md), [Virtual instrument bench](try.md) |
+| Machine panels | | [Push buttons](try.md), [Switches and selectors](try.md) |
 
 
 ## All sectors

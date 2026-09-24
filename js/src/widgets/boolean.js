@@ -113,6 +113,8 @@ export class BooleanView extends BaseView {
     this.root.classList.toggle("awi-pressed", pressed);
     if (value !== null) this.model.set("value", value);
     this.model.set("_pressed", pressed);
+    // numbered, so that a host applying the update twice counts one press
+    this.model.set("_seq", (this.get("_seq") || 0) + 1);
     this.model.save_changes();
     this.schedule();
   }

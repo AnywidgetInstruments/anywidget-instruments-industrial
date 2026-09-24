@@ -20,6 +20,21 @@ def _(ai):
 
 @app.cell
 def _(ai, mo):
+    # a latched press read in a callback: counted once (BOOL-010)
+    press = ai.PushButton(text="GO", label="Marimo press")
+    count = ai.SevenSegment(0, digits=3, decimals=0, label="Marimo presses")
+
+    @press.on_change
+    def _(change):
+        if press.read_latched():
+            count.value += 1
+
+    mo.hstack([press, count])
+    return
+
+
+@app.cell
+def _(ai, mo):
     knob = mo.ui.anywidget(ai.Knob(10, step=1, label="Marimo knob"))
     knob
     return (knob,)
