@@ -130,3 +130,101 @@ describe("PIDFaceplate (IND-030..032)", () => {
     expect(el.querySelector(".awi-pid-note").textContent).toBe("✖ confirmation required");
   });
 });
+
+describe("Annunciator (IND-040..043)", () => {
+  const windows = [
+    { tag: "PAH-1", text: "Pressure high", color: "red", active: true, state: "alert", first: true },
+    { tag: "LAL-2", text: "Level low", color: "amber", active: false, state: "ringback", first: false },
+    { tag: "XA-3", text: "Fault", color: "amber", active: false, state: "normal", first: false },
+  ];
+  const ann = { _kind: "annunciator", value: windows, columns: 3, sequence: "R", first_out: true, horn: true, test: false, size: [420, 170] };
+
+  it("states each window in text: first out, alarm, ringback", async () => {
+    const { el } = mount(ann);
+    await tick();
+    const status = [...el.querySelectorAll(".awi-ann-status")].map((s) => s.textContent);
+    expect(status).toEqual(["1ST · ALARM", "RINGBACK", ""]);
+    expect(el.querySelector(".awi-ann-horn").textContent).toBe("♪ HORN");
+    expect(el.querySelector(".awi-ann-first")).not.toBeNull();
+  });
+
+  it("sends operator actions, TEST while held", async () => {
+    const { el, model } = mount(ann);
+    await tick();
+    el.querySelector(".awi-ann-acknowledge").click();
+    expect(model.sent.at(-1)).toEqual({ type: "acknowledge" });
+    const test = el.querySelector(".awi-ann-test");
+    test.dispatchEvent(new KeyboardEvent("keydown", { key: " " }));
+    expect(model.sent.at(-1)).toEqual({ type: "test", on: true });
+    test.dispatchEvent(new KeyboardEvent("keyup", { key: " " }));
+    expect(model.sent.at(-1)).toEqual({ type: "test", on: false });
+  });
+
+  it("hides Reset for sequence A without first out", async () => {
+    const { el } = mount({ ...ann, sequence: "A", first_out: false });
+    await tick();
+    expect(el.querySelector(".awi-ann-reset").hidden).toBe(true);
+  });
+});
+
+describe("AlarmList (IND-050..053)", async () => {
+  const { filterAlarms, category } = await import("../src/widgets/alarmlist.js");
+  const alarms = [
+    { id: "A", timestamp: "2026-01-01T10:00:00", source: "TI-1", priority: "low", message: "temp", state: "active_unacknowledged", shelved_until: null, suppressed: false, out_of_service: false },
+    { id: "B", timestamp: "2026-01-01T10:05:00", source: "PI-2", priority: "critical", message: "pressure", state: "active_acknowledged", shelved_until: null, suppressed: false, out_of_service: false },
+    { id: "C", timestamp: "2026-01-01T10:06:00", source: "FI-3", priority: "high", message: "flow", state: "active_unacknowledged", shelved_until: "2026-01-01T11:00:00", suppressed: false, out_of_service: false },
+    { id: "D", timestamp: "", source: "LI-4", priority: "medium", message: "level", state: "normal", shelved_until: null, suppressed: true, out_of_service: false },
+  ];
+
+  it("categorises and filters (IND-050..052)", () => {
+    expect(alarms.map(category)).toEqual(["active", "active", "shelved", "suppressed"]);
+    expect(filterAlarms(alarms).map((a) => a.id)).toEqual(["A", "B"]); // unacknowledged first
+    expect(filterAlarms(alarms, { sort: "time" }).map((a) => a.id)).toEqual(["B", "A"]);
+    expect(filterAlarms(alarms, { view: "shelved" }).map((a) => a.id)).toEqual(["C"]);
+    expect(filterAlarms(alarms, { view: "suppressed" }).map((a) => a.id)).toEqual(["D"]);
+    expect(filterAlarms(alarms, { view: "all", priority: "critical" }).map((a) => a.id)).toEqual(["B"]);
+    expect(filterAlarms(alarms, { view: "all", text: "FLOW" }).map((a) => a.id)).toEqual(["C"]);
+    expect(filterAlarms(alarms, { view: "unack" }).map((a) => a.id)).toEqual(["A"]);
+  });
+
+  it("acknowledges and shelves from the table (IND-053)", async () => {
+    const { el, model } = mount({ _kind: "alarmlist", value: alarms, shelve_durations: [300, 3600], max_shelve: 28800, size: [640, 240] });
+    await tick();
+    expect(el.querySelector(".awi-al-counts").textContent).toBe("2 active · 1 unacknowledged · 1 shelved · 1 suppressed / OOS");
+    el.querySelector('button[aria-label="Acknowledge A"]').click();
+    expect(model.sent.at(-1)).toEqual({ type: "ack", alarm_id: "A" });
+    const shelve = el.querySelector('select[aria-label="Shelve B"]');
+    expect([...shelve.options].map((o) => o.textContent)).toEqual(["Shelve…", "5 min", "1 h"]);
+    shelve.value = "3600";
+    shelve.dispatchEvent(new Event("change"));
+    expect(model.sent.at(-1)).toEqual({ type: "shelve", alarm_id: "B", seconds: 3600 });
+  });
+});
+
+describe("StateMachine (IND-060..063)", () => {
+  const machine = {
+    states: [{ name: "Off", x: 0, y: 0, acting: false }, { name: "Warming", x: 1, y: 0, acting: true }, { name: "Ready", x: 2, y: 0, acting: false }],
+    transitions: [["Off", "On", "Warming"], ["Warming", "SC", "Ready"], ["Ready", "Off", "Off"]],
+    commands: ["On", "Off"],
+    initial: "Off",
+  };
+
+  it("edge points lie on the box border", async () => {
+    const { boxEdge } = await import("../src/widgets/statemachine.js");
+    expect(boxEdge(0, 0, 100, 0, 40, 20)).toEqual([80, 0]);
+    expect(boxEdge(100, 100, 100, 0, 40, 20)).toEqual([100, 10]);
+  });
+
+  it("highlights the current state and enables only valid commands (IND-061)", async () => {
+    const { el, model } = mount({ _kind: "statemachine", value: "Off", machine, available_commands: ["On"], last_command: "", size: [400, 200] });
+    await tick();
+    expect(el.querySelector(".awi-sm-label-current").textContent).toBe("▶ Off");
+    const [on, off] = el.querySelectorAll(".awi-sm-cmd");
+    expect(on.disabled).toBe(false);
+    expect(off.disabled).toBe(true);
+    expect(off.getAttribute("aria-disabled")).toBe("true");
+    on.click();
+    expect(model.sent.at(-1)).toEqual({ type: "command", command: "On" });
+    expect(el.querySelectorAll(".awi-sm-acting")).toHaveLength(1);
+  });
+});

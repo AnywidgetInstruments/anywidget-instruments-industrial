@@ -1,6 +1,8 @@
 """Instrumentation widgets for computational notebooks."""
 
 from ._alarm_logic import ALARM_LEVELS, compute_alarm_level, eng_scale
+from ._alarmlist import AlarmList
+from ._annunciator import ANN_COLORS, ANN_SEQUENCES, ANN_STATES, Annunciator, annunciator_transition
 from ._base import InstrumentWidget
 from ._boolean import (
     LED,
@@ -44,6 +46,7 @@ from ._polar import PolarPlot, RadarChart, SmithChart
 from ._process import PIPE_SHAPES, Motor, Pipe, ProcessObject, Pump, SynopticCanvas, Valve
 from ._sanitize import sanitize_svg
 from ._scada import ALARM_PRIORITIES, ALARM_STATES, AlarmBanner, AlarmIndicator, alarm_transition
+from ._statemachine import PACKML_COMMANDS, PACKML_MODEL, StateMachine
 from ._style import STYLES, get_default_style, set_default_style
 
 __version__ = "0.1.0.dev0"
@@ -52,9 +55,14 @@ __all__ = [
     "ALARM_LEVELS",
     "ALARM_PRIORITIES",
     "ALARM_STATES",
+    "ANN_COLORS",
+    "ANN_SEQUENCES",
+    "ANN_STATES",
     "COLORMAPS",
     "LED",
     "MECHANICAL_ACTIONS",
+    "PACKML_COMMANDS",
+    "PACKML_MODEL",
     "PID",
     "PID_MODES",
     "PIPE_SHAPES",
@@ -63,7 +71,9 @@ __all__ = [
     "STYLES",
     "AlarmBanner",
     "AlarmIndicator",
+    "AlarmList",
     "AnalogIndicator",
+    "Annunciator",
     "BooleanWidget",
     "Compass",
     "Dial",
@@ -94,6 +104,7 @@ __all__ = [
     "SlideSwitch",
     "SmithChart",
     "StackLight",
+    "StateMachine",
     "SynopticCanvas",
     "Tank",
     "Thermometer",
@@ -102,6 +113,7 @@ __all__ = [
     "Valve",
     "WaveformChart",
     "alarm_transition",
+    "annunciator_transition",
     "batch",
     "compute_alarm_level",
     "eng_scale",

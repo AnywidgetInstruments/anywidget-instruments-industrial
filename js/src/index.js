@@ -2,6 +2,8 @@
 // A single bundle serves every widget; the `_kind` trait selects the view.
 import { watchModel } from "./core/liveness.js";
 import { AlarmView } from "./widgets/alarm.js";
+import { AlarmListView } from "./widgets/alarmlist.js";
+import { AnnunciatorView } from "./widgets/annunciator.js";
 import { BooleanView } from "./widgets/boolean.js";
 import { ChartView } from "./widgets/chart.js";
 import { DigitalView } from "./widgets/digital.js";
@@ -15,6 +17,7 @@ import { PipeView, ProcessView, SynopticView } from "./widgets/process.js";
 import { LinearView } from "./widgets/linear.js";
 import { RotaryView } from "./widgets/rotary.js";
 import { SevenSegmentView } from "./widgets/sevensegment.js";
+import { StateMachineView } from "./widgets/statemachine.js";
 
 const VIEWS = {
   knob: RotaryView,
@@ -52,6 +55,9 @@ const VIEWS = {
   selectorswitch: SelectorView,
   stacklight: StackLightView,
   pidfaceplate: PIDView,
+  annunciator: AnnunciatorView,
+  alarmlist: AlarmListView,
+  statemachine: StateMachineView,
 };
 
 function render({ model, el }) {

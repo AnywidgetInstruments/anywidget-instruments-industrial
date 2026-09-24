@@ -58,6 +58,16 @@
   --awi-stack-green: #16a34a;
   --awi-stack-blue: #2563eb;
   --awi-stack-white: #f8fafc;
+  /* annunciator panel: dark hardware panel on light and dark hosts */
+  --awi-ann-bg: #111827;
+  --awi-ann-off: #374151;
+  --awi-ann-off-ink: #d1d5db;
+  --awi-ann-off-border: #4b5563;
+  --awi-ann-lit-border: #f9fafb;
+  --awi-ann-ink-light: #ffffff;
+  --awi-ann-ink-dark: #111827;
+  --awi-ann-horn: #fde68a;
+  --awi-ann-btn: #e5e7eb;
   --awi-font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --awi-anim: 0ms;
   --awi-blink-period: 0.5s;
@@ -125,6 +135,7 @@
     --awi-hp-track: #374151;
     --awi-hp-normal: #6b7280;
     --awi-hp-pointer: #e5e7eb;
+    --awi-stack-blue: #3b82f6;
   }
 }
 :is([data-jp-theme-light="false"], .vscode-dark, .vscode-high-contrast, [data-theme="dark"], .dark-mode) .awi-root.awi-style-system {
@@ -146,6 +157,7 @@
   --awi-hp-track: #374151;
   --awi-hp-normal: #6b7280;
   --awi-hp-pointer: #e5e7eb;
+  --awi-stack-blue: #3b82f6;
 }
 :is([data-jp-theme-light="true"], .vscode-light, [data-theme="light"]) .awi-root.awi-style-system {
   --awi-fg: var(--jp-ui-font-color1, var(--vscode-editor-foreground, #1f2937));
@@ -364,7 +376,7 @@
 .awi-root .awi-prio-critical .awi-prio-chip { color: #ffffff; }
 .awi-root tr.awi-state-active_unacknowledged { font-weight: 700; }
 .awi-root tr.awi-state-active_unacknowledged .awi-prio-chip { animation: awi-blink 0.8s steps(1, end) infinite; }
-.awi-root tr.awi-state-cleared_unacknowledged .awi-prio-chip { background: none; border: 2px solid var(--awi-prio); animation: awi-blink 2s steps(1, end) infinite; }
+.awi-root tr.awi-state-cleared_unacknowledged .awi-prio-chip { background: none; color: var(--awi-fg); border: 2px solid var(--awi-prio); animation: awi-blink 2s steps(1, end) infinite; }
 
 /* ---- industrial objects (IND-*) ----------------------------------------------- */
 /* analog indicator: grey unless in alarm (IND-002) */
@@ -432,12 +444,63 @@
 .awi-root .awi-pid-note { min-height: 18px; display: flex; gap: 4px; align-items: center; flex-wrap: wrap; font-size: 11px; }
 .awi-root .awi-pid-note .awi-pid-confirm { border-color: var(--awi-warn); border-width: 2px; }
 
+/* annunciator (IND-040..043, ISA-18.1): fast flash = alert, slow = ringback, steady = acknowledged */
+.awi-root.awi-annunciator .awi-body { display: flex; flex-direction: column; gap: 6px; padding: 6px; box-sizing: border-box; border: 1px solid var(--awi-face-stroke); background: var(--awi-ann-bg); cursor: default; }
+.awi-root .awi-ann-grid { display: grid; gap: 4px; flex: 1; }
+.awi-root .awi-ann-window { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2px 4px; border-radius: 2px; text-align: center; background: var(--awi-ann-off); color: var(--awi-ann-off-ink); border: 2px solid var(--awi-ann-off-border); min-height: 38px; }
+.awi-root .awi-ann-tag { font-size: 11px; font-weight: 800; letter-spacing: 0.4px; }
+.awi-root .awi-ann-text { font-size: 10px; line-height: 1.1; }
+.awi-root .awi-ann-status { font-size: 9px; font-weight: 800; min-height: 10px; }
+.awi-root .awi-ann-red { --awi-ann-lit: var(--awi-stack-red); --awi-ann-ink: var(--awi-ann-ink-light); }
+.awi-root .awi-ann-amber { --awi-ann-lit: var(--awi-stack-amber); --awi-ann-ink: var(--awi-ann-ink-dark); }
+.awi-root .awi-ann-white { --awi-ann-lit: var(--awi-stack-white); --awi-ann-ink: var(--awi-ann-ink-dark); }
+.awi-root .awi-ann-window:is(.awi-ann-st-alert, .awi-ann-st-acknowledged, .awi-ann-st-ringback, .awi-ann-st-test) { background: var(--awi-ann-lit); color: var(--awi-ann-ink); border-color: var(--awi-ann-lit-border); }
+.awi-root .awi-ann-st-alert { animation: awi-blink 0.5s steps(1, end) infinite; }
+.awi-root .awi-ann-st-ringback { animation: awi-blink 1.6s steps(1, end) infinite; }
+.awi-root .awi-ann-first { outline: 3px double var(--awi-ann-lit-border); outline-offset: 1px; }
+.awi-root .awi-ann-bar { display: flex; gap: 4px; align-items: center; justify-content: flex-end; }
+.awi-root .awi-ann-horn { margin-right: auto; font-size: 11px; font-weight: 800; color: var(--awi-ann-horn); }
+.awi-root .awi-ann-btn { font: inherit; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 3px; border: 1px solid var(--awi-ann-off-ink); background: var(--awi-ann-btn); color: var(--awi-ann-ink-dark); cursor: pointer; }
+.awi-root .awi-ann-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* alarm list (IND-050..053) */
+.awi-root.awi-alarmlist .awi-body { display: flex; flex-direction: column; border: 1px solid var(--awi-face-stroke); background: var(--awi-face); font-size: 12px; cursor: default; }
+.awi-root .awi-al-tools { display: flex; gap: 4px; padding: 4px 6px; flex-wrap: wrap; border-bottom: 1px solid var(--awi-grid); }
+.awi-root .awi-al-tools select, .awi-root .awi-al-tools input, .awi-root .awi-al-sort, .awi-root .awi-al-shelve { font: inherit; font-size: 11px; padding: 1px 4px; border: 1px solid var(--awi-face-stroke); border-radius: 3px; background: var(--awi-plot-bg); color: var(--awi-fg); }
+.awi-root .awi-al-search { flex: 1; min-width: 80px; }
+.awi-root .awi-al-sort { cursor: pointer; }
+.awi-root .awi-al-counts { padding: 2px 6px; font-weight: 700; color: var(--awi-muted); }
+.awi-root .awi-al-actions { display: flex; gap: 4px; }
+.awi-root tr.awi-al-shelved td { color: var(--awi-muted); }
+.awi-root tr.awi-al-shelved .awi-prio-chip { background: none; border: 1px dashed var(--awi-prio); color: var(--awi-fg); }
+.awi-root tr.awi-al-suppressed td { color: var(--awi-muted); font-style: italic; background-image: repeating-linear-gradient(45deg, transparent 0 6px, rgba(128, 128, 128, 0.15) 6px 8px); }
+.awi-root tr.awi-al-suppressed .awi-prio-chip { background: var(--awi-track); color: var(--awi-fg); }
+.awi-root .awi-al-state { font-weight: 700; }
+
+/* state machine (IND-060..063) */
+.awi-root.awi-statemachine .awi-body { display: flex; flex-direction: column; gap: 4px; padding: 6px; box-sizing: border-box; border: 1px solid var(--awi-face-stroke); background: var(--awi-face); font-size: 12px; cursor: default; }
+.awi-root .awi-sm-diagram { flex: none; }
+.awi-root .awi-sm-state { fill: var(--awi-plot-bg); stroke: var(--awi-face-stroke); stroke-width: 1.2; }
+.awi-root .awi-sm-acting { stroke-dasharray: 4 2; }
+.awi-root .awi-sm-current { fill: var(--awi-fg); stroke: var(--awi-fg); stroke-width: 2; stroke-dasharray: none; }
+.awi-root .awi-sm-label { fill: var(--awi-fg); font-size: 10px; font-family: var(--awi-font); }
+.awi-root .awi-sm-label-current { fill: var(--awi-face); font-weight: 800; }
+.awi-root .awi-sm-edge { fill: none; stroke: var(--awi-muted); stroke-width: 1; opacity: 0.7; }
+.awi-root .awi-sm-edge-next { stroke: var(--awi-fg); stroke-width: 2; opacity: 1; }
+.awi-root .awi-sm-arrowhead { fill: var(--awi-muted); }
+.awi-root .awi-sm-status { font-weight: 700; min-height: 16px; }
+.awi-root .awi-sm-commands { display: flex; gap: 4px; flex-wrap: wrap; }
+.awi-root .awi-sm-cmd { font: inherit; font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 3px; border: 1px solid var(--awi-fg); background: var(--awi-knob); color: var(--awi-fg); cursor: pointer; }
+.awi-root .awi-sm-cmd:disabled { opacity: 0.4; cursor: not-allowed; border-style: dashed; }
+
 /* ---- A11Y-005: reduced motion → no blinking/animation, steady distinct pattern ---- */
 @media (prefers-reduced-motion: reduce) {
   .awi-root *, .awi-root { animation: none !important; transition: none !important; }
   .awi-root.awi-blink .awi-led { stroke: var(--awi-fg); stroke-width: 3; stroke-dasharray: 3 2; }
   .awi-root tr.awi-state-active_unacknowledged .awi-prio-chip { outline: 2px dashed var(--awi-fg); }
   .awi-root .awi-stack-blink { stroke-width: 3; stroke-dasharray: 3 2; }
+  .awi-root .awi-ann-st-alert { border-style: dashed; border-width: 3px; }
+  .awi-root .awi-ann-st-ringback { border-style: dotted; border-width: 3px; }
   .awi-root.awi-state-active_unacknowledged .awi-alarm-shape,
   .awi-root.awi-state-cleared_unacknowledged .awi-alarm-shape { stroke: var(--awi-fg); stroke-width: 2.5; stroke-dasharray: 3 2; }
 }

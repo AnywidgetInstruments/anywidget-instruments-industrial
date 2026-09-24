@@ -53,6 +53,8 @@ const TEXT = [
   ["--awi-fg", "--awi-face"], ["--awi-fg", "--awi-plot-bg"], ["--awi-muted", "--awi-face"],
   ["--awi-alarm-hi", "--awi-face"], ["--awi-alarm-hihi", "--awi-face"],
   ["--awi-alarm-lo", "--awi-face"], ["--awi-alarm-lolo", "--awi-face"],
+  ["--awi-ann-off-ink", "--awi-ann-off"], ["--awi-ann-horn", "--awi-ann-bg"], ["--awi-ann-ink-dark", "--awi-ann-btn"],
+  ["--awi-ann-ink-light", "--awi-stack-red"], ["--awi-ann-ink-dark", "--awi-stack-amber"], ["--awi-ann-ink-dark", "--awi-stack-white"],
 ];
 const GRAPHICS = [
   ["--awi-fill", "--awi-track"], ["--awi-needle", "--awi-face"], ["--awi-pointer", "--awi-knob"],
@@ -62,6 +64,7 @@ const GRAPHICS = [
   ["--awi-trace-3", "--awi-plot-bg"], ["--awi-trace-4", "--awi-plot-bg"], ["--awi-trace-5", "--awi-plot-bg"],
   ["--awi-trace-6", "--awi-plot-bg"], ["--awi-trace-7", "--awi-plot-bg"],
   ["--awi-hp-pointer", "--awi-hp-track"], ["--awi-hp-pointer", "--awi-face"],
+  ["--awi-stack-red", "--awi-face"], ["--awi-stack-green", "--awi-face"], ["--awi-stack-blue", "--awi-face"],
 ];
 
 describe.each([["modern", modern], ["system (dark)", darkSystem]])("%s palette", (_name, t) => {
@@ -76,5 +79,15 @@ describe.each([["modern", modern], ["system (dark)", darkSystem]])("%s palette",
 describe("alarm priority chips", () => {
   it.each([["#ffffff", "--awi-prio-critical"], ["#111827", "--awi-prio-high"], ["#111827", "--awi-prio-medium"], ["#111827", "--awi-prio-low"]])("chip text %s on %s >= 4.5", (text, p) => {
     expect(contrast(text, modern[p])).toBeGreaterThanOrEqual(4.5);
+  });
+});
+
+describe("priority chips without their own background", () => {
+  // a chip drawn as an outline sits on the widget face: its text must use the
+  // face text color, not the dark ink meant for the colored chip (dark hosts)
+  it("set a text color readable on the face", () => {
+    const rules = [...css.matchAll(/([^{}]*\.awi-prio-chip[^{}]*)\{([^}]*)\}/g)].filter(([, , body]) => /background:\s*none/.test(body));
+    expect(rules.length).toBeGreaterThan(0);
+    for (const [, selector, body] of rules) expect(body, selector.trim()).toMatch(/(^|;)\s*color:\s*var\(--awi-fg\)/);
   });
 });
