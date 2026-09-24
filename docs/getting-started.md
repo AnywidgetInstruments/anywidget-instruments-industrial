@@ -76,3 +76,40 @@ Controls are operable with the keyboard: arrows (± step), Page Up/Down
 (± 10 steps), Home/End (min/max), Space/Enter (Boolean controls, faceplates).
 Host shortcuts (JupyterLab, Notebook 7) are suppressed while a widget has
 the focus.
+
+## Units
+
+```python
+import pint
+
+ureg = pint.UnitRegistry()
+t = ai.Thermometer(unit="degC")
+t.value = ureg.Quantity(300, "kelvin")  # pint quantities are converted (26.85 °C)
+```
+
+Install `pint` with `pip install "anywidget-instruments[units]"`.
+
+## Styles and theming
+
+`style` is `"modern"`, `"classic"` or `"system"`. The `system` style follows
+the host colors, including dark mode. `ai.set_default_style("classic")`
+changes the default style of the widgets created afterwards. Every color is a
+CSS custom property scoped to `.awi-root` (for example `--awi-fill`,
+`--awi-needle`, `--awi-alarm-hi`), so you can override it per page or per
+widget.
+
+## marimo
+
+```python
+import marimo as mo
+
+knob = mo.ui.anywidget(ai.Knob(label="Gain"))
+knob  # other cells that read knob.value re-run when it changes
+```
+
+## Kernel loss
+
+If the kernel is restarted or lost, the widgets show a **STALE** badge and
+reject input. A notebook reopened without its kernel shows the saved values
+as read-only (see [Hosts and liveness](hosts.md)).
+

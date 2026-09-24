@@ -33,6 +33,15 @@ on a VU meter and the dominant frequency on a seven-segment display.
 
 ![Signal acquisition](img/signal_acquisition.png)
 
+## Filling line operator station — `examples/filling_line.ipynb`
+
+A bottle filling line driven by the ISA-TR88.00.02 state model, with a
+HAND / OFF / AUTO selector, a stack light, a PID faceplate for the product
+temperature, the fill weight on a high-performance indicator, an ISA-18.1
+annunciator and an alarm list with shelving.
+
+![Filling line](img/filling_line.png)
+
 ## marimo — `examples/marimo_panel.py`
 
 ```bash

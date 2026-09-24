@@ -5,7 +5,7 @@ import { kernelExec, runNotebook, widget } from "./helpers.js";
 
 const NB = "allwidgets.ipynb";
 const numericControls = ["Knob", "Dial", "FillSlide"];
-const numericIndicators = ["Gauge", "Meter", "VUMeter", "Tank", "Thermometer", "SevenSegment", "Compass"];
+const numericIndicators = ["Gauge", "Meter", "VUMeter", "Tank", "Thermometer", "SevenSegment", "Compass", "AnalogIndicator"];
 const booleans = ["ToggleSwitch", "RockerSwitch", "SlideSwitch", "PushButton", "EmergencyStop"];
 
 test.describe.configure({ mode: "serial" });
@@ -148,5 +148,64 @@ test.describe("every widget", () => {
     await widget(page, "SynopticCanvas").scrollIntoViewIfNeeded();
     await py('W["SynopticCanvas"].add(ai.LED(True, label="child led"), x=10, y=10)');
     await expect(widget(page, "child led")).toHaveClass(/awi-on/);
+  });
+
+  // industrial operator objects (IND-*)
+  test("SelectorSwitch: both directions", async () => {
+    await widget(page, "SelectorSwitch").scrollIntoViewIfNeeded();
+    await py('W["SelectorSwitch"].value = "AUTO"');
+    await expect(body("SelectorSwitch")).toHaveAttribute("aria-valuetext", "AUTO");
+    await body("SelectorSwitch").focus();
+    await page.keyboard.press("ArrowLeft");
+    await expect.poll(() => py('print(W["SelectorSwitch"].value)')).toBe("OFF");
+  });
+
+  test("StackLight: kernel -> front", async () => {
+    await widget(page, "StackLight").scrollIntoViewIfNeeded();
+    await py('W["StackLight"].set("green", "blink")');
+    await expect(body("StackLight")).toHaveAttribute("aria-label", /green blink/);
+  });
+
+  test("PIDFaceplate: both directions", async () => {
+    const w = widget(page, "PIDFaceplate");
+    await w.scrollIntoViewIfNeeded();
+    await py('W["PIDFaceplate"].step(35.0, 1.0)');
+    await expect(w.locator(".awi-pid-pv .awi-pid-val")).toHaveText("35.0");
+    await w.getByRole("spinbutton", { name: "New SP" }).fill("45");
+    await w.getByRole("button", { name: "Set SP" }).click();
+    await expect.poll(() => py('print(W["PIDFaceplate"].sp)')).toBe("45.0");
+    await w.getByRole("button", { name: "MAN", exact: true }).click();
+    await expect.poll(() => py('print(W["PIDFaceplate"].loop_mode)')).toBe("MAN");
+    await expect(w.getByRole("spinbutton", { name: "New OP" })).toBeVisible();
+  });
+
+  test("Annunciator: both directions", async () => {
+    const w = widget(page, "Annunciator");
+    await w.scrollIntoViewIfNeeded();
+    await py('W["Annunciator"].set("XA-1")');
+    await expect(w.locator(".awi-ann-status")).toHaveText("ALARM");
+    await w.getByRole("button", { name: "ACK" }).click();
+    await expect.poll(() => py('print(W["Annunciator"].state_of("XA-1"))')).toBe("acknowledged");
+  });
+
+  test("AlarmList: both directions", async () => {
+    const w = widget(page, "AlarmList");
+    await w.scrollIntoViewIfNeeded();
+    await py('W["AlarmList"].raise_alarm("L1", "boom", "TI-1")');
+    await expect(w.locator("tbody tr")).toContainText("boom");
+    await w.getByRole("button", { name: "Acknowledge L1" }).click();
+    await expect.poll(() => py('print(W["AlarmList"].state_of("L1"))')).toBe("active_acknowledged");
+    await w.getByRole("combobox", { name: "Shelve L1" }).selectOption("300");
+    await expect.poll(() => py('print(W["AlarmList"].is_shelved("L1"))')).toBe("True");
+  });
+
+  test("StateMachine: both directions", async () => {
+    const w = widget(page, "StateMachine");
+    await w.scrollIntoViewIfNeeded();
+    await w.getByRole("button", { name: "Reset", exact: true }).click();
+    await expect.poll(() => py('print(W["StateMachine"].value)')).toBe("Resetting");
+    await py('W["StateMachine"].state_complete()');
+    await expect(w.locator(".awi-sm-label-current")).toHaveText("▶ Idle");
+    await expect(w.getByRole("button", { name: "Start", exact: true })).toBeEnabled();
   });
 });

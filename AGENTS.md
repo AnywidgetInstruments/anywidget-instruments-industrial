@@ -103,6 +103,8 @@ pushing changes to the front end or to the kernel/front-end protocol.
 
 ### Documentation and wording
 - Repository content is in English.
+- Content goes to the documentation (`docs/`) first; the README stays short
+  (pitch, install, quick start, links to the documentation).
 - Refer to requirements by their IDs (`NUM-005`, `ROB-001`, …) in docstrings,
   comments and commit messages where useful.
 - Do not name or compare with third-party commercial products.

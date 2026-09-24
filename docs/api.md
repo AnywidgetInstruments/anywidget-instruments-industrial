@@ -64,6 +64,18 @@ Generated from the docstrings (DOC-001).
 ::: anywidget_instruments.AlarmBanner
 ::: anywidget_instruments.alarm_transition
 
+## Industrial operator objects
+
+::: anywidget_instruments.AnalogIndicator
+::: anywidget_instruments.SelectorSwitch
+::: anywidget_instruments.StackLight
+::: anywidget_instruments.PID
+::: anywidget_instruments.PIDFaceplate
+::: anywidget_instruments.Annunciator
+::: anywidget_instruments.annunciator_transition
+::: anywidget_instruments.AlarmList
+::: anywidget_instruments.StateMachine
+
 ## Utilities
 
 ::: anywidget_instruments.sanitize_svg

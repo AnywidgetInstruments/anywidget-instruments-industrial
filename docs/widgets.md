@@ -71,3 +71,63 @@ pic.on_click(lambda e: print(e["x"], e["y"]))
 animated pipe runs on a background image.
 
 ![Tank supervision](img/tank_supervision.png)
+
+## Industrial operator objects
+
+Objects for control rooms and machine panels (IND-001 .. IND-063). They follow
+ISA-101 (grey scale in normal operation, color for abnormal situations),
+ISA-18.1 (annunciator sequences), ISA-18.2 / IEC 62682 (alarm management),
+IEC 60073 (indicator colors) and ISA-TR88.00.02 (machine state model).
+
+```python
+import anywidget_instruments as ai
+
+# high-performance bar: normal band, limits and target; color only in alarm
+weight = ai.AnalogIndicator(
+    502, min=470, max=530, unit="g", normal_lo=495, normal_hi=508, target=502, lo=490, hi=515
+)
+
+# selector and key switch
+mode = ai.SelectorSwitch("AUTO", positions=["HAND", "OFF", "AUTO"])
+access = ai.SelectorSwitch("LOCAL", positions=["LOCAL", "REMOTE"], keyed=True, locked=True)
+
+# signal tower
+light = ai.StackLight(tiers=["red", "amber", "green"], labels=["Fault", "Attention", "Run"])
+light.set("green", "on")
+
+# control loop: PID controller and its faceplate
+loop = ai.PIDFaceplate(
+    tag="TIC-101",
+    unit="°C",
+    pv_max=150,
+    confirm_delta=10,
+    controller=ai.PID(kp=2.0, ti=30.0, sp=75.0),
+)
+op = loop.step(pv=72.4, dt=0.5)  # call with each new measurement
+
+# annunciator (ISA-18.1 sequence A, M or R, first out)
+ann = ai.Annunciator(
+    [("PAH-101", "Pressure high", "red"), ("LAL-201", "Level low")], sequence="R", first_out=True
+)
+ann.set("PAH-101", True)
+
+# alarm summary with shelving, suppression and out-of-service states
+alarms = ai.AlarmList()
+alarms.raise_alarm("TI-101.HI", "Temperature high", source="TI-101", priority="high")
+alarms.on_event(lambda e: print(e["name"], e["alarm_id"]))
+
+# machine state model (PackML by default)
+machine = ai.StateMachine()
+machine.command("Reset")
+machine.state_complete()  # the kernel ends acting states
+```
+
+| Widget | Operator actions sent to the kernel |
+|---|---|
+| `SelectorSwitch` | position (rejected while a key switch is locked) |
+| `PIDFaceplate` | loop mode; SP in AUTO, OP in MAN, with confirmation of large changes |
+| `Annunciator` | Silence, Acknowledge, Reset, Test (while held) |
+| `AlarmList` | Acknowledge, Shelve (timed), Unshelve |
+| `StateMachine` | commands valid in the current state |
+
+![Filling line](img/filling_line.png)

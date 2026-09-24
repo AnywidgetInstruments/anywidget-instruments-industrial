@@ -101,6 +101,21 @@ JupyterLab / Notebook 7 / marimo (`e2e/`).
 | SEC-003 | M | 🟡 | Trusted publishing + build provenance workflow (`release.yml`); needs the PyPI trusted publisher to be configured |
 | SEC-004 | S | ✅ | `npm run check:reproducible` in CI (byte-identical rebuild) |
 
+## IND – Industrial operator objects
+| ID | Pri | Status | Notes |
+|---|---|---|---|
+| IND-001 … IND-003 | S/C | ✅ | AnalogIndicator: normal band, limit marks, target; grey scale unless in alarm |
+| IND-010 … IND-013 | S/C | ✅ | SelectorSwitch: 2–5 positions, keyboard and ARIA, key lock enforced in the kernel, spring return |
+| IND-020 … IND-022 | S/M/C | ✅ | StackLight: IEC 60073 colors, state glyph and text per tier, buzzer indicator |
+| IND-030 … IND-034 | S | ✅ | PID (standard form, derivative on PV, anti-windup, bumpless) and PIDFaceplate (mode rules, clamping, confirmation, SP tracking) |
+| IND-040 … IND-043 | S | ✅ | Annunciator: ISA-18.1 sequences A, M, R with lock-in, first out, horn, Silence / Ack / Reset / Test |
+| IND-050 … IND-053 | S | ✅ | AlarmList: sort and filter, timed shelving with automatic unshelving, suppressed / out of service |
+| IND-060 … IND-063 | S/C | ✅ | StateMachine: PackML model (17 states), valid commands only, `state_complete()`, custom models |
+
+Tests: py (`tests/test_industrial.py`), js (`js/test/industrial.test.js`), e2e
+(`allwidgets.spec.js`, both directions for each object), visual baselines;
+example `examples/filling_line.ipynb`.
+
 ## DOC, QA
 | ID | Pri | Status | Notes |
 |---|---|---|---|

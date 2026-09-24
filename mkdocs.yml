@@ -25,6 +25,7 @@ nav:
       - Hosts and liveness: hosts.md
   - API reference: api.md
   - Specification: specification.md
+  - Development: development.md
   - Requirements status: requirements-status.md
 plugins:
   - search
