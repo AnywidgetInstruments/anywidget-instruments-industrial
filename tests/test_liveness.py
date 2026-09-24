@@ -25,22 +25,44 @@ def test_set_heartbeat_updates_widgets():
         ai.set_heartbeat(-1)
 
 
-def test_beat_sends_through_one_widget(monkeypatch):
+def _group_of(widgets):
+    g = _liveness._Group()
+    for w in widgets:
+        g.widgets.add(w)
+    return g
+
+
+def test_beat_sends_through_every_open_widget(monkeypatch):
+    """Some models are never rendered (marimo wrappers): reach all of them."""
     sent = []
-    widgets = [ai.Knob(), ai.Knob()]
+    widgets = [ai.Knob(), ai.Knob(), ai.Knob()]
     for w in widgets:
         monkeypatch.setattr(w, "send", lambda msg, w=w: sent.append((w, msg)))
-    monkeypatch.setattr(_liveness, "_widgets", type(_liveness._widgets)(widgets))
-    assert _liveness.beat() is True
-    assert len(sent) == 1
-    assert sent[0][1]["type"] == "hb" and sent[0][1]["session"] == _liveness.SESSION
+    widgets[1].close()
+    assert _liveness.beat(_group_of(widgets)) == 2
+    assert {id(w) for w, _ in sent} == {id(widgets[0]), id(widgets[2])}
+    assert all(m["type"] == "hb" and m["session"] == _liveness.SESSION for _, m in sent)
 
 
-def test_beat_skips_closed_widgets(monkeypatch):
+def test_beat_skips_closed_widgets():
     w = ai.Knob()
     w.close()
-    monkeypatch.setattr(_liveness, "_widgets", type(_liveness._widgets)([w]))
-    assert _liveness.beat() is False
+    assert _liveness.beat(_group_of([w])) == 0
+
+
+def test_widgets_are_grouped_by_runtime_context(monkeypatch):
+    """marimo run: one heartbeat thread per session (runtime context)."""
+    monkeypatch.setattr(_liveness, "_groups", {})
+    started = []
+    monkeypatch.setattr(_liveness.threading.Thread, "start", lambda self: started.append(self))
+    monkeypatch.setattr(_liveness, "_context_key", lambda: 1)
+    a = ai.Knob()
+    monkeypatch.setattr(_liveness, "_context_key", lambda: 2)
+    b = ai.Knob()
+    groups = _liveness._groups
+    assert set(groups) == {1, 2}
+    assert list(groups[1].widgets) == [a] and list(groups[2].widgets) == [b]
+    assert len(started) == 2 and groups[1].thread is not groups[2].thread
 
 
 def test_no_threads_disables_heartbeat(monkeypatch):
@@ -50,7 +72,7 @@ def test_no_threads_disables_heartbeat(monkeypatch):
     def refuse(self):
         raise RuntimeError("can't start new thread")
 
-    monkeypatch.setattr(_liveness, "_thread", None)
+    monkeypatch.setattr(_liveness, "_groups", {})
     monkeypatch.setattr(threading.Thread, "start", refuse)
     try:
         k = ai.Knob()

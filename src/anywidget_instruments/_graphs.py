@@ -141,8 +141,8 @@ class DigitalWaveformGraph(GraphWidget):
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
-        self._bits = np.zeros((0, 0), dtype=np.uint8)
-        self._analog = np.zeros((0, 0), dtype=np.float64)
+        self._bits: np.ndarray = np.zeros((0, 0), dtype=np.uint8)
+        self._analog: np.ndarray = np.zeros((0, 0), dtype=np.float64)
         self.on_msg(self._handle_front_msg)
 
     @property

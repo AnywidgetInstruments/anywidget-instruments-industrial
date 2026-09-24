@@ -6,14 +6,31 @@ export const widget = (page, label) => {
   return page.locator(".awi-root", { has: page.locator(":scope > .awi-label", { hasText: exact }) });
 };
 
-/** Open a notebook in JupyterLab and run all its cells. */
+/**
+ * Open a notebook in JupyterLab and run all its cells.
+ *
+ * Specs run one at a time: kernels of other notebooks are shut down first,
+ * so JupyterLab does not ask which kernel to use; if it still does (slow
+ * runners), the dialog is answered whenever it shows up.
+ */
 export async function runNotebook(page, name) {
+  const sessions = await (await page.request.get("/api/sessions")).json();
+  for (const s of sessions) {
+    if (s.path !== name) await page.request.delete(`/api/sessions/${s.id}`);
+  }
   await page.goto(`/lab/tree/${name}?reset`);
   await page.locator(".jp-Notebook").waitFor();
-  // a "Select kernel" dialog may appear when other kernels are running
   const select = page.locator(".jp-Dialog").getByRole("button", { name: "Select", exact: true });
-  if (await select.isVisible({ timeout: 3000 }).catch(() => false)) await select.click();
-  await expect(page.locator(".jp-Notebook-ExecutionIndicator[data-status='idle']")).toBeVisible({ timeout: 60_000 });
+  const idle = page.locator(".jp-Notebook-ExecutionIndicator[data-status='idle']");
+  await expect
+    .poll(
+      async () => {
+        if (await select.isVisible().catch(() => false)) await select.click();
+        return idle.isVisible();
+      },
+      { timeout: 90_000, intervals: [250, 500, 1000] },
+    )
+    .toBe(true);
   await page.locator(".jp-Notebook").click();
   await page.keyboard.press("Escape");
   await page.getByRole("menuitem", { name: "Run", exact: true }).click();

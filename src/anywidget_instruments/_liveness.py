@@ -1,10 +1,16 @@
 """Kernel liveness heartbeat (ROB-001, ROB-004).
 
 A daemon thread sends a small ``{"type": "hb"}`` message every
-``interval`` seconds through *one* open widget of the kernel. All views of
+``interval`` seconds through every open widget of the kernel. All views of
 that kernel share the timestamp on the front end (keyed by ``_session``) and
 show a stale-data indication, rejecting input, when heartbeats stop: kernel
 restarted, died, disconnected, or notebook reopened without a kernel.
+
+Every widget receives the heartbeat because some models are never rendered
+(e.g. a widget wrapped by ``mo.ui.anywidget``): a single, arbitrarily chosen
+widget may not reach any view. Under ``marimo run`` several sessions share
+one process, so widgets are grouped by marimo runtime context, each group
+with its own ``mo.Thread`` (plain threads cannot reach the front end there).
 """
 
 from __future__ import annotations
@@ -18,10 +24,23 @@ from typing import Any
 
 SESSION = uuid.uuid4().hex
 
-_widgets: weakref.WeakSet[Any] = weakref.WeakSet()
 _interval = 2.0
-_thread: threading.Thread | None = None
 _lock = threading.Lock()
+
+
+class _Group:
+    """Widgets of one runtime context (one kernel, or one marimo session)."""
+
+    def __init__(self) -> None:
+        self.widgets: weakref.WeakSet[Any] = weakref.WeakSet()
+        self.thread: threading.Thread | None = None
+
+
+_groups: dict[int | None, _Group] = {}
+
+
+def _all_widgets() -> list[Any]:
+    return [w for g in list(_groups.values()) for w in list(g.widgets)]
 
 
 def get_heartbeat() -> float:
@@ -39,7 +58,7 @@ def set_heartbeat(interval: float) -> None:
     if interval < 0:
         raise ValueError("interval must be >= 0")
     _interval = float(interval)
-    for w in list(_widgets):
+    for w in _all_widgets():
         with contextlib.suppress(Exception):  # widget being torn down
             w._heartbeat = _interval
 
@@ -60,41 +79,61 @@ def _marimo_thread_class() -> Any:
         return None
 
 
+def _context_key() -> int | None:
+    """Identity of the current marimo runtime context (session), else None."""
+    if _marimo_thread_class() is None:
+        return None
+    try:
+        from marimo._runtime.context import get_context
+
+        return id(get_context())
+    except Exception:  # pragma: no cover - defensive against marimo internals
+        return None
+
+
 def _alive(thread: threading.Thread | None) -> bool:
     return thread is not None and thread.is_alive() and not getattr(thread, "should_exit", False)
 
 
 def register(widget: Any) -> None:
-    global _thread
-    _widgets.add(widget)
+    key = _context_key()
     with _lock:
-        if _interval > 0 and not _alive(_thread):
+        group = _groups.setdefault(key, _Group())
+        group.widgets.add(widget)
+        if _interval > 0 and not _alive(group.thread):
             thread_cls = _marimo_thread_class() or threading.Thread
-            _thread = thread_cls(target=_loop, name="awi-heartbeat", daemon=True)
+            group.thread = thread_cls(
+                target=_loop, args=(group,), name="awi-heartbeat", daemon=True
+            )
             try:
-                _thread.start()
+                group.thread.start()
             except RuntimeError:
                 # no threads (Pyodide / JupyterLite): stale detection disabled
-                _thread = None
+                group.thread = None
                 set_heartbeat(0)
 
 
-def beat() -> bool:
-    """Send one heartbeat through the first open widget. Returns True if sent."""
-    for w in list(_widgets):
+def beat(group: _Group | None = None) -> int:
+    """Send one heartbeat through every open widget (of ``group``, or of all groups).
+
+    Returns the number of widgets the heartbeat was sent through.
+    """
+    widgets = list(group.widgets) if group is not None else _all_widgets()
+    sent = 0
+    for w in widgets:
         if getattr(w, "comm", None) is None:
             continue
         try:
             w.send({"type": "hb", "session": SESSION, "interval": _interval})
-            return True
+            sent += 1
         except Exception:
             continue
-    return False
+    return sent
 
 
-def _loop() -> None:
+def _loop(group: _Group) -> None:
     me = threading.current_thread()
     while not getattr(me, "should_exit", False):  # marimo: cell invalidated
         time.sleep(_interval if _interval > 0 else 1.0)
         if _interval > 0:
-            beat()
+            beat(group)
