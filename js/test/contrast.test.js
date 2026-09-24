@@ -61,6 +61,7 @@ const GRAPHICS = [
   ["--awi-trace-0", "--awi-plot-bg"], ["--awi-trace-1", "--awi-plot-bg"], ["--awi-trace-2", "--awi-plot-bg"],
   ["--awi-trace-3", "--awi-plot-bg"], ["--awi-trace-4", "--awi-plot-bg"], ["--awi-trace-5", "--awi-plot-bg"],
   ["--awi-trace-6", "--awi-plot-bg"], ["--awi-trace-7", "--awi-plot-bg"],
+  ["--awi-hp-pointer", "--awi-hp-track"], ["--awi-hp-pointer", "--awi-face"],
 ];
 
 describe.each([["modern", modern], ["system (dark)", darkSystem]])("%s palette", (_name, t) => {

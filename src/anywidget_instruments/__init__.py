@@ -22,6 +22,7 @@ from ._graphs import (
     MixedSignalGraph,
     unpack_bits,
 )
+from ._industrial import STACK_COLORS, STACK_STATES, AnalogIndicator, SelectorSwitch, StackLight
 from ._liveness import get_heartbeat, set_heartbeat
 from ._numeric import (
     Compass,
@@ -38,6 +39,7 @@ from ._numeric import (
 )
 from ._panel import Panel
 from ._picture import PictureControl
+from ._pid import PID, PID_MODES, PIDFaceplate
 from ._polar import PolarPlot, RadarChart, SmithChart
 from ._process import PIPE_SHAPES, Motor, Pipe, ProcessObject, Pump, SynopticCanvas, Valve
 from ._sanitize import sanitize_svg
@@ -53,10 +55,15 @@ __all__ = [
     "COLORMAPS",
     "LED",
     "MECHANICAL_ACTIONS",
+    "PID",
+    "PID_MODES",
     "PIPE_SHAPES",
+    "STACK_COLORS",
+    "STACK_STATES",
     "STYLES",
     "AlarmBanner",
     "AlarmIndicator",
+    "AnalogIndicator",
     "BooleanWidget",
     "Compass",
     "Dial",
@@ -72,6 +79,7 @@ __all__ = [
     "MixedSignalGraph",
     "Motor",
     "NumericWidget",
+    "PIDFaceplate",
     "Panel",
     "PictureControl",
     "Pipe",
@@ -81,9 +89,11 @@ __all__ = [
     "PushButton",
     "RadarChart",
     "RockerSwitch",
+    "SelectorSwitch",
     "SevenSegment",
     "SlideSwitch",
     "SmithChart",
+    "StackLight",
     "SynopticCanvas",
     "Tank",
     "Thermometer",

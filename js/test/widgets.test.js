@@ -4,6 +4,7 @@ import { Ring, viewWindow } from "../src/widgets/chart.js";
 import { sevenSegmentText } from "../src/widgets/sevensegment.js";
 import widget from "../src/index.js";
 import { parseSkin } from "../src/core/dom.js";
+import { common, fakeModel } from "./helpers.js";
 
 describe("mechanical actions", () => {
   it("switch actions", () => {
@@ -62,22 +63,6 @@ describe("skin parsing", () => {
 });
 
 /** Minimal in-memory anywidget model. */
-function fakeModel(state) {
-  const handlers = {};
-  const sent = [];
-  return {
-    sent,
-    get: (k) => state[k],
-    set: (k, v) => { state[k] = v; },
-    save_changes: () => sent.push({ ...state }),
-    on: (ev, cb) => { (handlers[ev] ||= []).push(cb); },
-    off: (ev, cb) => { handlers[ev] = (handlers[ev] || []).filter((h) => h !== cb); },
-    send: (msg) => sent.push(msg),
-    emit: (ev, ...args) => (handlers[ev] || []).forEach((h) => h(...args)),
-  };
-}
-
-const common = { mode: "control", label: "<b>Gain</b>", disabled: false, visible: true, tooltip: "", size: [160, 160], style: "modern", skin: {} };
 
 describe("rendering", () => {
   it("renders a knob with text-only label and keyboard control", async () => {

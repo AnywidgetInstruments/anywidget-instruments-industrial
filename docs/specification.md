@@ -7,7 +7,7 @@
 | Project | anywidget-instruments (working name) |
 | Document type | Software requirements specification |
 | Notation | EARS (Easy Approach to Requirements Syntax) |
-| Version | 0.2 |
+| Version | 0.3 |
 | Date | 2026-09-24 |
 | Status | Baseline for version 1.0 |
 
@@ -342,7 +342,78 @@ Requirements use identifiers `<GROUP>-<NNN>` with priorities:
 
 ---
 
-## 18. Traceability of Front Panel Components
+## 18. Industrial Operator Objects (IND)
+
+Operator objects for control rooms and machine panels. They follow ISA-101
+(high-performance HMI), ISA-18.1 (annunciator sequences), ISA-18.2 / IEC 62682
+(alarm management), IEC 60073 (indicator colors) and ISA-TR88.00.02 (machine
+state model).
+
+### 18.1 Analog Indicator
+
+| ID | Pri. | Requirement |
+|---|---|---|
+| IND-001 | S | The library shall provide an **AnalogIndicator** widget: a horizontal or vertical bar showing the value as a pointer on a neutral scale, with the normal operating range as a shaded band. |
+| IND-002 | S | Where alarm limits are set, the AnalogIndicator shall mark them on the scale, and shall draw the pointer and value in color only while an alarm level is active (grey scale otherwise). |
+| IND-003 | C | Where a `target` is set, the AnalogIndicator shall mark it on the scale. |
+
+### 18.2 Selector Switch
+
+| ID | Pri. | Requirement |
+|---|---|---|
+| IND-010 | S | The library shall provide a **SelectorSwitch** widget with 2 to 5 labelled positions (for example HAND / OFF / AUTO); its value shall be the label of the selected position. |
+| IND-011 | S | The SelectorSwitch shall be operable with the pointer and with the arrow keys, and shall expose the selected position through ARIA. |
+| IND-012 | S | Where `keyed` is enabled and `locked` is true, the SelectorSwitch shall reject position changes from the front end and shall show a lock symbol. |
+| IND-013 | C | Where a position is declared spring-return, the SelectorSwitch shall return to its `default_position` when released. |
+
+### 18.3 Stack Light
+
+| ID | Pri. | Requirement |
+|---|---|---|
+| IND-020 | S | The library shall provide a **StackLight** widget with 1 to 5 tiers, each with an IEC 60073 color (red, amber, green, blue, white) and a state `off`, `on` or `blink`. |
+| IND-021 | M | The StackLight shall convey each tier state by text or shape as well as by color. |
+| IND-022 | C | Where `buzzer` is set, the StackLight shall show a sounding indicator; the library shall not play sound. |
+
+### 18.4 PID Faceplate
+
+| ID | Pri. | Requirement |
+|---|---|---|
+| IND-030 | S | The library shall provide a **PIDFaceplate** widget showing the setpoint (SP), process value (PV) and output (OP) as values and bars, the engineering unit, the tag and the mode (`MAN`, `AUTO`, `CAS`). |
+| IND-031 | S | While the mode is `AUTO`, the faceplate shall let the operator change SP only; while `MAN`, OP only; while `CAS`, neither. |
+| IND-032 | S | When the operator enters SP or OP, the faceplate shall clamp the value to its limits; where `confirm_delta` is set, a change larger than `confirm_delta` shall require a confirmation step. |
+| IND-033 | S | The library shall provide a **PID** controller class (proportional, integral and derivative actions, output limits, anti-windup, direct or reverse action) that a PIDFaceplate can drive with `step(pv, dt)`. |
+| IND-034 | S | When the mode changes from `MAN` to `AUTO`, the controller shall start from the current output without a step change (bumpless transfer), and, where `sp_tracking` is enabled, the setpoint shall be set to the process value. |
+
+### 18.5 Annunciator
+
+| ID | Pri. | Requirement |
+|---|---|---|
+| IND-040 | S | The library shall provide an **Annunciator** widget: a grid of alarm windows, each with a tag and a text. |
+| IND-041 | S | The Annunciator shall follow the ISA-18.1 sequence selected by `sequence`: `A` (automatic reset), `M` (manual reset) or `R` (ringback). |
+| IND-042 | S | Where `first_out` is enabled, the Annunciator shall mark the first window to alarm in a group with a distinct pattern and text until the group is reset. |
+| IND-043 | S | The Annunciator shall provide Silence, Acknowledge, Reset and Test operator actions, and shall send each action to the kernel as an event. |
+
+### 18.6 Alarm List
+
+| ID | Pri. | Requirement |
+|---|---|---|
+| IND-050 | S | The library shall provide an **AlarmList** widget: a table of alarms with time, tag, priority, message and state, sortable by time or priority and filterable by priority, state and text. |
+| IND-051 | S | Where the operator shelves an alarm for a duration, the AlarmList shall hide it from the active view, show the number of shelved alarms and unshelve it automatically when the duration expires (ISA-18.2). |
+| IND-052 | S | The AlarmList shall display suppressed and out-of-service alarms distinctly from active ones. |
+| IND-053 | S | When the operator acknowledges or shelves an alarm, the AlarmList shall send the event to the kernel with the alarm identifier. |
+
+### 18.7 State Machine
+
+| ID | Pri. | Requirement |
+|---|---|---|
+| IND-060 | S | The library shall provide a **StateMachine** widget showing the ISA-TR88.00.02 machine state model (17 states) with the current state highlighted. |
+| IND-061 | S | The StateMachine shall offer only the commands valid in the current state (Start, Stop, Hold, Unhold, Suspend, Unsuspend, Reset, Abort, Clear), and the kernel shall reject any other command. |
+| IND-062 | S | When an acting state completes (for example Starting → Execute), the kernel code shall advance the model with `state_complete()`; the widget shall not advance on its own. |
+| IND-063 | C | The StateMachine shall accept a custom model given as states and transitions. |
+
+---
+
+## 19. Traceability of Front Panel Components
 
 | Front panel component | Library widget | Requirement |
 |---|---|---|
@@ -374,10 +445,17 @@ Requirements use identifiers `<GROUP>-<NNN>` with priorities:
 | Modern / Classic / System styles | `style` trait | STYLE-001 to STYLE-004 |
 | Custom control parts | Skins | STYLE-005, STYLE-006 |
 | Control / indicator switch | `mode` trait | API-003, API-004 |
+| Analog bar with normal band | AnalogIndicator | IND-001 to IND-003 |
+| Selector switch, key switch | SelectorSwitch | IND-010 to IND-013 |
+| Stack light | StackLight | IND-020 to IND-022 |
+| Controller faceplate | PIDFaceplate, PID | IND-030 to IND-034 |
+| Annunciator panel | Annunciator | IND-040 to IND-043 |
+| Alarm summary | AlarmList | IND-050 to IND-053 |
+| Machine state model | StateMachine | IND-060 to IND-063 |
 
 ---
 
-## 19. Open Questions
+## 20. Open Questions
 
 1. Final project name (candidates: `anywidget-instruments`, `ipyinstruments`, `notebook-panel`).
 2. Front-end rendering technology: plain SVG for all widgets, or Canvas/WebGL for charts only (impacts CHART-005 and PERF-004).
@@ -391,3 +469,4 @@ Requirements use identifiers `<GROUP>-<NNN>` with priorities:
 |---|---|
 | 0.1 | Initial draft. |
 | 0.2 | Moved into the repository; DOC-003 withdrawn; component traceability table made product-neutral. |
+| 0.3 | Industrial operator objects (IND): analog indicator, selector switch, stack light, PID faceplate, annunciator, alarm list, state machine. |

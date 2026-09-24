@@ -48,6 +48,16 @@
   --awi-trace-5: #0891b2;
   --awi-trace-6: #be185d;
   --awi-trace-7: #4d7c0f;
+  /* industrial objects (IND-*): grey scale for normal operation (ISA-101) */
+  --awi-hp-track: #e5e7eb;
+  --awi-hp-normal: #b6bcc6;
+  --awi-hp-pointer: #374151;
+  /* stack light tiers (IEC 60073) */
+  --awi-stack-red: #dc2626;
+  --awi-stack-amber: #f59e0b;
+  --awi-stack-green: #16a34a;
+  --awi-stack-blue: #2563eb;
+  --awi-stack-white: #f8fafc;
   --awi-font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --awi-anim: 0ms;
   --awi-blink-period: 0.5s;
@@ -112,6 +122,9 @@
     --awi-alarm-hihi: #f87171;
     --awi-fill: var(--jp-brand-color1, #60a5fa);
     --awi-trace-6: #f472b6;
+    --awi-hp-track: #374151;
+    --awi-hp-normal: #6b7280;
+    --awi-hp-pointer: #e5e7eb;
   }
 }
 :is([data-jp-theme-light="false"], .vscode-dark, .vscode-high-contrast, [data-theme="dark"], .dark-mode) .awi-root.awi-style-system {
@@ -130,6 +143,9 @@
   --awi-alarm-hihi: #f87171;
   --awi-fill: var(--jp-brand-color1, #60a5fa);
   --awi-trace-6: #f472b6;
+  --awi-hp-track: #374151;
+  --awi-hp-normal: #6b7280;
+  --awi-hp-pointer: #e5e7eb;
 }
 :is([data-jp-theme-light="true"], .vscode-light, [data-theme="light"]) .awi-root.awi-style-system {
   --awi-fg: var(--jp-ui-font-color1, var(--vscode-editor-foreground, #1f2937));
@@ -350,11 +366,78 @@
 .awi-root tr.awi-state-active_unacknowledged .awi-prio-chip { animation: awi-blink 0.8s steps(1, end) infinite; }
 .awi-root tr.awi-state-cleared_unacknowledged .awi-prio-chip { background: none; border: 2px solid var(--awi-prio); animation: awi-blink 2s steps(1, end) infinite; }
 
+/* ---- industrial objects (IND-*) ----------------------------------------------- */
+/* analog indicator: grey unless in alarm (IND-002) */
+.awi-root .awi-ai-track { fill: var(--awi-hp-track); stroke: var(--awi-face-stroke); stroke-width: 1; }
+.awi-root .awi-ai-normal { fill: var(--awi-hp-normal); }
+.awi-root .awi-ai-limit { stroke: var(--awi-fg); stroke-width: 1.5; }
+.awi-root .awi-ai-limit-lolo, .awi-root .awi-ai-limit-hihi { stroke-width: 3; }
+.awi-root .awi-ai-target { fill: none; stroke: var(--awi-fg); stroke-width: 1.5; }
+.awi-root .awi-ai-pointer { fill: var(--awi-hp-pointer); }
+.awi-root .awi-ai-pointer-line { stroke: var(--awi-hp-pointer); stroke-width: 2; }
+.awi-root.awi-analogindicator:is(.awi-alarm-lo, .awi-alarm-hi) { --awi-hp-pointer: var(--awi-alarm-hi); }
+.awi-root.awi-analogindicator:is(.awi-alarm-lolo, .awi-alarm-hihi) { --awi-hp-pointer: var(--awi-alarm-hihi); }
+
+/* selector switch */
+.awi-root .awi-sel-plate { fill: var(--awi-face); stroke: var(--awi-face-stroke); stroke-width: 1.5; }
+.awi-root .awi-sel-bar { fill: var(--awi-knob); stroke: var(--awi-knob-stroke); stroke-width: 1.5; }
+.awi-root .awi-sel-arrow { fill: var(--awi-pointer); }
+.awi-root .awi-sel-label { fill: var(--awi-muted); font-size: 9px; font-weight: 600; }
+.awi-root .awi-sel-label.awi-sel-current { fill: var(--awi-fg); font-weight: 800; }
+.awi-root .awi-sel-hit { fill: transparent; cursor: pointer; }
+.awi-root.awi-indicator .awi-sel-hit, .awi-root.awi-locked .awi-sel-hit { cursor: not-allowed; }
+.awi-root .awi-sel-key { fill: var(--awi-fg); }
+.awi-root .awi-lock-body { fill: var(--awi-warn); stroke: var(--awi-fg); }
+.awi-root .awi-lock-shackle { fill: none; stroke: var(--awi-fg); stroke-width: 2; }
+.awi-root.awi-control.awi-selectorswitch .awi-body { cursor: default; }
+.awi-root.awi-animate .awi-sel-handle, .awi-root .awi-sel-handle { transition: transform 120ms ease-out; }
+
+/* stack light (IND-020..022) */
+.awi-root .awi-stack-tier { stroke: var(--awi-face-stroke); stroke-width: 1; fill: var(--awi-stack-color); fill-opacity: 0.18; }
+.awi-root .awi-stack-tier:is(.awi-stack-on, .awi-stack-blink) { fill-opacity: 1; stroke: var(--awi-fg); }
+.awi-root .awi-stack-blink { animation: awi-blink 0.8s steps(1, end) infinite; }
+.awi-root .awi-stack-red { --awi-stack-color: var(--awi-stack-red); }
+.awi-root .awi-stack-amber { --awi-stack-color: var(--awi-stack-amber); }
+.awi-root .awi-stack-green { --awi-stack-color: var(--awi-stack-green); }
+.awi-root .awi-stack-blue { --awi-stack-color: var(--awi-stack-blue); }
+.awi-root .awi-stack-white { --awi-stack-color: var(--awi-stack-white); }
+.awi-root .awi-stack-text { fill: var(--awi-muted); font-size: 10px; }
+.awi-root .awi-stack-text:is(.awi-stack-text-on, .awi-stack-text-blink) { fill: var(--awi-fg); font-weight: 700; }
+.awi-root .awi-stack-pole { fill: var(--awi-muted); }
+.awi-root .awi-stack-buzzer { fill: var(--awi-knob); stroke: var(--awi-fg); }
+.awi-root .awi-stack-waves { fill: none; stroke: var(--awi-fg); stroke-width: 1.5; }
+
+/* PID faceplate (IND-030..034) */
+.awi-root.awi-pidfaceplate .awi-body { display: flex; flex-direction: column; gap: 4px; padding: 6px 8px; box-sizing: border-box; border: 1px solid var(--awi-face-stroke); background: var(--awi-face); font-size: 12px; cursor: default; }
+.awi-root .awi-pid-head { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+.awi-root .awi-pid-tag { font-weight: 800; letter-spacing: 0.3px; }
+.awi-root .awi-pid-modes { display: flex; gap: 2px; }
+.awi-root .awi-pid-mode { font: inherit; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 3px; border: 1px solid var(--awi-face-stroke); background: var(--awi-face); color: var(--awi-fg); cursor: pointer; }
+.awi-root .awi-pid-mode[aria-pressed="true"] { background: var(--awi-fg); color: var(--awi-face); border-color: var(--awi-fg); }
+.awi-root .awi-pid-mode:disabled { cursor: default; }
+.awi-root .awi-pid-bars { flex: none; }
+.awi-root .awi-pid-pv-bar { fill: var(--awi-hp-pointer); }
+.awi-root .awi-pid-op-bar { fill: var(--awi-hp-normal); stroke: var(--awi-hp-pointer); stroke-width: 1; }
+.awi-root .awi-pid-sp-mark { fill: none; stroke: var(--awi-fg); stroke-width: 1.5; }
+.awi-root.awi-pidfaceplate:is(.awi-alarm-lo, .awi-alarm-hi) .awi-pid-pv-bar { fill: var(--awi-alarm-hi); }
+.awi-root.awi-pidfaceplate:is(.awi-alarm-lolo, .awi-alarm-hihi) .awi-pid-pv-bar { fill: var(--awi-alarm-hihi); }
+.awi-root .awi-pid-rows { display: grid; gap: 2px; }
+.awi-root .awi-pid-row { display: grid; grid-template-columns: 28px 1fr 64px 36px; align-items: center; gap: 4px; min-height: 22px; font-variant-numeric: tabular-nums; }
+.awi-root .awi-pid-name { font-weight: 700; color: var(--awi-muted); }
+.awi-root .awi-pid-val { font-weight: 700; }
+.awi-root.awi-pidfaceplate:is(.awi-alarm-lo, .awi-alarm-hi) .awi-pid-pv .awi-pid-val { color: var(--awi-alarm-hi); }
+.awi-root.awi-pidfaceplate:is(.awi-alarm-lolo, .awi-alarm-hihi) .awi-pid-pv .awi-pid-val { color: var(--awi-alarm-hihi); }
+.awi-root .awi-pid-input { font: inherit; width: 100%; box-sizing: border-box; padding: 1px 3px; border: 1px solid var(--awi-face-stroke); border-radius: 3px; background: var(--awi-plot-bg); color: var(--awi-fg); }
+.awi-root .awi-pid-set, .awi-root .awi-pid-note button { font: inherit; font-size: 10px; font-weight: 700; padding: 2px 4px; border-radius: 3px; border: 1px solid var(--awi-fg); background: var(--awi-face); color: var(--awi-fg); cursor: pointer; }
+.awi-root .awi-pid-note { min-height: 18px; display: flex; gap: 4px; align-items: center; flex-wrap: wrap; font-size: 11px; }
+.awi-root .awi-pid-note .awi-pid-confirm { border-color: var(--awi-warn); border-width: 2px; }
+
 /* ---- A11Y-005: reduced motion → no blinking/animation, steady distinct pattern ---- */
 @media (prefers-reduced-motion: reduce) {
   .awi-root *, .awi-root { animation: none !important; transition: none !important; }
   .awi-root.awi-blink .awi-led { stroke: var(--awi-fg); stroke-width: 3; stroke-dasharray: 3 2; }
   .awi-root tr.awi-state-active_unacknowledged .awi-prio-chip { outline: 2px dashed var(--awi-fg); }
+  .awi-root .awi-stack-blink { stroke-width: 3; stroke-dasharray: 3 2; }
   .awi-root.awi-state-active_unacknowledged .awi-alarm-shape,
   .awi-root.awi-state-cleared_unacknowledged .awi-alarm-shape { stroke: var(--awi-fg); stroke-width: 2.5; stroke-dasharray: 3 2; }
 }

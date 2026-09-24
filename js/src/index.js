@@ -5,8 +5,10 @@ import { AlarmView } from "./widgets/alarm.js";
 import { BooleanView } from "./widgets/boolean.js";
 import { ChartView } from "./widgets/chart.js";
 import { DigitalView } from "./widgets/digital.js";
+import { AnalogIndicatorView, SelectorView, StackLightView } from "./widgets/industrial.js";
 import { IntensityView } from "./widgets/intensity.js";
 import { BannerView } from "./widgets/banner.js";
+import { PIDView } from "./widgets/pid.js";
 import { PictureView } from "./widgets/picture.js";
 import { PolarView } from "./widgets/polar.js";
 import { PipeView, ProcessView, SynopticView } from "./widgets/process.js";
@@ -46,6 +48,10 @@ const VIEWS = {
   motor: ProcessView,
   pipe: PipeView,
   synoptic: SynopticView,
+  analogindicator: AnalogIndicatorView,
+  selectorswitch: SelectorView,
+  stacklight: StackLightView,
+  pidfaceplate: PIDView,
 };
 
 function render({ model, el }) {

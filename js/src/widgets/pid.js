@@ -1,0 +1,192 @@
+// PID faceplate (IND-030..034): PV / SP / OP bars and values, loop mode,
+// operator entries with mode rules and confirmation of large changes.
+import { clear, html, svg, svgText } from "../core/dom.js";
+import { formatValue, tickFormat, withUnit } from "../core/format.js";
+import { parseNumber, ticks, toFraction } from "../core/scale.js";
+import { BaseView } from "../core/view.js";
+
+const ALARM_TEXT = { lolo: "LOLO", lo: "LO", hi: "HI", hihi: "HIHI" };
+const EDITABLE_IN = { sp: "AUTO", op: "MAN" };
+
+/** Operator entry check done before sending (the kernel checks again). */
+export function entryDecision({ field, mode, value, current, min, max, confirmDelta }) {
+  if (EDITABLE_IN[field] !== mode) return { ok: false, reason: `${field.toUpperCase()} can only be changed in ${EDITABLE_IN[field]} mode` };
+  if (!Number.isFinite(value)) return { ok: false, reason: "not a number" };
+  const v = Math.min(max, Math.max(min, value));
+  const confirm = confirmDelta !== null && confirmDelta !== undefined && Math.abs(v - current) > confirmDelta;
+  return { ok: true, value: v, confirm };
+}
+
+export class PIDView extends BaseView {
+  constructor(model, el) {
+    super(model, el, ["value", "tag", "unit", "op_unit", "format", "pv", "sp", "op", "loop_mode", "modes", "pv_min", "pv_max", "sp_min", "sp_max", "op_min", "op_max", "confirm_delta", "lolo", "lo", "hi", "hihi", "alarm_level"]);
+    const b = this.body;
+    b.setAttribute("role", "group");
+    this.head = html("div", { cls: "awi-pid-head" });
+    this.tagEl = html("span", { cls: "awi-pid-tag" });
+    this.modeBar = html("div", { cls: "awi-pid-modes", attrs: { role: "group", "aria-label": "Loop mode" } });
+    this.head.append(this.tagEl, this.modeBar);
+    this.svgEl = svg("svg", { class: "awi-svg awi-pid-bars", "aria-hidden": "true" });
+    this.rows = {};
+    const table = html("div", { cls: "awi-pid-rows" });
+    for (const f of ["pv", "sp", "op"]) {
+      const name = html("span", { cls: "awi-pid-name", text: f.toUpperCase() });
+      const val = html("span", { cls: "awi-pid-val" });
+      const input = html("input", { cls: "awi-pid-input", attrs: { type: "number", "aria-label": `New ${f.toUpperCase()}`, "data-lm-suppress-shortcuts": "true" } });
+      const set = html("button", { cls: "awi-pid-set", text: "Set", attrs: { type: "button", "aria-label": `Set ${f.toUpperCase()}` } });
+      const commit = () => this.enter(f, parseNumber(input.value));
+      set.addEventListener("click", commit);
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          commit();
+        } else if (e.key === "Escape") {
+          input.value = "";
+          input.blur();
+        }
+      });
+      const row = html("div", { cls: `awi-pid-row awi-pid-${f}` }, [name, val, f === "pv" ? null : input, f === "pv" ? null : set]);
+      table.appendChild(row);
+      this.rows[f] = { row, val, input, set };
+    }
+    this.note = html("div", { cls: "awi-pid-note", attrs: { role: "status", "aria-live": "polite" } });
+    b.append(this.head, this.svgEl, table, this.note);
+    this.pending = null;
+    this.listen("msg:custom", (msg) => {
+      if (msg && msg.type === "rejected") this.showNote(`✖ ${msg.reason}`);
+    });
+    this.schedule();
+  }
+
+  num(name) {
+    const v = this.get(name);
+    return v === null || v === undefined ? null : parseNumber(v);
+  }
+
+  spLimits() {
+    return [this.num("sp_min") ?? this.num("pv_min"), this.num("sp_max") ?? this.num("pv_max")];
+  }
+
+  showNote(text, buttons = []) {
+    clear(this.note);
+    this.note.appendChild(html("span", { text }));
+    for (const btn of buttons) this.note.appendChild(btn);
+  }
+
+  /** Operator entry (IND-031, IND-032). */
+  enter(field, value) {
+    if (!this.interactive) return;
+    const [min, max] = field === "sp" ? this.spLimits() : [this.num("op_min"), this.num("op_max")];
+    const d = entryDecision({ field, mode: this.get("loop_mode"), value, current: this.num(field), min, max, confirmDelta: this.num("confirm_delta") });
+    if (!d.ok) return this.showNote(`✖ ${d.reason}`);
+    const send = (confirmed) => {
+      this.model.send({ type: "set", field, value: d.value, confirmed });
+      this.rows[field].input.value = "";
+      this.showNote("");
+      this.pending = null;
+    };
+    if (!d.confirm) return send(false);
+    const fmt = this.get("format");
+    const ok = html("button", { cls: "awi-pid-confirm", text: "Confirm", attrs: { type: "button" } });
+    const cancel = html("button", { text: "Cancel", attrs: { type: "button" } });
+    ok.addEventListener("click", () => send(true));
+    cancel.addEventListener("click", () => {
+      this.pending = null;
+      this.showNote("");
+    });
+    this.pending = field;
+    this.showNote(`Change ${field.toUpperCase()} ${formatValue(this.num(field), fmt)} → ${formatValue(d.value, fmt)}?`, [ok, cancel]);
+    ok.focus();
+  }
+
+  setMode(m) {
+    if (this.interactive && m !== this.get("loop_mode")) this.model.send({ type: "loop_mode", mode: m });
+  }
+
+  draw() {
+    const fmt = this.get("format");
+    const unit = this.get("unit");
+    const mode = this.get("loop_mode");
+    const control = this.get("mode") === "control";
+    this.tagEl.textContent = this.get("tag") || this.get("label") || "PID";
+
+    // mode buttons: text and pressed state (not color only)
+    clear(this.modeBar);
+    for (const m of this.get("modes") || []) {
+      const btn = html("button", { cls: "awi-pid-mode", text: m, attrs: { type: "button", "aria-pressed": String(m === mode) } });
+      btn.disabled = !control || !!this.get("disabled");
+      btn.addEventListener("click", () => this.setMode(m));
+      this.modeBar.appendChild(btn);
+    }
+    if (!(this.get("modes") || []).includes(mode)) this.modeBar.appendChild(html("span", { cls: "awi-pid-mode", text: mode }));
+
+    // values and editors
+    const level = this.get("alarm_level") || "normal";
+    for (const l of Object.keys(ALARM_TEXT)) this.root.classList.toggle(`awi-alarm-${l}`, level === l);
+    const pvText = withUnit(formatValue(parseNumber(this.get("pv")), fmt), unit);
+    this.rows.pv.val.textContent = ALARM_TEXT[level] ? `${pvText} ${ALARM_TEXT[level]}` : pvText;
+    this.rows.sp.val.textContent = withUnit(formatValue(this.num("sp"), fmt), unit);
+    this.rows.op.val.textContent = withUnit(formatValue(this.num("op"), fmt), this.get("op_unit"));
+    for (const f of ["sp", "op"]) {
+      const r = this.rows[f];
+      const editable = control && EDITABLE_IN[f] === mode;
+      r.input.hidden = !editable;
+      r.set.hidden = !editable;
+      r.input.disabled = !!this.get("disabled");
+      r.set.disabled = !!this.get("disabled");
+      const [min, max] = f === "sp" ? this.spLimits() : [this.num("op_min"), this.num("op_max")];
+      r.input.min = String(min);
+      r.input.max = String(max);
+      r.input.step = "any";
+      if (document.activeElement !== r.input && !r.input.value) r.input.placeholder = formatValue(this.num(f), fmt);
+    }
+    this.root.classList.toggle("awi-pid-man", mode === "MAN");
+    this.drawBars();
+    this.body.setAttribute("aria-label", `${this.tagEl.textContent}: PV ${this.rows.pv.val.textContent}, SP ${this.rows.sp.val.textContent}, OP ${this.rows.op.val.textContent}, mode ${mode}`);
+  }
+
+  drawBars() {
+    const [w] = this.get("size");
+    const h = 116;
+    const s = this.svgEl;
+    s.setAttribute("viewBox", `0 0 ${w} ${h}`);
+    s.style.height = `${h}px`;
+    clear(s);
+    const [pmin, pmax] = [this.num("pv_min"), this.num("pv_max")];
+    const [omin, omax] = [this.num("op_min"), this.num("op_max")];
+    const y0 = h - 14;
+    const y1 = 8;
+    const yOf = (v, a, b) => y0 - Math.min(1, Math.max(0, toFraction(v, a, b))) * (y0 - y1);
+    // PV / SP column
+    const pvX = 44;
+    const barW = 26;
+    s.appendChild(svg("rect", { class: "awi-ai-track", x: pvX, y: y1, width: barW, height: y0 - y1 }));
+    const pv = parseNumber(this.get("pv"));
+    if (Number.isFinite(pv)) {
+      const y = yOf(pv, pmin, pmax);
+      s.appendChild(svg("rect", { class: "awi-pid-pv-bar", x: pvX, y, width: barW, height: y0 - y }));
+    }
+    for (const k of ["lolo", "lo", "hi", "hihi"]) {
+      const v = this.num(k);
+      if (v !== null) s.appendChild(svg("path", { class: `awi-ai-limit awi-ai-limit-${k}`, d: `M${pvX - 4} ${yOf(v, pmin, pmax)}H${pvX + barW + 4}` }));
+    }
+    const sy = yOf(this.num("sp"), pmin, pmax);
+    s.appendChild(svg("path", { class: "awi-pid-sp-mark", d: `M${pvX + barW + 2} ${sy}L${pvX + barW + 12} ${sy - 6}L${pvX + barW + 12} ${sy + 6}Z` }));
+    s.appendChild(svgText("SP", { class: "awi-tick-label", x: pvX + barW + 14, y: sy, "dominant-baseline": "central" }));
+    const tk = ticks(pmin, pmax, 4, 0);
+    const tf = tickFormat(this.get("format"));
+    for (const v of tk.major) {
+      const y = yOf(v, pmin, pmax);
+      s.appendChild(svgText(formatValue(v, tf), { class: "awi-tick-label", x: pvX - 6, y, "text-anchor": "end", "dominant-baseline": "central" }));
+    }
+    s.appendChild(svgText("PV", { class: "awi-tick-label", x: pvX + barW / 2, y: h - 2, "text-anchor": "middle" }));
+    // OP column
+    const opX = w - 50;
+    s.appendChild(svg("rect", { class: "awi-ai-track", x: opX, y: y1, width: 18, height: y0 - y1 }));
+    const oy = yOf(this.num("op"), omin, omax);
+    s.appendChild(svg("rect", { class: "awi-pid-op-bar", x: opX, y: oy, width: 18, height: y0 - oy }));
+    s.appendChild(svgText(formatValue(omax, tf), { class: "awi-tick-label", x: opX + 22, y: y1, "dominant-baseline": "central" }));
+    s.appendChild(svgText(formatValue(omin, tf), { class: "awi-tick-label", x: opX + 22, y: y0, "dominant-baseline": "central" }));
+    s.appendChild(svgText("OP", { class: "awi-tick-label", x: opX + 9, y: h - 2, "text-anchor": "middle" }));
+  }
+}
