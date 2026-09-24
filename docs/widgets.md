@@ -2,6 +2,26 @@
 
 ![Widget gallery, system style in a dark host](img/gallery-dark.png)
 
+## At a glance
+
+Widgets grouped by function. **C** = control by default, **I** = indicator
+by default; every widget switches with `mode`.
+
+| Group | Widgets | Standards followed |
+|---|---|---|
+| Controls, continuous | `Knob` (C), `Dial` (C), `FillSlide` (C); a numeric entry field on every numeric control | |
+| Controls, discrete | `PushButton` (C), `ToggleSwitch` (C), `RockerSwitch` (C), `SlideSwitch` (C), `SelectorSwitch` (C), `EmergencyStop` (C) | IEC 60073 (button and lamp colors) |
+| Indicators, analog | `Gauge`, `Meter`, `VUMeter`, `Tank`, `Thermometer`, `SevenSegment`, `Compass`, `AnalogIndicator` (I) | ISA-101 (`AnalogIndicator`) |
+| Indicators, discrete | `LED`, `StackLight` (I) | IEC 60073 |
+| Graphs, time | `WaveformChart`, `IntensityChart`, `DigitalWaveformGraph`, `MixedSignalGraph` (I) | |
+| Graphs, specialized | `PolarPlot`, `SmithChart`, `RadarChart`, `PictureControl` | |
+| Alarms and events | `AlarmIndicator`, `AlarmBanner`, `AlarmList`, `Annunciator` | ISA-18.1, ISA-18.2 / IEC 62682 |
+| Process symbols | `Valve`, `Pump`, `Motor`, `Pipe` (faceplates) | ISA-5.1 (symbols) |
+| Supervisory objects | `PIDFaceplate` with `PID`, `StateMachine` | ISA-101, ISA-TR88.00.02 |
+| Layout and session | `Panel`, `SynopticCanvas`, `ThemeSwitch` | |
+
+The sections below follow the families of the [specification](specification.md).
+
 ## Numeric controls and indicators
 
 | Widget | Default mode | Notes |
