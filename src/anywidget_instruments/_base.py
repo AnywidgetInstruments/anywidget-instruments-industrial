@@ -98,8 +98,11 @@ class InstrumentWidget(anywidget.AnyWidget):
     #: Optional skin: mapping part name -> SVG source (sanitized, STYLE-005/006).
     skin = t.Dict(value_trait=t.Unicode(), default_value={}).tag(sync=True)
     #: Kernel session id and heartbeat interval used for stale detection (ROB-001).
-    _session = t.Unicode(_liveness.SESSION).tag(sync=True)
-    _heartbeat = t.Float(2.0).tag(sync=True)
+    #: The class defaults announce nothing (HOST-003): a host without a Python
+    #: kernel that uses them never shows a stale indication. Every Python
+    #: widget announces the kernel session and heartbeat in ``__init__``.
+    _session = t.Unicode("").tag(sync=True)
+    _heartbeat = t.Float(0.0, min=0.0).tag(sync=True)
 
     #: Callback priority in a batch (see :func:`anywidget_instruments.batch`).
     _callback_priority: int = _dispatch.PRIORITY_NORMAL
@@ -112,6 +115,7 @@ class InstrumentWidget(anywidget.AnyWidget):
         kwargs.setdefault("theme", get_default_theme())
         kwargs.setdefault("mode", self._default_mode)
         kwargs.setdefault("size", self._default_size)
+        kwargs.setdefault("_session", _liveness.SESSION)
         kwargs.setdefault("_heartbeat", _liveness.get_heartbeat())
         super().__init__(**kwargs)
         _liveness.register(self)

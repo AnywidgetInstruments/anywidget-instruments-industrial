@@ -54,10 +54,17 @@ def _synced(cls: type) -> dict[str, t.TraitType]:
     return {k: v for k, v in cls.class_traits(sync=True).items() if k not in FRAMEWORK}
 
 
-def test_every_widget_class_has_a_schema() -> None:
-    """Phase 2 pilot: at least the migrated widgets carry a schema."""
+def test_base_schemas() -> None:
     classes = {w["class"] for w in CONTRACT["widgets"].values()}
     assert {"InstrumentWidget", "NumericWidget"} <= classes
+
+
+def test_class_defaults_announce_no_liveness() -> None:
+    """HOST-003: a host using class defaults never sees NO KERNEL."""
+    for cls in (_base.InstrumentWidget, ai.Knob, ai.Gauge, ai.WaveformChart):
+        traits = cls.class_traits()
+        assert traits["_session"].default() == ""
+        assert traits["_heartbeat"].default() == 0
 
 
 @pytest.mark.parametrize(("title", "spec"), WIDGETS, ids=IDS)
@@ -108,7 +115,7 @@ def test_trait_declarations(title: str, spec: dict[str, Any]) -> None:
         encoded = trait.metadata.get("to_json") is _base.float_serializers["to_json"]
         if s["type"] == "number":
             assert encoded == bool(s.get("nonfinite")), f"{where}: float_serializers"
-        if not isinstance(trait, t.Enum) and name not in HOST_FILLED:
+        if not isinstance(trait, t.Enum):
             assert _bound(trait, "min") == s.get("minimum"), f"{where}: minimum"
             assert _bound(trait, "max") == s.get("maximum"), f"{where}: maximum"
 
@@ -118,8 +125,6 @@ def test_class_defaults(title: str, spec: dict[str, Any]) -> None:
     """Hosts without a kernel read class defaults (HOST-007)."""
     cls = CLASSES[spec["class"]]
     for name, trait in _synced(cls).items():
-        if name in HOST_FILLED:  # liveness defaults are inverted in the next step (HOST-003)
-            continue
         assert _json(_class_default(trait)) == spec["traits"][name]["default"], f"{title}.{name}"
 
 
