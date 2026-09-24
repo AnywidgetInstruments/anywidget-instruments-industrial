@@ -21,3 +21,4 @@ site/
 lite/.jupyterlite.doit.db
 lite/_output/
 lite/.cache/
+lite/marimo/public/

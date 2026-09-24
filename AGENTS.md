@@ -21,8 +21,9 @@ specification linked in `README.md`; `docs/requirements-status.md` tracks them.
 | `js/test/` | vitest unit tests (jsdom) |
 | `tests/` | pytest unit tests, including headless execution of `examples/*.ipynb` |
 | `e2e/` | Playwright end-to-end tests (JupyterLab, Notebook 7, marimo, visual, performance) |
+| `e2e-site/` | Browser tests of the built site's in-browser deployments (`npm run test:site`, run by the Docs workflow) |
 | `examples/` | Example notebooks and a marimo app |
-| `docs/` | MkDocs site; `lite/` holds the JupyterLite content |
+| `docs/` | MkDocs site; `lite/` holds the JupyterLite content and `lite/marimo/` the marimo WebAssembly notebook |
 
 ## Commands
 

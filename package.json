@@ -9,9 +9,10 @@
     "build": "node js/build.mjs",
     "dev": "esbuild js/src/index.js --bundle --format=esm --target=es2020 --outfile=src/anywidget_instruments/static/index.js --watch",
     "test": "vitest run",
-    "lint": "eslint js e2e",
+    "lint": "eslint js e2e e2e-site",
     "check:reproducible": "node js/scripts/check-reproducible.mjs",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:site": "playwright test -c playwright.site.config.js"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",

@@ -1,5 +1,5 @@
-# Documentation site (DOC-001, DOC-005) with a JupyterLite deployment
-# (DOC-006), published to GitHub Pages.
+# Documentation site (DOC-001, DOC-005) with in-browser deployments (DOC-006):
+# JupyterLite and a marimo WebAssembly export, published to GitHub Pages.
 name: Docs
 
 on:
@@ -35,6 +35,22 @@ jobs:
       - name: JupyterLite with the package wheel
         working-directory: lite
         run: jupyter lite build --contents content --piplite-wheels ../dist/*.whl --output-dir ../site/lite
+      - name: marimo WebAssembly export with the package wheel
+        run: |
+          mkdir -p lite/marimo/public
+          cp dist/*.whl lite/marimo/public/
+          (cd dist && ls *.whl) > lite/marimo/public/wheel.txt
+          marimo export html-wasm lite/marimo/instruments.py -o site/marimo --mode edit
+          rm -f site/marimo/CLAUDE.md
+      - name: In-browser deployments work (DOC-006)
+        run: |
+          npx playwright install --with-deps chromium
+          npm run test:site -- --reporter=list
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: site-test-results
+          path: test-results/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site

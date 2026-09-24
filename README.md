@@ -13,6 +13,11 @@ need a JavaScript toolchain to use them.
 > (EARS requirements). [`docs/requirements-status.md`](docs/requirements-status.md)
 > lists which requirements are implemented.
 
+Documentation: <https://s-celles.github.io/anywidget-instruments/>. You can
+try the widgets in your browser, with nothing to install, in
+[marimo](https://s-celles.github.io/anywidget-instruments/marimo/) or
+[JupyterLite](https://s-celles.github.io/anywidget-instruments/lite/lab/index.html?path=gallery.ipynb).
+
 ## Install
 
 ```bash

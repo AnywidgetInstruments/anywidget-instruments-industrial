@@ -5,7 +5,7 @@ export default [
   { ignores: ["src/**", "node_modules/**"] },
   js.configs.recommended,
   {
-    files: ["js/**/*.js", "js/**/*.mjs", "e2e/**/*.js"],
+    files: ["js/**/*.js", "js/**/*.mjs", "e2e/**/*.js", "e2e-site/**/*.js"],
     languageOptions: { ecmaVersion: 2022, sourceType: "module", globals: { ...globals.browser } },
     rules: {
       // SEC-001: no dynamic code evaluation and no HTML injection from trait data
@@ -22,5 +22,5 @@ export default [
       "no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
     },
   },
-  { files: ["js/test/**/*.js", "js/build.mjs", "js/scripts/**/*.mjs", "e2e/**/*.js", "*.config.js"], languageOptions: { globals: { ...globals.node } } },
+  { files: ["js/test/**/*.js", "js/build.mjs", "js/scripts/**/*.mjs", "e2e/**/*.js", "e2e-site/**/*.js", "*.config.js"], languageOptions: { globals: { ...globals.node } } },
 ];

@@ -35,6 +35,7 @@ docs = [
   "jupyter-server>=2",
   "jupyterlite-core>=0.4",
   "jupyterlite-pyodide-kernel>=0.4",
+  "marimo>=0.14",
 ]
 
 [project.urls]
@@ -66,6 +67,10 @@ extend-exclude = ["e2e/notebooks", "e2e/marimo"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
+
+[tool.ruff.lint.per-file-ignores]
+# marimo displays the last expression of a cell
+"lite/marimo/*.py" = ["B018"]
 
 [tool.mypy]
 ignore_missing_imports = true
