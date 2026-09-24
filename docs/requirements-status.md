@@ -127,18 +127,20 @@ Tests: py (`tests/test_industrial.py`), js (`js/test/industrial.test.js`), e2e
 example `examples/filling_line.ipynb`.
 
 ## HOST – Host independence
-Migration in progress: pilot on `Knob` and `Tank` (see the
+Migration in progress. Migrated: `Knob`, `Dial`, `Gauge`, `Meter`, `Compass`, `Tank`,
+`Thermometer`, `FillSlide`, `VUMeter`, `SevenSegment`, `AnalogIndicator`,
+`Transmitter`, `NumericEntry` (see the
 [migration inventory](dev/frontend-migration-inventory.md)).
 
 | ID | Pri | Status | Notes |
 |---|---|---|---|
-| HOST-001 | M | 🟡 | Schemas for the shared traits, the numeric base, `Knob` and `Tank`; generated TypeScript types and `static/contract.json` (py, js) |
-| HOST-002 | M | 🟡 | `Knob`, `Tank`: traits read through the schema, coerced value, last valid scale (js, e2e host page) |
+| HOST-001 | M | 🟡 | Schemas for the shared traits, the numeric base, peak hold and the migrated widgets; generated TypeScript types and `static/contract.json` (py, js) |
+| HOST-002 | M | 🟡 | Migrated widgets: traits read through the schema, coerced value, last valid scale, Compass heading wrapped (`x-awi-modulo`) (js, e2e host page) |
 | HOST-003 | M | ✅ | Every widget: neutral class defaults, Python widgets announce the kernel session; no stale indication without an announcement (py, js, e2e host page) |
-| HOST-004 | M | 🟡 | `alarm_level` of `Knob` and `Tank` computed by the front end without a host, host value kept otherwise (js, e2e host page) |
-| HOST-005 | M | 🟡 | Parity cases in `tests/parity/`: alarm levels, coerce, scale validity, accepted states (py, js) |
+| HOST-004 | M | 🟡 | `alarm_level` of the migrated numeric widgets and `peak` of `Gauge`, `Meter`, `VUMeter` computed by the front end without a host, host value kept otherwise (js, e2e host page) |
+| HOST-005 | M | 🟡 | Parity cases in `tests/parity/`: alarm levels, coerce, scale validity, heading wrap, peak hold, accepted states (py, js) |
 | HOST-006 | S | ✅ | Unminified bundle with a linked source map, still reproducible |
-| HOST-007 | M | 🟡 | Checked for the widgets with a schema (`Knob`, `Tank`) by `tests/test_contract.py` |
+| HOST-007 | M | 🟡 | Checked for the widgets with a schema by `tests/test_contract.py` |
 | HOST-008 | S | 🟡 | `ArrayBuffer`, `DataView` and typed arrays accepted by `core/buffers.ts`; layouts in the schemas with the graphs |
 
 ## DOC, QA
