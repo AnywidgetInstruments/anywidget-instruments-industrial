@@ -92,6 +92,7 @@ MIGRATED = {
     "Motor",
     "EventLog",
     "StateMachine",
+    "PIDFaceplate",
 }
 
 

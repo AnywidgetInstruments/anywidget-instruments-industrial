@@ -8,7 +8,7 @@ from typing import Any
 import traitlets as t
 
 from ._alarm_logic import ALARM_LEVELS, compute_alarm_level
-from ._base import InstrumentWidget, float_serializers
+from ._base import InstrumentWidget, float_serializers, size_trait
 
 PID_MODES: tuple[str, ...] = ("MAN", "AUTO", "CAS")
 
@@ -160,6 +160,7 @@ class PIDFaceplate(InstrumentWidget):
 
     _kind = t.Unicode("pidfaceplate").tag(sync=True)
     _default_size = (240, 236)
+    size = size_trait(*_default_size)
 
     value = t.Dict(read_only=True).tag(sync=True)
     tag = t.Unicode("").tag(sync=True)
@@ -185,6 +186,10 @@ class PIDFaceplate(InstrumentWidget):
     hihi = _opt_float()
     deadband = t.Float(0.0, min=0.0).tag(sync=True)
     alarm_level = t.Enum(list(ALARM_LEVELS), default_value="normal", read_only=True).tag(sync=True)
+
+    #: Attached controller; a class default so that the observers of sp / op
+    #: work while the constructor sets them (before the controller is attached).
+    controller: PID | None = None
 
     def __init__(self, controller: PID | None = None, **kwargs: Any) -> None:
         loop_mode = kwargs.pop("loop_mode", None)

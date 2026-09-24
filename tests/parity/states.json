@@ -472,6 +472,30 @@
           "initial": "Off"
         }
       }
+    },
+    {
+      "widget": "PIDFaceplate",
+      "traits": {
+        "tag": "TIC-101",
+        "unit": "°C",
+        "pv": 72.4,
+        "sp": 75,
+        "op": 62.5,
+        "loop_mode": "MAN",
+        "modes": [
+          "MAN",
+          "AUTO",
+          "CAS"
+        ],
+        "pv_max": 150,
+        "sp_min": 20,
+        "sp_max": 120,
+        "op_max": 80,
+        "confirm_delta": 5,
+        "sp_tracking": true,
+        "hi": 100,
+        "deadband": 1
+      }
     }
   ]
 }

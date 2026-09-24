@@ -5,6 +5,7 @@ import alarmCases from "../../tests/parity/alarm_level.json";
 import barCases from "../../tests/parity/bars.json";
 import numericCases from "../../tests/parity/numeric.json";
 import peakCases from "../../tests/parity/peak.json";
+import pidCases from "../../tests/parity/pid.json";
 import processCases from "../../tests/parity/process.json";
 import resolvedCases from "../../tests/parity/resolved.json";
 import machineCases from "../../tests/parity/statemachine.json";
@@ -14,6 +15,8 @@ import { barLevels, normalizeBars } from "../src/contract/bars.js";
 import { selectorValue, stackStates } from "../src/contract/industrial.js";
 import { coerceValue, validScale } from "../src/contract/numeric.js";
 import { nextPeak, type PeakState } from "../src/contract/peak.js";
+import { pidState } from "../src/contract/derived.js";
+import { loopModeChange, operatorSet } from "../src/contract/pid.js";
 import { positionDemand, processCommand, type ProcessState } from "../src/contract/process.js";
 import { availableCommands, type Machine, nextState, normalizeMachine, SC } from "../src/contract/statemachine.js";
 import { readTrait } from "../src/contract/traits.js";
@@ -151,6 +154,27 @@ describe("state machine", () => {
         const next = command === SC ? nextState(m, state, SC) : nextState(m, state, command);
         if (next !== null) state = next;
         expect([state, availableCommands(m, state)], `${c.name}: ${command}`).toEqual([expected, available]);
+      }
+    });
+  }
+});
+
+describe("PID faceplate operator rules", () => {
+  for (const c of pidCases.cases) {
+    test(c.name, () => {
+      const spec = CONTRACTS.PIDFaceplate.traits;
+      const state: Record<string, unknown> = Object.fromEntries(Object.entries(spec).map(([k, s]) => [k, readTrait(s, s.default)]));
+      Object.assign(state, c.traits, "pv" in c.traits ? { pv: parseNumber((c.traits as { pv: unknown }).pv) } : {});
+      for (const [step, expected] of c.steps as Array<[unknown[], Record<string, unknown>]>) {
+        const s = pidState((k) => state[k]);
+        if (step[0] === "set") {
+          const r = operatorSet(s, String(step[1]), step[2], !!step[3]);
+          if (r.ok) state[r.field] = r.value;
+        } else {
+          const r = loopModeChange(s, String(step[1]));
+          if (r.ok) Object.assign(state, r.changes);
+        }
+        for (const [name, v] of Object.entries(expected)) expect(state[name], `${c.name}: ${JSON.stringify(step)} ${name}`).toEqual(v);
       }
     });
   }

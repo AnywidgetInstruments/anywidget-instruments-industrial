@@ -449,3 +449,11 @@ def test_state_machine_custom_model():
         ai.StateMachine({"states": [{"name": "A"}], "transitions": [["A", "go", "B"]]})
     with pytest.raises(t.TraitError, match="unique"):
         ai.StateMachine({"states": [{"name": "A"}, {"name": "A"}]})
+
+
+def test_pid_faceplate_accepts_sp_and_op_at_creation() -> None:
+    """Regression: sp / op given to the constructor used to raise AttributeError
+    (their observers ran before the controller attribute existed)."""
+    fp = ai.PIDFaceplate(sp=75, op=10, pv_max=150)
+    assert (fp.sp, fp.op) == (75, 10)
+    assert fp.value["sp"] == 75

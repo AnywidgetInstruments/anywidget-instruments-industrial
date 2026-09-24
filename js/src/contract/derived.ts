@@ -12,6 +12,7 @@ import { type AlarmLevel, computeAlarmLevel } from "./alarm.js";
 import { barLevels, normalizeBars } from "./bars.js";
 import { coerceValue } from "./numeric.js";
 import { nextPeak, type PeakState } from "./peak.js";
+import { clampedSpOp, type PIDState } from "./pid.js";
 import { availableCommands, type Machine, normalizeMachine, resolveState } from "./statemachine.js";
 import type { WidgetContract } from "./spec.js";
 import { readTrait } from "./traits.js";
@@ -36,12 +37,17 @@ export function reader(model: AnyModel, contract: WidgetContract): (name: string
   };
 }
 
-const ALARM_INPUTS = ["value", "min", "max", "coerce", "lolo", "lo", "hi", "hihi", "deadband", "alarm_level", "_session"];
-
-/** alarm_level of a numeric widget (ALARM-002, ALARM-003). */
+/**
+ * alarm_level of a numeric widget or of the PV of a PID faceplate
+ * (ALARM-002, ALARM-003): computed from the trait named by x-awi-source
+ * (default value), coerced to [min, max] where the widget has `coerce`.
+ */
 function attachAlarmLevel(model: AnyModel<Traits>, contract: WidgetContract): () => void {
   const read = reader(model, contract);
   const num = (name: string): number | null => read(name) as number | null;
+  const source = contract.traits.alarm_level.source ?? "value";
+  const hasCoerce = "coerce" in contract.traits;
+  const ALARM_INPUTS = [source, "min", "max", "coerce", "lolo", "lo", "hi", "hihi", "deadband", "alarm_level", "_session"];
   let previous = read("alarm_level") as AlarmLevel;
   let writing = false;
   const update = (): void => {
@@ -50,7 +56,8 @@ function attachAlarmLevel(model: AnyModel<Traits>, contract: WidgetContract): ()
       previous = read("alarm_level") as AlarmLevel;
       return;
     }
-    const value = coerceValue(num("value") as number, num("min") as number, num("max") as number, !!read("coerce"));
+    const raw = num(source) as number;
+    const value = hasCoerce ? coerceValue(raw, num("min") as number, num("max") as number, !!read("coerce")) : raw;
     const level = computeAlarmLevel(value, { lolo: num("lolo"), lo: num("lo"), hi: num("hi"), hihi: num("hihi"), deadband: num("deadband") ?? 0, previous });
     previous = level;
     if (model.get("alarm_level") !== level) {
@@ -170,6 +177,44 @@ function attachStateMachine(model: AnyModel<Traits>, contract: WidgetContract): 
   };
 }
 
+/** value {pv, sp, op, mode} of a PID faceplate (IND-030), with sp / op clamped as the kernel stores them. */
+function attachPidSummary(model: AnyModel<Traits>, contract: WidgetContract): () => void {
+  const read = reader(model, contract);
+  const inputs = ["pv", "sp", "op", "loop_mode", "sp_min", "sp_max", "pv_min", "pv_max", "op_min", "op_max", "_session"];
+  let writing = false;
+  const update = (): void => {
+    if (writing || hostOwnsState(model)) return;
+    const { sp, op } = pidState(read);
+    const pv = read("pv") as number;
+    const summary = { pv: Number.isFinite(pv) ? pv : String(pv).toLowerCase().replace("infinity", "inf"), sp, op, mode: read("loop_mode") };
+    if (JSON.stringify(model.get("value")) === JSON.stringify(summary)) return;
+    writing = true;
+    try {
+      model.set("value", summary);
+      model.save_changes();
+    } finally {
+      writing = false;
+    }
+  };
+  for (const name of inputs) model.on(`change:${name}`, update);
+  update();
+  return () => {
+    for (const name of inputs) model.off(`change:${name}`, update);
+  };
+}
+
+/** Operator-rule state of a PID faceplate, read through its contract, with SP and OP as the kernel stores them (clamped). */
+export function pidState(read: (name: string) => unknown): PIDState {
+  const n = (k: string): number => read(k) as number;
+  const o = (k: string): number | null => read(k) as number | null;
+  const s: PIDState = {
+    pv: n("pv"), sp: n("sp"), op: n("op"), loop_mode: String(read("loop_mode")), modes: (read("modes") as string[]) || [],
+    pv_min: n("pv_min"), pv_max: n("pv_max"), sp_min: o("sp_min"), sp_max: o("sp_max"), op_min: n("op_min"), op_max: n("op_max"),
+    confirm_delta: o("confirm_delta"), sp_tracking: !!read("sp_tracking"),
+  };
+  return { ...s, ...clampedSpOp(s) };
+}
+
 /**
  * Model-level hook (AFM `initialize`): keep the derived traits of a widget
  * with a schema up to date when no host owns the state. Returns a cleanup.
@@ -181,5 +226,6 @@ export function attachDerived(model: AnyModel, { clock = monotonic }: { clock?: 
   if (contract?.traits.peak?.writer === "derived") cleanups.push(attachPeak(model, contract, clock));
   if (contract?.traits.alarm_levels?.writer === "derived") cleanups.push(attachBarLevels(model, contract));
   if (contract?.traits.available_commands?.writer === "derived") cleanups.push(attachStateMachine(model, contract));
+  if (contract?.traits.loop_mode && contract.traits.value?.writer === "derived") cleanups.push(attachPidSummary(model, contract));
   return () => cleanups.forEach((c) => c());
 }

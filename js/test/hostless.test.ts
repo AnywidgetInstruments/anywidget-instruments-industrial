@@ -456,6 +456,45 @@ describe("State machine without a kernel", () => {
   });
 });
 
+describe("PID faceplate without a kernel", () => {
+  const enter = (el: HTMLElement, field: number, value: string) => {
+    const input = el.querySelectorAll(".awi-pid-input")[field] as HTMLInputElement;
+    input.value = value;
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+  };
+  const modeButton = (el: HTMLElement, m: string) => [...el.querySelectorAll(".awi-pid-mode")].find((b) => b.textContent === m) as HTMLButtonElement;
+
+  test("alarm on PV, summary, SP entry and SP tracking", async () => {
+    const sent: unknown[] = [];
+    const { model, el } = mount({ ...defaults("PIDFaceplate"), tag: "TIC-101", pv: 95, hi: 90, sp: 300, sp_max: 150, sp_tracking: true, confirm_delta: 20 });
+    model.send = (msg: unknown) => {
+      sent.push(msg);
+    };
+    await frame();
+    expect(model.get("alarm_level")).toBe("hi");
+    expect(model.get("value")).toEqual({ pv: 95, sp: 150, op: 0, mode: "AUTO" }); // sp shown clamped
+    enter(el, 0, "140");
+    expect(sent.at(-1)).toEqual({ type: "set", field: "sp", value: 140, confirmed: false });
+    expect(model.get("sp")).toBe(140);
+    enter(el, 0, "10"); // larger than confirm_delta: needs a confirmation
+    expect(model.get("sp")).toBe(140);
+    (el.querySelector(".awi-pid-confirm") as HTMLButtonElement).click();
+    expect(model.get("sp")).toBe(10);
+    modeButton(el, "MAN").click();
+    expect(model.get("loop_mode")).toBe("MAN");
+    modeButton(el, "AUTO").click(); // leaving MAN with sp_tracking: SP = PV
+    expect(model.get("sp")).toBe(95);
+  });
+
+  test("with a kernel, entries are only sent", async () => {
+    const { model, el } = mount({ ...defaults("PIDFaceplate"), _session: "kernel", pv: 50 });
+    await frame();
+    enter(el, 0, "40");
+    expect(model.get("sp")).toBe(0);
+    expect(model.saved).toHaveLength(0);
+  });
+});
+
 describe("Tank without a kernel", () => {
   test("indicator by default, markers read through the schema", async () => {
     const { root, body, el } = mount({ ...defaults("Tank"), value: 3.2, max: 4, unit: "m", markers: [0.5, "x", 3.5], hi: 3, hihi: 3.5 });

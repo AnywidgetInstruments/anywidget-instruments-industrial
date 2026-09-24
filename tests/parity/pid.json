@@ -1,0 +1,32 @@
+{
+  "description": "PID faceplate operator rules (IND-030 .. IND-034). Each case builds a faceplate from traits, applies the steps ([\"set\", field, value, confirmed] or [\"mode\", mode]) and checks the expected traits; a rejected step leaves the traits unchanged.",
+  "cases": [
+    { "name": "SP in AUTO, clamped to the PV range", "traits": { "pv_max": 150 }, "steps": [
+      [["set", "sp", 72.5, false], { "sp": 72.5 }],
+      [["set", "sp", 999, false], { "sp": 150 }],
+      [["set", "op", 50, false], { "op": 0 }] ] },
+    { "name": "SP limits narrower than the PV range", "traits": { "sp_min": 10, "sp_max": 90 }, "steps": [
+      [["set", "sp", 5, false], { "sp": 10 }],
+      [["set", "sp", 95, false], { "sp": 90 }] ] },
+    { "name": "OP in MAN only", "traits": { "loop_mode": "MAN", "op_max": 80 }, "steps": [
+      [["set", "op", 90, false], { "op": 80 }],
+      [["set", "sp", 40, false], { "sp": 0 }],
+      [["mode", "AUTO"], { "loop_mode": "AUTO" }],
+      [["set", "op", 10, false], { "op": 80 }] ] },
+    { "name": "confirmation of large changes", "traits": { "confirm_delta": 5 }, "steps": [
+      [["set", "sp", 4, false], { "sp": 4 }],
+      [["set", "sp", 20, false], { "sp": 4 }],
+      [["set", "sp", 20, true], { "sp": 20 }] ] },
+    { "name": "non-finite entries are refused", "traits": {}, "steps": [
+      [["set", "sp", "abc", false], { "sp": 0 }],
+      [["set", "sp", "nan", false], { "sp": 0 }] ] },
+    { "name": "setpoint tracking when leaving MAN", "traits": { "loop_mode": "MAN", "sp_tracking": true, "pv": 42.5 }, "steps": [
+      [["mode", "AUTO"], { "loop_mode": "AUTO", "sp": 42.5 }] ] },
+    { "name": "no tracking without sp_tracking", "traits": { "loop_mode": "MAN", "pv": 42.5 }, "steps": [
+      [["mode", "AUTO"], { "loop_mode": "AUTO", "sp": 0 }] ] },
+    { "name": "tracking clamps to the SP limits", "traits": { "loop_mode": "MAN", "sp_tracking": true, "pv": 95, "sp_max": 80 }, "steps": [
+      [["mode", "AUTO"], { "sp": 80 }] ] },
+    { "name": "a mode that is not enabled is refused", "traits": {}, "steps": [
+      [["mode", "CAS"], { "loop_mode": "AUTO" }] ] }
+  ]
+}

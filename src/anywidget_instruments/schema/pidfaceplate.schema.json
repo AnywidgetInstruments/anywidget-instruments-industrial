@@ -1,0 +1,256 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://s-celles.github.io/anywidget-instruments/schema/pidfaceplate.schema.json",
+  "title": "PIDFaceplate",
+  "description": "Operator faceplate of a control loop (IND-030 .. IND-034).",
+  "type": "object",
+  "x-awi-class": "PIDFaceplate",
+  "allOf": [
+    {
+      "$ref": "instrument.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "pidfaceplate",
+      "default": "pidfaceplate",
+      "x-awi-writer": "host"
+    },
+    "size": {
+      "default": [
+        240,
+        236
+      ]
+    },
+    "tag": {
+      "type": "string",
+      "default": "",
+      "x-awi-writer": "host",
+      "description": "Loop tag, e.g. TIC-101."
+    },
+    "unit": {
+      "type": "string",
+      "default": "",
+      "x-awi-writer": "host",
+      "description": "Unit of PV and SP."
+    },
+    "op_unit": {
+      "type": "string",
+      "default": "%",
+      "x-awi-writer": "host",
+      "description": "Unit of OP."
+    },
+    "format": {
+      "type": "string",
+      "default": "%.1f",
+      "x-awi-writer": "host",
+      "description": "printf-like spec of the values (NUM-004)."
+    },
+    "pv": {
+      "$ref": "instrument.schema.json#/$defs/float",
+      "default": "nan",
+      "x-awi-writer": "host",
+      "description": "Process value (measurement), set by the host."
+    },
+    "sp": {
+      "type": "number",
+      "default": 0.0,
+      "x-awi-writer": "host",
+      "description": "Setpoint, clamped to sp_min .. sp_max (or the PV range). Changed by the operator in AUTO (IND-031)."
+    },
+    "op": {
+      "type": "number",
+      "default": 0.0,
+      "x-awi-writer": "host",
+      "description": "Output, clamped to op_min .. op_max. Changed by the operator in MAN."
+    },
+    "loop_mode": {
+      "enum": [
+        "MAN",
+        "AUTO",
+        "CAS"
+      ],
+      "default": "AUTO",
+      "x-awi-writer": "host",
+      "description": "Loop mode: MAN (operator sets OP), AUTO (operator sets SP), CAS (neither). Must be one of modes."
+    },
+    "modes": {
+      "type": "array",
+      "default": [
+        "MAN",
+        "AUTO"
+      ],
+      "x-awi-writer": "host",
+      "description": "Modes offered on the faceplate.",
+      "items": {
+        "enum": [
+          "MAN",
+          "AUTO",
+          "CAS"
+        ]
+      }
+    },
+    "pv_min": {
+      "type": "number",
+      "default": 0.0,
+      "x-awi-writer": "host",
+      "description": "Lower end of the PV scale."
+    },
+    "pv_max": {
+      "type": "number",
+      "default": 100.0,
+      "x-awi-writer": "host",
+      "description": "Upper end of the PV scale."
+    },
+    "sp_min": {
+      "$ref": "instrument.schema.json#/$defs/optionalNumber",
+      "default": null,
+      "x-awi-writer": "host",
+      "description": "Lower setpoint limit; null: pv_min."
+    },
+    "sp_max": {
+      "$ref": "instrument.schema.json#/$defs/optionalNumber",
+      "default": null,
+      "x-awi-writer": "host",
+      "description": "Upper setpoint limit; null: pv_max."
+    },
+    "op_min": {
+      "type": "number",
+      "default": 0.0,
+      "x-awi-writer": "host",
+      "description": "Lower output limit."
+    },
+    "op_max": {
+      "type": "number",
+      "default": 100.0,
+      "x-awi-writer": "host",
+      "description": "Upper output limit."
+    },
+    "confirm_delta": {
+      "$ref": "instrument.schema.json#/$defs/optionalNumber",
+      "default": null,
+      "x-awi-writer": "host",
+      "description": "A change of SP or OP larger than this needs a confirmation (IND-032); null: never."
+    },
+    "sp_tracking": {
+      "type": "boolean",
+      "default": false,
+      "x-awi-writer": "host",
+      "description": "Leaving MAN sets SP to PV (bumpless transfer, IND-034)."
+    },
+    "lolo": {
+      "$ref": "instrument.schema.json#/$defs/optionalNumber",
+      "default": null,
+      "x-awi-writer": "host",
+      "description": "Low-low alarm limit on PV."
+    },
+    "lo": {
+      "$ref": "instrument.schema.json#/$defs/optionalNumber",
+      "default": null,
+      "x-awi-writer": "host",
+      "description": "Low alarm limit on PV."
+    },
+    "hi": {
+      "$ref": "instrument.schema.json#/$defs/optionalNumber",
+      "default": null,
+      "x-awi-writer": "host",
+      "description": "High alarm limit on PV."
+    },
+    "hihi": {
+      "$ref": "instrument.schema.json#/$defs/optionalNumber",
+      "default": null,
+      "x-awi-writer": "host",
+      "description": "High-high alarm limit on PV."
+    },
+    "deadband": {
+      "type": "number",
+      "minimum": 0.0,
+      "default": 0.0,
+      "x-awi-writer": "host",
+      "description": "Alarm hysteresis (ALARM-003)."
+    },
+    "alarm_level": {
+      "enum": [
+        "normal",
+        "lo",
+        "lolo",
+        "hi",
+        "hihi"
+      ],
+      "default": "normal",
+      "x-awi-writer": "derived",
+      "readOnly": true,
+      "description": "Alarm level of pv. Derived: by the host when it owns the state, otherwise by the front end (HOST-004).",
+      "x-awi-source": "pv"
+    },
+    "value": {
+      "type": "object",
+      "default": {},
+      "x-awi-writer": "derived",
+      "readOnly": true,
+      "description": "Summary {pv, sp, op, mode}. Derived: by the host when it owns the state, otherwise by the front end.",
+      "properties": {
+        "pv": {
+          "$ref": "instrument.schema.json#/$defs/float"
+        },
+        "sp": {
+          "type": "number"
+        },
+        "op": {
+          "type": "number"
+        },
+        "mode": {
+          "type": "string"
+        }
+      },
+      "x-awi-resolved": true
+    }
+  },
+  "x-awi-messages": [
+    {
+      "type": "set",
+      "direction": "front-to-host",
+      "description": "Operator entry of SP or OP; also sent when the front end applies it itself.",
+      "fields": {
+        "field": {
+          "enum": [
+            "sp",
+            "op"
+          ]
+        },
+        "value": {
+          "type": "number"
+        },
+        "confirmed": {
+          "type": "boolean"
+        }
+      },
+      "buffers": []
+    },
+    {
+      "type": "loop_mode",
+      "direction": "front-to-host",
+      "description": "Operator mode change.",
+      "fields": {
+        "mode": {
+          "type": "string"
+        }
+      },
+      "buffers": []
+    },
+    {
+      "type": "rejected",
+      "direction": "host-to-front",
+      "description": "An operator entry refused by the rules.",
+      "fields": {
+        "field": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "buffers": []
+    }
+  ]
+}

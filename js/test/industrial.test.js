@@ -87,7 +87,7 @@ describe("AnalogIndicator (IND-001..003)", () => {
 });
 
 describe("PIDFaceplate (IND-030..032)", () => {
-  const fp = { _kind: "pidfaceplate", value: {}, tag: "TIC-1", unit: "°C", op_unit: "%", format: "%.1f", pv: 50, sp: 60, op: 40, loop_mode: "AUTO", modes: ["MAN", "AUTO"], pv_min: 0, pv_max: 100, sp_min: null, sp_max: null, op_min: 0, op_max: 100, confirm_delta: 10, sp_tracking: false, lolo: null, lo: null, hi: 90, hihi: null, alarm_level: "normal", size: [240, 236] };
+  const fp = { _kind: "pidfaceplate", _session: "kernel", value: {}, tag: "TIC-1", unit: "°C", op_unit: "%", format: "%.1f", pv: 50, sp: 60, op: 40, loop_mode: "AUTO", modes: ["MAN", "AUTO"], pv_min: 0, pv_max: 100, sp_min: null, sp_max: null, op_min: 0, op_max: 100, confirm_delta: 10, sp_tracking: false, lolo: null, lo: null, hi: 90, hihi: null, alarm_level: "normal", size: [240, 236] };
 
   it("entry rules: mode, clamping and confirmation", async () => {
     const { entryDecision } = await import("../src/widgets/pid.js");

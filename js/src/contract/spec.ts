@@ -56,6 +56,8 @@ export interface TraitSpec extends ValueSpec {
   transitions?: Array<[string, string, string]>;
   /** Simulated state after each command of a process object (x-awi-simulated). */
   simulated?: Record<string, string>;
+  /** Trait a derived alarm level is computed from (default: value). */
+  source?: string;
   description?: string;
 }
 

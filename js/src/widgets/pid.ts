@@ -1,25 +1,43 @@
 // PID faceplate (IND-030..034): PV / SP / OP bars and values, loop mode,
 // operator entries with mode rules and confirmation of large changes.
+import { hostOwnsState, pidState } from "../contract/derived.js";
+import { loopModeChange, operatorSet, type PIDState } from "../contract/pid.js";
 import { clear, html, svg, svgText } from "../core/dom.js";
 import { formatValue, tickFormat, withUnit } from "../core/format.js";
 import { fromFraction, linearHit, parseNumber, ticks, toFraction } from "../core/scale.js";
+import type { AnyModel } from "../core/model.js";
 import { BaseView } from "../core/view.js";
+import type { PIDFaceplateTraits } from "../generated/contract.js";
 import { svgPoint } from "./numeric.js";
 
-const ALARM_TEXT = { lolo: "LOLO", lo: "LO", hi: "HI", hihi: "HIHI" };
-const EDITABLE_IN = { sp: "AUTO", op: "MAN" };
+type Field = "pv" | "sp" | "op";
 
-/** Operator entry check done before sending (the kernel checks again). */
-export function entryDecision({ field, mode, value, current, min, max, confirmDelta }) {
-  if (EDITABLE_IN[field] !== mode) return { ok: false, reason: `${field.toUpperCase()} can only be changed in ${EDITABLE_IN[field]} mode` };
-  if (!Number.isFinite(value)) return { ok: false, reason: "not a number" };
-  const v = Math.min(max, Math.max(min, value));
-  const confirm = confirmDelta !== null && confirmDelta !== undefined && Math.abs(v - current) > confirmDelta;
-  return { ok: true, value: v, confirm };
+const ALARM_TEXT: Record<string, string> = { lolo: "LOLO", lo: "LO", hi: "HI", hihi: "HIHI" };
+const EDITABLE_IN: Record<string, string> = { sp: "AUTO", op: "MAN" };
+
+/**
+ * Operator entry check done before sending (the kernel checks again): the
+ * rules of operatorSet (contract/pid.ts), with whether a confirmation is needed.
+ */
+export function entryDecision({ field, mode, value, current, min, max, confirmDelta }: { field: string; mode: string; value: number; current: number; min: number; max: number; confirmDelta?: number | null }): { ok: true; value: number; confirm: boolean } | { ok: false; reason: string } {
+  const s: PIDState = { pv: NaN, sp: current, op: current, loop_mode: mode, modes: [mode], pv_min: min, pv_max: max, sp_min: null, sp_max: null, op_min: min, op_max: max, confirm_delta: confirmDelta ?? null, sp_tracking: false };
+  const r = operatorSet(s, field, value, true);
+  if (!r.ok) return r;
+  return { ok: true, value: r.value, confirm: confirmDelta !== null && confirmDelta !== undefined && Math.abs(r.value - current) > confirmDelta };
 }
 
-export class PIDView extends BaseView {
-  constructor(model, el) {
+export class PIDView extends BaseView<PIDFaceplateTraits> {
+  readonly head: HTMLDivElement;
+  readonly tagEl: HTMLSpanElement;
+  readonly modeBar: HTMLDivElement;
+  readonly svgEl: SVGElement;
+  readonly rows: Record<string, { row: HTMLDivElement; val: HTMLSpanElement; input: HTMLInputElement; set: HTMLButtonElement }>;
+  readonly note: HTMLDivElement;
+  pending: string | null;
+  preview: { field: Field; value: number } | null;
+  barGeom: { pv: [number, number]; op: [number, number]; y0: number; y1: number } | undefined;
+
+  constructor(model: AnyModel<PIDFaceplateTraits>, el: HTMLElement) {
     super(model, el, ["value", "tag", "unit", "op_unit", "format", "pv", "sp", "op", "loop_mode", "modes", "pv_min", "pv_max", "sp_min", "sp_max", "op_min", "op_max", "confirm_delta", "lolo", "lo", "hi", "hihi", "alarm_level"]);
     const b = this.body;
     b.setAttribute("role", "group");
@@ -30,7 +48,7 @@ export class PIDView extends BaseView {
     this.svgEl = svg("svg", { class: "awi-svg awi-pid-bars", "aria-hidden": "true" });
     this.rows = {};
     const table = html("div", { cls: "awi-pid-rows" });
-    for (const f of ["pv", "sp", "op"]) {
+    for (const f of ["pv", "sp", "op"] as Field[]) {
       const name = html("span", { cls: "awi-pid-name", text: f.toUpperCase() });
       const val = html("span", { cls: "awi-pid-val" });
       const input = html("input", { cls: "awi-pid-input", attrs: { type: "number", "aria-label": `New ${f.toUpperCase()}`, "data-lm-suppress-shortcuts": "true" } });
@@ -56,35 +74,53 @@ export class PIDView extends BaseView {
     // direct manipulation (API-014): drag the SP marker in AUTO, the OP bar in MAN
     this.preview = null;
     this.svgEl.addEventListener("pointerdown", (e) => this.startDrag(e));
-    this.listen("msg:custom", (msg) => {
+    this.listen("msg:custom", (msg: { type?: string; reason?: string } | null) => {
       if (msg && msg.type === "rejected") this.showNote(`✖ ${msg.reason}`);
     });
     this.schedule();
   }
 
-  num(name) {
+  num(name: string): number | null {
     const v = this.get(name);
-    return v === null || v === undefined ? null : parseNumber(v);
+    if (v === null || v === undefined) return null;
+    // SP and OP as the kernel stores them: clamped to their limits
+    if (this.contract && (name === "sp" || name === "op")) return this.state[name];
+    return parseNumber(v);
   }
 
-  spLimits() {
-    return [this.num("sp_min") ?? this.num("pv_min"), this.num("sp_max") ?? this.num("pv_max")];
+  /** Operator-rule state, read through the contract. */
+  get state(): PIDState {
+    return pidState((k) => this.get(k));
   }
 
-  showNote(text, buttons = []) {
+  /** Apply an accepted operator action when no host owns the state (HOST-004). */
+  applyLocally(changes: Record<string, unknown>): void {
+    const model = this.model as unknown as AnyModel;
+    if (!this.contract || hostOwnsState(model)) return;
+    for (const [k, v] of Object.entries(changes)) model.set(k, v);
+    model.save_changes();
+  }
+
+  spLimits(): [number, number] {
+    return [(this.num("sp_min") ?? this.num("pv_min")) as number, (this.num("sp_max") ?? this.num("pv_max")) as number];
+  }
+
+  showNote(text: string, buttons: HTMLElement[] = []): void {
     clear(this.note);
     this.note.appendChild(html("span", { text }));
     for (const btn of buttons) this.note.appendChild(btn);
   }
 
   /** Operator entry (IND-031, IND-032). */
-  enter(field, value) {
+  enter(field: Field, value: number): void {
     if (!this.interactive) return;
-    const [min, max] = field === "sp" ? this.spLimits() : [this.num("op_min"), this.num("op_max")];
-    const d = entryDecision({ field, mode: this.get("loop_mode"), value, current: this.num(field), min, max, confirmDelta: this.num("confirm_delta") });
+    const [min, max] = field === "sp" ? this.spLimits() : [this.num("op_min") as number, this.num("op_max") as number];
+    const d = entryDecision({ field, mode: this.get("loop_mode"), value, current: this.num(field) as number, min, max, confirmDelta: this.num("confirm_delta") });
     if (!d.ok) return this.showNote(`✖ ${d.reason}`);
-    const send = (confirmed) => {
+    const send = (confirmed: boolean): void => {
       this.model.send({ type: "set", field, value: d.value, confirmed });
+      const r = operatorSet(this.state, field, d.value, confirmed);
+      if (r.ok) this.applyLocally({ [r.field]: r.value });
       this.rows[field].input.value = "";
       this.showNote("");
       this.pending = null;
@@ -99,33 +135,33 @@ export class PIDView extends BaseView {
       this.showNote("");
     });
     this.pending = field;
-    this.showNote(`Change ${field.toUpperCase()} ${formatValue(this.num(field), fmt)} → ${formatValue(d.value, fmt)}?`, [ok, cancel]);
+    this.showNote(`Change ${field.toUpperCase()} ${formatValue(this.num(field) as number, fmt)} → ${formatValue(d.value, fmt)}?`, [ok, cancel]);
     ok.focus();
   }
 
   /** Field and value under the pointer, or null when that field is not editable now. */
-  dragTarget(e) {
+  dragTarget(e: PointerEvent): { field: Field; value: number } | null {
     const g = this.barGeom;
     if (!g) return null;
     const p = svgPoint(this.svgEl, e);
-    const field = p.x >= g.op[0] ? "op" : p.x <= g.pv[1] ? "sp" : null;
+    const field: Field | null = p.x >= g.op[0] ? "op" : p.x <= g.pv[1] ? "sp" : null;
     if (!field || EDITABLE_IN[field] !== this.get("loop_mode")) return null;
-    const [a, b] = field === "sp" ? [this.num("pv_min"), this.num("pv_max")] : [this.num("op_min"), this.num("op_max")];
+    const [a, b] = (field === "sp" ? [this.num("pv_min"), this.num("pv_max")] : [this.num("op_min"), this.num("op_max")]) as [number, number];
     return { field, value: fromFraction(linearHit(p.y, g.y0, g.y1), a, b) };
   }
 
-  startDrag(e) {
+  startDrag(e: PointerEvent): void {
     if (!this.interactive || this.get("mode") !== "control" || e.button !== 0) return;
     const first = this.dragTarget(e);
     if (!first) return;
     e.preventDefault();
     this.svgEl.setPointerCapture?.(e.pointerId);
-    const move = (ev) => {
+    const move = (ev: PointerEvent): void => {
       const t = this.dragTarget(ev);
       if (t && t.field === first.field) this.preview = t;
       this.drawBars();
     };
-    const up = (ev) => {
+    const up = (ev: PointerEvent): void => {
       this.svgEl.removeEventListener("pointermove", move);
       this.svgEl.removeEventListener("pointerup", up);
       this.svgEl.removeEventListener("pointercancel", up);
@@ -141,11 +177,15 @@ export class PIDView extends BaseView {
     this.svgEl.addEventListener("pointercancel", up);
   }
 
-  setMode(m) {
-    if (this.interactive && m !== this.get("loop_mode")) this.model.send({ type: "loop_mode", mode: m });
+  setMode(m: string): void {
+    if (!this.interactive || m === this.get("loop_mode")) return;
+    this.model.send({ type: "loop_mode", mode: m });
+    const r = loopModeChange(this.state, m);
+    if (r.ok) this.applyLocally(r.changes);
+    else if (this.contract && !hostOwnsState(this.model as unknown as AnyModel)) this.showNote(`✖ ${r.reason}`);
   }
 
-  draw() {
+  override draw(): void {
     const fmt = this.get("format");
     const unit = this.get("unit");
     const mode = this.get("loop_mode");
@@ -167,38 +207,38 @@ export class PIDView extends BaseView {
     for (const l of Object.keys(ALARM_TEXT)) this.root.classList.toggle(`awi-alarm-${l}`, level === l);
     const pvText = withUnit(formatValue(parseNumber(this.get("pv")), fmt), unit);
     this.rows.pv.val.textContent = ALARM_TEXT[level] ? `${pvText} ${ALARM_TEXT[level]}` : pvText;
-    this.rows.sp.val.textContent = withUnit(formatValue(this.num("sp"), fmt), unit);
-    this.rows.op.val.textContent = withUnit(formatValue(this.num("op"), fmt), this.get("op_unit"));
-    for (const f of ["sp", "op"]) {
+    this.rows.sp.val.textContent = withUnit(formatValue(this.num("sp") as number, fmt), unit);
+    this.rows.op.val.textContent = withUnit(formatValue(this.num("op") as number, fmt), this.get("op_unit"));
+    for (const f of ["sp", "op"] as Field[]) {
       const r = this.rows[f];
       const editable = control && EDITABLE_IN[f] === mode;
       r.input.hidden = !editable;
       r.set.hidden = !editable;
       r.input.disabled = !!this.get("disabled");
       r.set.disabled = !!this.get("disabled");
-      const [min, max] = f === "sp" ? this.spLimits() : [this.num("op_min"), this.num("op_max")];
+      const [min, max] = f === "sp" ? this.spLimits() : [this.num("op_min") as number, this.num("op_max") as number];
       r.input.min = String(min);
       r.input.max = String(max);
       r.input.step = "any";
-      if (document.activeElement !== r.input && !r.input.value) r.input.placeholder = formatValue(this.num(f), fmt);
+      if (document.activeElement !== r.input && !r.input.value) r.input.placeholder = formatValue(this.num(f) as number, fmt);
     }
     this.root.classList.toggle("awi-pid-man", mode === "MAN");
     this.drawBars();
     this.body.setAttribute("aria-label", `${this.tagEl.textContent}: PV ${this.rows.pv.val.textContent}, SP ${this.rows.sp.val.textContent}, OP ${this.rows.op.val.textContent}, mode ${mode}`);
   }
 
-  drawBars() {
+  drawBars(): void {
     const [w] = this.get("size");
     const h = 116;
     const s = this.svgEl;
     s.setAttribute("viewBox", `0 0 ${w} ${h}`);
     s.style.height = `${h}px`;
     clear(s);
-    const [pmin, pmax] = [this.num("pv_min"), this.num("pv_max")];
-    const [omin, omax] = [this.num("op_min"), this.num("op_max")];
+    const [pmin, pmax] = [this.num("pv_min") as number, this.num("pv_max") as number];
+    const [omin, omax] = [this.num("op_min") as number, this.num("op_max") as number];
     const y0 = h - 14;
     const y1 = 8;
-    const yOf = (v, a, b) => y0 - Math.min(1, Math.max(0, toFraction(v, a, b))) * (y0 - y1);
+    const yOf = (v: number, a: number, b: number): number => y0 - Math.min(1, Math.max(0, toFraction(v, a, b))) * (y0 - y1);
     // PV / SP column
     const pvX = 44;
     const barW = 26;
@@ -212,7 +252,7 @@ export class PIDView extends BaseView {
       const v = this.num(k);
       if (v !== null) s.appendChild(svg("path", { class: `awi-ai-limit awi-ai-limit-${k}`, d: `M${pvX - 4} ${yOf(v, pmin, pmax)}H${pvX + barW + 4}` }));
     }
-    const spShown = this.preview?.field === "sp" ? this.preview.value : this.num("sp");
+    const spShown = (this.preview?.field === "sp" ? this.preview.value : this.num("sp")) as number;
     const sy = yOf(spShown, pmin, pmax);
     s.appendChild(svg("path", { class: "awi-pid-sp-mark", d: `M${pvX + barW + 2} ${sy}L${pvX + barW + 12} ${sy - 6}L${pvX + barW + 12} ${sy + 6}Z` }));
     s.appendChild(svgText("SP", { class: "awi-tick-label", x: pvX + barW + 14, y: sy, "dominant-baseline": "central" }));
@@ -231,7 +271,7 @@ export class PIDView extends BaseView {
     s.classList.toggle("awi-pid-drag-sp", drag && loop === "AUTO");
     s.classList.toggle("awi-pid-drag-op", drag && loop === "MAN");
     s.appendChild(svg("rect", { class: "awi-ai-track", x: opX, y: y1, width: 18, height: y0 - y1 }));
-    const opShown = this.preview?.field === "op" ? this.preview.value : this.num("op");
+    const opShown = (this.preview?.field === "op" ? this.preview.value : this.num("op")) as number;
     const oy = yOf(opShown, omin, omax);
     s.appendChild(svg("rect", { class: "awi-pid-op-bar", x: opX, y: oy, width: 18, height: y0 - oy }));
     s.appendChild(svgText(formatValue(omax, tf), { class: "awi-tick-label", x: opX + 22, y: y1, "dominant-baseline": "central" }));

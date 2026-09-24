@@ -173,7 +173,7 @@ describe("derived alarm_level (HOST-004)", () => {
   });
 
   test("widgets without a schema are left alone", () => {
-    const m = eventModel({ _kind: "pidfaceplate", pv: 95, hi: 80 });
+    const m = eventModel({ _kind: "not-a-widget", value: 95, hi: 80 });
     attachDerived(m);
     expect(m.get("alarm_level")).toBeUndefined();
   });

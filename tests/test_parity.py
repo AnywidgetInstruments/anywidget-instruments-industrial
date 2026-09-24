@@ -198,3 +198,18 @@ def test_machine_commands(case: dict[str, Any]) -> None:
         else:
             sm.command(command)
         assert (sm.value, sm.available_commands) == (state, available), (case["name"], command)
+
+
+PID = _load("pid.json")["cases"]
+
+
+@pytest.mark.parametrize("case", PID, ids=[c["name"] for c in PID])
+def test_pid_operator_rules(case: dict[str, Any]) -> None:
+    fp = ai.PIDFaceplate(**{k: _num(v) if k == "pv" else v for k, v in case["traits"].items()})
+    for step, expected in case["steps"]:
+        if step[0] == "set":
+            fp.operator_set(step[1], step[2], confirmed=step[3])
+        else:
+            fp._handle_front_msg(fp, {"type": "loop_mode", "mode": step[1]}, [])
+        for name, v in expected.items():
+            assert getattr(fp, name) == v, (case["name"], step, name)
