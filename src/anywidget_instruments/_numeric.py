@@ -317,6 +317,7 @@ class Compass(NumericWidget):
 
     _kind = t.Unicode("compass").tag(sync=True)
     _default_mode = "indicator"
+    mode = mode_trait(_default_mode)
     min = t.Float(0.0).tag(sync=True)
     max = t.Float(360.0).tag(sync=True)
     unit = t.Unicode("°").tag(sync=True)

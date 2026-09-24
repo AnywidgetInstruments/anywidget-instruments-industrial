@@ -148,6 +148,17 @@ describe.each(NUMERIC)("%s without a kernel", (title, max) => {
   });
 });
 
+describe("Compass without a kernel", () => {
+  test("wraps the heading as the kernel does", async () => {
+    const { model, body } = mount({ ...defaults("Compass"), value: -90, label: "Heading" });
+    await frame();
+    expect(body.getAttribute("aria-valuenow")).toBe("270");
+    model.push("value", 725);
+    await frame();
+    expect(body.getAttribute("aria-valuenow")).toBe("5");
+  });
+});
+
 describe("Tank without a kernel", () => {
   test("indicator by default, markers read through the schema", async () => {
     const { root, body, el } = mount({ ...defaults("Tank"), value: 3.2, max: 4, unit: "m", markers: [0.5, "x", 3.5], hi: 3, hihi: 3.5 });

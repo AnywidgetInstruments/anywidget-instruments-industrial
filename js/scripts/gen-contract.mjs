@@ -105,6 +105,7 @@ function traitSpec(name, p, where, nested = false) {
     throw new Error(`${where}.${name}: unsupported type ${JSON.stringify(p.type)}`);
   }
   for (const k of ["minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum"]) if (p[k] !== undefined) spec[k] = p[k];
+  if (p["x-awi-modulo"] !== undefined) spec.modulo = p["x-awi-modulo"];
   if (spec.type === "array") {
     if (Array.isArray(p.prefixItems)) spec.prefixItems = p.prefixItems.map((it, i) => traitSpec(`${name}[${i}]`, it, where, true));
     else if (p.items && typeof p.items === "object") spec.items = traitSpec(`${name}[]`, p.items, where, true);

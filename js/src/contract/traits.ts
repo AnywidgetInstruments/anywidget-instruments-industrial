@@ -19,6 +19,7 @@ function readNumber(spec: ValueSpec, raw: unknown): number | undefined {
   else if (spec.nonfinite && typeof raw === "string" && NONFINITE.has(raw)) v = parseNumber(raw);
   else return undefined;
   if (!Number.isFinite(v)) return spec.nonfinite ? v : undefined;
+  if (spec.modulo) v = ((v % spec.modulo) + spec.modulo) % spec.modulo;
   if (spec.type === "integer") v = Math.round(v);
   if (spec.exclusiveMinimum !== undefined && v <= spec.exclusiveMinimum) return undefined;
   if (spec.exclusiveMaximum !== undefined && v >= spec.exclusiveMaximum) return undefined;

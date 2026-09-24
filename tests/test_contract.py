@@ -55,7 +55,7 @@ def _synced(cls: type) -> dict[str, t.TraitType]:
 
 
 #: Widgets migrated to the host-independent front end.
-MIGRATED = {"Knob", "Tank", "Dial", "Thermometer", "FillSlide", "SevenSegment"}
+MIGRATED = {"Knob", "Tank", "Dial", "Thermometer", "FillSlide", "SevenSegment", "Compass"}
 
 
 def test_migrated_widgets_have_a_schema() -> None:

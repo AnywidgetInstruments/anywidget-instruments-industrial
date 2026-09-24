@@ -36,6 +36,12 @@ describe("numeric rules", () => {
     const v = coerceValue(parseNumber(c.value), c.min, c.max, c.coerce);
     expect(Object.is(v, parseNumber(c.expected)) || v === parseNumber(c.expected)).toBe(true);
   });
+  test.each(numericCases.modulo)("$widget value $value wraps to $expected", (c) => {
+    const spec = CONTRACTS[c.widget as keyof typeof CONTRACTS].traits.value;
+    const v = readTrait(spec, c.value) as number;
+    const expected = parseNumber(c.expected);
+    expect(Number.isNaN(expected) ? Number.isNaN(v) : v === expected).toBe(true);
+  });
   test.each(numericCases.scale)("scale $min .. $max ($scale) valid: $valid", (c) => {
     expect(validScale(c)).toBe(c.valid);
   });

@@ -25,6 +25,8 @@ export interface ValueSpec {
   maximum?: number;
   exclusiveMinimum?: number;
   exclusiveMaximum?: number;
+  /** Finite values are wrapped into [0, modulo) (e.g. a heading). */
+  modulo?: number;
   /** Array items (homogeneous array). */
   items?: ValueSpec;
   /** Array items (fixed-length tuple). */

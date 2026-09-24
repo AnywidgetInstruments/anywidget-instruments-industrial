@@ -93,3 +93,10 @@ def test_states_are_accepted_unchanged(case: dict[str, Any]) -> None:
     state = json.loads(json.dumps(w.get_state()))
     for name, v in case["traits"].items():
         assert state[name] == v, name
+
+
+@pytest.mark.parametrize("case", NUMERIC["modulo"])
+def test_modulo(case: dict[str, Any]) -> None:
+    """Values wrapped by the kernel (x-awi-modulo in the schema), e.g. a heading."""
+    w = getattr(ai, case["widget"])(_num(case["value"]))
+    assert _same(w.value, _num(case["expected"]))

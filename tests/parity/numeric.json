@@ -1,21 +1,150 @@
 {
-  "description": "Numeric rules (NUM-006, NUM-010): stored value under coerce, and scale validity.",
+  "description": "Numeric rules (NUM-006, NUM-010, SPEC-001): stored value under coerce, scale validity, heading wrap.",
   "coerce": [
-    { "value": 50, "min": 0, "max": 100, "coerce": true, "expected": 50 },
-    { "value": 150, "min": 0, "max": 100, "coerce": true, "expected": 100 },
-    { "value": -5, "min": 0, "max": 100, "coerce": true, "expected": 0 },
-    { "value": 150, "min": 0, "max": 100, "coerce": false, "expected": 150 },
-    { "value": "nan", "min": 0, "max": 100, "coerce": true, "expected": "nan" },
-    { "value": "inf", "min": 0, "max": 100, "coerce": true, "expected": "inf" },
-    { "value": 0.5, "min": -1, "max": 1, "coerce": true, "expected": 0.5 }
+    {
+      "value": 50,
+      "min": 0,
+      "max": 100,
+      "coerce": true,
+      "expected": 50
+    },
+    {
+      "value": 150,
+      "min": 0,
+      "max": 100,
+      "coerce": true,
+      "expected": 100
+    },
+    {
+      "value": -5,
+      "min": 0,
+      "max": 100,
+      "coerce": true,
+      "expected": 0
+    },
+    {
+      "value": 150,
+      "min": 0,
+      "max": 100,
+      "coerce": false,
+      "expected": 150
+    },
+    {
+      "value": "nan",
+      "min": 0,
+      "max": 100,
+      "coerce": true,
+      "expected": "nan"
+    },
+    {
+      "value": "inf",
+      "min": 0,
+      "max": 100,
+      "coerce": true,
+      "expected": "inf"
+    },
+    {
+      "value": 0.5,
+      "min": -1,
+      "max": 1,
+      "coerce": true,
+      "expected": 0.5
+    }
   ],
   "scale": [
-    { "min": 0, "max": 100, "scale": "linear", "valid": true },
-    { "min": -10, "max": -5, "scale": "linear", "valid": true },
-    { "min": 5, "max": 5, "scale": "linear", "valid": false },
-    { "min": 10, "max": 0, "scale": "linear", "valid": false },
-    { "min": 1, "max": 1000, "scale": "log", "valid": true },
-    { "min": 0, "max": 1000, "scale": "log", "valid": false },
-    { "min": -1, "max": 10, "scale": "log", "valid": false }
+    {
+      "min": 0,
+      "max": 100,
+      "scale": "linear",
+      "valid": true
+    },
+    {
+      "min": -10,
+      "max": -5,
+      "scale": "linear",
+      "valid": true
+    },
+    {
+      "min": 5,
+      "max": 5,
+      "scale": "linear",
+      "valid": false
+    },
+    {
+      "min": 10,
+      "max": 0,
+      "scale": "linear",
+      "valid": false
+    },
+    {
+      "min": 1,
+      "max": 1000,
+      "scale": "log",
+      "valid": true
+    },
+    {
+      "min": 0,
+      "max": 1000,
+      "scale": "log",
+      "valid": false
+    },
+    {
+      "min": -1,
+      "max": 10,
+      "scale": "log",
+      "valid": false
+    }
+  ],
+  "modulo": [
+    {
+      "widget": "Compass",
+      "value": 0,
+      "expected": 0
+    },
+    {
+      "widget": "Compass",
+      "value": 90,
+      "expected": 90
+    },
+    {
+      "widget": "Compass",
+      "value": 359.5,
+      "expected": 359.5
+    },
+    {
+      "widget": "Compass",
+      "value": 360,
+      "expected": 0
+    },
+    {
+      "widget": "Compass",
+      "value": 725,
+      "expected": 5
+    },
+    {
+      "widget": "Compass",
+      "value": -10,
+      "expected": 350
+    },
+    {
+      "widget": "Compass",
+      "value": -360,
+      "expected": 0
+    },
+    {
+      "widget": "Compass",
+      "value": -725,
+      "expected": 355
+    },
+    {
+      "widget": "Compass",
+      "value": "nan",
+      "expected": "nan"
+    },
+    {
+      "widget": "Compass",
+      "value": "inf",
+      "expected": "inf"
+    }
   ]
 }
