@@ -249,6 +249,33 @@ describe("Boolean widgets without a kernel", () => {
   });
 });
 
+describe("Operator objects without a kernel", () => {
+  test("a selector resolves its position as the kernel does", async () => {
+    const { model, el } = mount({ ...defaults("SelectorSwitch"), positions: ["1", "2", "3", "4"], label: "Speed" });
+    await frame();
+    expect((el.querySelector(".awi-choice") as HTMLSelectElement).value).toBe("3");
+    model.push("positions", ["X"]); // invalid (fewer than 2): the schema default is used
+    await frame();
+    expect((el.querySelector(".awi-choice") as HTMLSelectElement).value).toBe("OFF");
+  });
+
+  test("a locked key switch ignores the operator", async () => {
+    const { model, el } = mount({ ...defaults("SelectorSwitch"), value: "AUTO", keyed: true, locked: true });
+    await frame();
+    const choice = el.querySelector(".awi-choice") as HTMLSelectElement;
+    choice.value = "HAND";
+    choice.dispatchEvent(new Event("change"));
+    expect(model.get("value")).toBe("AUTO");
+    expect(model.saved).toHaveLength(0);
+  });
+
+  test("a stack light shows one state per tier", async () => {
+    const { body } = mount({ ...defaults("StackLight"), tiers: ["red", "amber", "green", "blue"], value: ["on", "purple"], label: "Line" });
+    await frame();
+    expect(body.getAttribute("aria-label")).toBe("Line: red on, amber off, green off, blue off");
+  });
+});
+
 describe("Tank without a kernel", () => {
   test("indicator by default, markers read through the schema", async () => {
     const { root, body, el } = mount({ ...defaults("Tank"), value: 3.2, max: 4, unit: "m", markers: [0.5, "x", 3.5], hi: 3, hihi: 3.5 });

@@ -1,21 +1,34 @@
 // Operator panel objects: AnalogIndicator (IND-001..003), SelectorSwitch
 // (IND-010..013) and StackLight (IND-020..022).
+import { selectorValue, stackStates } from "../contract/industrial.js";
 import { clear, html, svg, svgText } from "../core/dom.js";
 import { formatValue, tickFormat } from "../core/format.js";
 import { linearHit, parseNumber, ticks } from "../core/scale.js";
+import type { AnyModel } from "../core/model.js";
 import { BaseView } from "../core/view.js";
+import type { AnalogIndicatorTraits, SelectorSwitchTraits, StackLightTraits } from "../generated/contract.js";
 import { NumericView, svgPoint } from "./numeric.js";
 
 // ---------------------------------------------------------------------------
 // AnalogIndicator: grey scale, shaded normal band, limit marks, pointer
 // ---------------------------------------------------------------------------
-export class AnalogIndicatorView extends NumericView {
-  constructor(model, el) {
+interface AITrack {
+  a0: number;
+  a1: number;
+  b0: number;
+  b1: number;
+}
+
+export class AnalogIndicatorView extends NumericView<AnalogIndicatorTraits> {
+  readonly svgEl: SVGElement;
+  track: AITrack | undefined;
+
+  constructor(model: AnyModel<AnalogIndicatorTraits>, el: HTMLElement) {
     super(model, el, ["orientation", "normal_lo", "normal_hi", "target"], { role: "slider" });
     this.svgEl = svg("svg", { class: "awi-svg", "aria-hidden": "true" });
     this.body.appendChild(this.svgEl);
     // direct manipulation in control mode (API-014): drag along the scale
-    const hit = (e, final) => {
+    const hit = (e: PointerEvent, final: boolean): void => {
       if (!this.track) return;
       const p = svgPoint(this.svgEl, e);
       this.commitFraction(linearHit(this.vertical ? p.y : p.x, this.track.a0, this.track.a1), final);
@@ -24,26 +37,26 @@ export class AnalogIndicatorView extends NumericView {
     this.schedule();
   }
 
-  get vertical() {
+  get vertical(): boolean {
     return this.get("orientation") === "vertical";
   }
 
-  opt(name) {
+  opt(name: string): number | null {
     const v = this.get(name);
     return v === null || v === undefined ? null : parseNumber(v);
   }
 
-  draw() {
+  override draw(): void {
     const [w, h] = this.get("size");
     const s = this.svgEl;
     s.setAttribute("viewBox", `0 0 ${w} ${h}`);
     clear(s);
     const v = this.vertical;
     // track geometry: [a0, a1] along the scale, [b0, b1] across it
-    const t = v ? { a0: h - 10, a1: 10, b0: w - 30, b1: w - 18 } : { a0: 12, a1: w - 12, b0: 14, b1: 26 };
+    const t: AITrack = v ? { a0: h - 10, a1: 10, b0: w - 30, b1: w - 18 } : { a0: 12, a1: w - 12, b0: 14, b1: 26 };
     this.track = t;
-    const at = (f) => t.a0 + f * (t.a1 - t.a0);
-    const rect = (f0, f1, b0, b1, cls) => {
+    const at = (f: number): number => t.a0 + f * (t.a1 - t.a0);
+    const rect = (f0: number, f1: number, b0: number, b1: number, cls: string): SVGElement => {
       const [p, q] = [at(f0), at(f1)].sort((x, y) => x - y);
       return svg("rect", v ? { class: cls, x: b0, y: p, width: b1 - b0, height: q - p } : { class: cls, x: p, y: b0, width: q - p, height: b1 - b0 });
     };
@@ -94,16 +107,20 @@ export class AnalogIndicatorView extends NumericView {
 // ---------------------------------------------------------------------------
 // SelectorSwitch: rotary handle with labelled positions
 // ---------------------------------------------------------------------------
-const SPREAD = { 2: 90, 3: 120, 4: 150, 5: 180 };
+const SPREAD: Record<number, number> = { 2: 90, 3: 120, 4: 150, 5: 180 };
 
 /** Handle angle (degrees, 0 = up, clockwise) of position `i` among `n`. */
-export function selectorAngle(i, n) {
+export function selectorAngle(i: number, n: number): number {
   const spread = SPREAD[n] ?? 120;
   return n <= 1 ? 0 : -spread / 2 + (i * spread) / (n - 1);
 }
 
-export class SelectorView extends BaseView {
-  constructor(model, el) {
+export class SelectorView extends BaseView<SelectorSwitchTraits> {
+  readonly svgEl: SVGElement;
+  readonly stateEl: HTMLDivElement;
+  readonly choice: HTMLSelectElement;
+
+  constructor(model: AnyModel<SelectorSwitchTraits>, el: HTMLElement) {
     super(model, el, ["value", "positions", "keyed", "locked", "spring_return", "default_position"]);
     this.svgEl = svg("svg", { class: "awi-svg", viewBox: "0 0 100 100", "aria-hidden": "true" });
     this.body.appendChild(this.svgEl);
@@ -116,50 +133,55 @@ export class SelectorView extends BaseView {
     this.root.appendChild(this.stateEl);
     this.body.setAttribute("aria-labelledby", this.labelEl.id);
     this.body.addEventListener("keydown", (e) => this.onKey(e));
-    this.body.addEventListener("keyup", (e) => this.release(e));
-    this.body.addEventListener("pointerup", (e) => this.release(e));
-    this.body.addEventListener("pointercancel", (e) => this.release(e));
+    this.body.addEventListener("keyup", () => this.release());
+    this.body.addEventListener("pointerup", () => this.release());
+    this.body.addEventListener("pointercancel", () => this.release());
     this.schedule();
   }
 
-  get positions() {
+  get positions(): string[] {
     return this.get("positions") || [];
   }
 
-  get canOperate() {
+  /** Selected position, resolved as the kernel does (x-awi-resolved). */
+  get value(): string {
+    return selectorValue(this.positions, this.get("value"), this.get("default_position"));
+  }
+
+  get canOperate(): boolean {
     return this.interactive && !(this.get("keyed") && this.get("locked"));
   }
 
-  select(label) {
-    if (!this.canOperate || label === this.get("value")) return;
+  select(label: string): void {
+    if (!this.canOperate || label === this.value) return;
     this.model.set("value", label);
     this.model.save_changes();
     this.schedule();
   }
 
   /** IND-013: spring-return positions go back to the default when released. */
-  release() {
-    const v = this.get("value");
+  release(): void {
+    const v = this.value;
     const def = this.get("default_position");
     if (def && (this.get("spring_return") || []).includes(v)) this.select(def);
   }
 
-  onKey(e) {
+  onKey(e: KeyboardEvent): void {
     if (e.repeat && (e.key.startsWith("Arrow"))) return e.preventDefault();
     const pos = this.positions;
-    const i = pos.indexOf(this.get("value"));
-    const map = { ArrowRight: i + 1, ArrowUp: i + 1, ArrowLeft: i - 1, ArrowDown: i - 1, Home: 0, End: pos.length - 1 };
+    const i = pos.indexOf(this.value);
+    const map: Record<string, number> = { ArrowRight: i + 1, ArrowUp: i + 1, ArrowLeft: i - 1, ArrowDown: i - 1, Home: 0, End: pos.length - 1 };
     if (!(e.key in map)) return;
     e.preventDefault();
     const j = Math.min(pos.length - 1, Math.max(0, map[e.key]));
     this.select(pos[j]);
   }
 
-  draw() {
+  override draw(): void {
     const s = this.svgEl;
     clear(s);
     const pos = this.positions;
-    const value = this.get("value");
+    const value = this.value;
     const idx = Math.max(0, pos.indexOf(value));
     const locked = !!(this.get("keyed") && this.get("locked"));
     this.root.classList.toggle("awi-locked", locked);
@@ -197,12 +219,13 @@ export class SelectorView extends BaseView {
       }
     }
     const text = `${value}${locked ? " · LOCKED" : ""}`;
-    this.stateEl.firstChild.textContent = text;
+    const valueEl = this.stateEl.firstChild as HTMLElement;
+    valueEl.textContent = text;
     const list = this.get("mode") === "control";
     this.choice.hidden = !list;
     // with the list shown, the text only says whether the key switch is locked
-    if (list) this.stateEl.firstChild.textContent = locked ? "LOCKED" : "";
-    this.stateEl.firstChild.hidden = list && !locked;
+    if (list) valueEl.textContent = locked ? "LOCKED" : "";
+    valueEl.hidden = list && !locked;
     if (list) {
       const labels = [...this.choice.options].map((o) => o.value);
       if (labels.join("\u0000") !== pos.join("\u0000")) {
@@ -228,10 +251,12 @@ export class SelectorView extends BaseView {
 // ---------------------------------------------------------------------------
 // StackLight: tiers with color, state glyph and text (IND-021)
 // ---------------------------------------------------------------------------
-const STATE_GLYPH = { off: "○", on: "●", blink: "◐" };
+const STATE_GLYPH: Record<string, string> = { off: "○", on: "●", blink: "◐" };
 
-export class StackLightView extends BaseView {
-  constructor(model, el) {
+export class StackLightView extends BaseView<StackLightTraits> {
+  readonly svgEl: SVGElement;
+
+  constructor(model: AnyModel<StackLightTraits>, el: HTMLElement) {
     super(model, el, ["value", "tiers", "labels", "buzzer"]);
     this.svgEl = svg("svg", { class: "awi-svg", "aria-hidden": "true" });
     this.body.appendChild(this.svgEl);
@@ -239,20 +264,21 @@ export class StackLightView extends BaseView {
     this.schedule();
   }
 
-  draw() {
+  override draw(): void {
     const [w, h] = this.get("size");
     const s = this.svgEl;
     s.setAttribute("viewBox", `0 0 ${w} ${h}`);
     clear(s);
     const tiers = this.get("tiers") || [];
-    const states = this.get("value") || [];
+    // one state per tier, resolved as the kernel does (x-awi-resolved)
+    const states = stackStates(tiers, this.get("value") || []);
     const labels = this.get("labels") || [];
     const buzzer = !!this.get("buzzer");
     const col = { x: 8, w: Math.min(40, w * 0.35) };
     const top = buzzer ? 26 : 8;
     const pole = 26;
     const tierH = Math.max(12, (h - top - pole - 4) / Math.max(1, tiers.length));
-    const parts = [];
+    const parts: string[] = [];
     if (buzzer) {
       s.appendChild(svg("rect", { class: "awi-stack-buzzer", x: col.x + 4, y: 6, width: col.w - 8, height: 16, rx: 3 }));
       s.appendChild(svg("path", { class: "awi-stack-waves", d: `M${col.x + col.w + 3} 9q4 5 0 10M${col.x + col.w + 8} 6q6 8 0 16` }));

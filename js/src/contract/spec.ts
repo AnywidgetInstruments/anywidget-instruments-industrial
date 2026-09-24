@@ -27,6 +27,11 @@ export interface ValueSpec {
   exclusiveMaximum?: number;
   /** Finite values are wrapped into [0, modulo) (e.g. a heading). */
   modulo?: number;
+  minItems?: number;
+  maxItems?: number;
+  uniqueItems?: boolean;
+  /** Replacement of an invalid array item (instead of dropping it, which would shift the others). */
+  itemDefault?: unknown;
   /** Array items (homogeneous array). */
   items?: ValueSpec;
   /** Array items (fixed-length tuple). */
@@ -39,6 +44,12 @@ export interface TraitSpec extends ValueSpec {
   default: unknown;
   writer: Writer;
   readOnly?: boolean;
+  /**
+   * The default is resolved from other traits: when a Python widget is
+   * created, or when the front end reads the trait (e.g. an empty selector
+   * value means the default position).
+   */
+  resolved?: boolean;
   description?: string;
 }
 

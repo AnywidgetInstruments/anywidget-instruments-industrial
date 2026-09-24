@@ -88,7 +88,8 @@ STATES = _load("states.json")["states"]
 @pytest.mark.parametrize("case", STATES, ids=[f"{s['widget']}-{i}" for i, s in enumerate(STATES)])
 def test_states_are_accepted_unchanged(case: dict[str, Any]) -> None:
     cls = getattr(ai, case["widget"])
-    traits = {k: _num(v) if k == "value" else v for k, v in case["traits"].items()}
+    floats = {k for k, tr in cls.class_traits().items() if isinstance(tr, t.Float)}
+    traits = {k: _num(v) if k in floats else v for k, v in case["traits"].items()}
     w = cls(**traits)
     state = json.loads(json.dumps(w.get_state()))
     for name, v in case["traits"].items():
@@ -117,3 +118,24 @@ def test_peak_hold(case: dict[str, Any], monkeypatch: pytest.MonkeyPatch) -> Non
         clock["now"] = now
         g.value = _num(value)
         assert g.peak == expected, (case["name"], now, value)
+
+
+RESOLVED = _load("resolved.json")
+
+
+@pytest.mark.parametrize("case", RESOLVED["selector"])
+def test_selector_resolved_value(case: dict[str, Any]) -> None:
+    sw = ai.SelectorSwitch(
+        case.get("value"), positions=case["positions"], default_position=case["default_position"]
+    )
+    assert sw.value == case["expected"]
+
+
+@pytest.mark.parametrize("case", RESOLVED["stacklight"])
+def test_stacklight_resolved_value(case: dict[str, Any]) -> None:
+    if case["value"] is None:
+        light = ai.StackLight(tiers=case["tiers"])
+    else:  # states of a three-tier light, then the tiers change
+        light = ai.StackLight(value=case["value"])
+        light.tiers = case["tiers"]
+    assert light.value == case["expected"]

@@ -277,6 +277,61 @@
         "value": true,
         "label": "E-stop"
       }
+    },
+    {
+      "widget": "SelectorSwitch",
+      "traits": {
+        "value": "AUTO",
+        "positions": [
+          "HAND",
+          "OFF",
+          "AUTO"
+        ],
+        "keyed": true,
+        "locked": true,
+        "default_position": "OFF",
+        "spring_return": [
+          "HAND"
+        ]
+      }
+    },
+    {
+      "widget": "SelectorSwitch",
+      "traits": {
+        "value": "B",
+        "positions": [
+          "A",
+          "B"
+        ],
+        "default_position": null
+      }
+    },
+    {
+      "widget": "StackLight",
+      "traits": {
+        "tiers": [
+          "red",
+          "red",
+          "green",
+          "blue",
+          "white"
+        ],
+        "labels": [
+          "Fault",
+          "Stop",
+          "Run",
+          "Service",
+          "Info"
+        ],
+        "value": [
+          "blink",
+          "off",
+          "on",
+          "off",
+          "on"
+        ],
+        "buzzer": true
+      }
     }
   ]
 }

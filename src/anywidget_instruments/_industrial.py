@@ -50,6 +50,7 @@ class SelectorSwitch(InstrumentWidget):
 
     _kind = t.Unicode("selectorswitch").tag(sync=True)
     _default_size = (140, 130)
+    size = size_trait(*_default_size)
     value = t.Unicode("").tag(sync=True)
     positions = t.List(t.Unicode(), default_value=["HAND", "OFF", "AUTO"]).tag(sync=True)
     keyed = t.Bool(False).tag(sync=True)
@@ -127,6 +128,8 @@ class StackLight(InstrumentWidget):
     _kind = t.Unicode("stacklight").tag(sync=True)
     _default_mode = "indicator"
     _default_size = (120, 200)
+    mode = mode_trait(_default_mode)
+    size = size_trait(*_default_size)
     tiers = t.List(t.Enum(list(STACK_COLORS)), default_value=["red", "amber", "green"]).tag(
         sync=True
     )

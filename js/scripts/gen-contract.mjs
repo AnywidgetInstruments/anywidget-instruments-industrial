@@ -107,6 +107,8 @@ function traitSpec(name, p, where, nested = false) {
   }
   for (const k of ["minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum"]) if (p[k] !== undefined) spec[k] = p[k];
   if (p["x-awi-modulo"] !== undefined) spec.modulo = p["x-awi-modulo"];
+  for (const k of ["minItems", "maxItems", "uniqueItems"]) if (p[k] !== undefined) spec[k] = p[k];
+  if (p["x-awi-item-default"] !== undefined) spec.itemDefault = p["x-awi-item-default"];
   if (spec.type === "array") {
     if (Array.isArray(p.prefixItems)) spec.prefixItems = p.prefixItems.map((it, i) => traitSpec(`${name}[${i}]`, it, where, true));
     else if (p.items && typeof p.items === "object") spec.items = traitSpec(`${name}[]`, p.items, where, true);
@@ -119,6 +121,7 @@ function traitSpec(name, p, where, nested = false) {
   if (!WRITERS.has(writer)) throw new Error(`${where}.${name}: x-awi-writer must be one of ${[...WRITERS]}`);
   spec.writer = writer;
   if (p.readOnly) spec.readOnly = true;
+  if (p["x-awi-resolved"]) spec.resolved = true;
   if (p.description) spec.description = p.description;
   return spec;
 }

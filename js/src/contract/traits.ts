@@ -52,9 +52,16 @@ export function readValue(spec: ValueSpec, raw: unknown): unknown {
         const out = spec.prefixItems.map((s, i) => readValue(s, raw[i]));
         return out.includes(undefined) ? undefined : out;
       }
-      if (!spec.items) return raw;
-      const items = spec.items;
-      return raw.map((x) => readValue(items, x)).filter((x) => x !== undefined);
+      let out: unknown[] = raw;
+      if (spec.items) {
+        const items = spec.items;
+        const read = raw.map((x) => readValue(items, x));
+        out = spec.itemDefault !== undefined ? read.map((x) => (x === undefined ? spec.itemDefault : x)) : read.filter((x) => x !== undefined);
+      }
+      if (spec.minItems !== undefined && out.length < spec.minItems) return undefined;
+      if (spec.maxItems !== undefined && out.length > spec.maxItems) return undefined;
+      if (spec.uniqueItems && new Set(out.map((x) => JSON.stringify(x))).size !== out.length) return undefined;
+      return out;
     }
     case "object": {
       if (!isPlainObject(raw)) return undefined;

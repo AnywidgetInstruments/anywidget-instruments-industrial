@@ -1,0 +1,17 @@
+{
+  "description": "Defaults resolved from other traits (x-awi-resolved): the Python classes resolve them when a widget is created, the front end when it reads the trait.",
+  "selector": [
+    { "positions": ["HAND", "OFF", "AUTO"], "default_position": null, "expected": "OFF" },
+    { "positions": ["A", "B"], "default_position": null, "expected": "B" },
+    { "positions": ["1", "2", "3", "4"], "default_position": null, "expected": "3" },
+    { "positions": ["1", "2", "3", "4", "5"], "default_position": null, "expected": "3" },
+    { "positions": ["HAND", "OFF", "AUTO"], "default_position": "AUTO", "expected": "AUTO" },
+    { "positions": ["HAND", "OFF", "AUTO"], "default_position": "HAND", "value": "OFF", "expected": "OFF" }
+  ],
+  "stacklight": [
+    { "tiers": ["red", "amber", "green"], "value": null, "expected": ["off", "off", "off"] },
+    { "tiers": ["red"], "value": null, "expected": ["off"] },
+    { "tiers": ["red", "amber", "green", "blue", "white"], "value": ["on", "blink", "off"], "expected": ["on", "blink", "off", "off", "off"] },
+    { "tiers": ["green"], "value": ["on", "blink", "off"], "expected": ["on"] }
+  ]
+}

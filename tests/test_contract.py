@@ -77,6 +77,8 @@ MIGRATED = {
     "SlideSwitch",
     "PushButton",
     "EmergencyStop",
+    "SelectorSwitch",
+    "StackLight",
 }
 
 
@@ -160,8 +162,8 @@ def test_instance_defaults(title: str, spec: dict[str, Any]) -> None:
     cls = CLASSES[spec["class"]]
     w = cls()
     for name in _synced(cls):
-        if name in HOST_FILLED:
-            continue
+        if name in HOST_FILLED or spec["traits"][name].get("resolved"):
+            continue  # resolved defaults: see tests/parity/resolved.json
         assert _json(getattr(w, name)) == spec["traits"][name]["default"], f"{title}.{name}"
 
 
