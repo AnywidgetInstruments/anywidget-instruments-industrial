@@ -39,13 +39,9 @@ jobs:
         with:
           path: site
 
-  # Publishing needs GitHub Pages enabled (Settings > Pages > Source: GitHub
-  # Actions; a paid plan for private repositories) and the repository
-  # variable DEPLOY_DOCS=true. Only the default branch is published.
+  # Published from pushes to main (Settings > Pages > Source: GitHub Actions).
   deploy:
-    if: >-
-      vars.DEPLOY_DOCS == 'true' && github.event_name != 'pull_request' &&
-      github.ref_name == github.event.repository.default_branch
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
     permissions:

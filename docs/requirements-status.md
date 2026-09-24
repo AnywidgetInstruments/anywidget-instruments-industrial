@@ -108,7 +108,7 @@ JupyterLab / Notebook 7 / marimo (`e2e/`).
 | DOC-002 | M | ✅ | Gallery notebook |
 | DOC-003 | M | ⬜ | Mapping table to a third-party product: removed on request |
 | DOC-004 | S | ✅ | PID tuning, tank supervision, signal acquisition (executed by pytest and e2e) |
-| DOC-005 | S | ✅ | Offline-capable static site (no web fonts / CDN), `docs.yml` deploys to GitHub Pages |
+| DOC-005 | S | ✅ | Offline-capable static site (no web fonts / CDN), `docs.yml` deploys to GitHub Pages from `main` |
 | DOC-006 | C | 🟡 | JupyterLite build with the package wheel; its runtime (Pyodide from a CDN) could not be exercised in the development sandbox |
 | QA-001, QA-002 | M | ✅ | pytest, vitest |
 | QA-003 | M | ✅ | e2e JupyterLab (every widget, both directions), marimo, Notebook 7 |
