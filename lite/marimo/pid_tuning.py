@@ -5,7 +5,7 @@ import marimo
 app = marimo.App(width="medium")
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
     import sys
 
@@ -14,7 +14,7 @@ def _():
     return mo, sys
 
 
-@app.cell
+@app.cell(hide_code=True)
 async def _(mo, sys):
     # In the browser the package is not on the package index: install the
     # wheel built with the site. Locally it is already installed.
@@ -29,7 +29,7 @@ async def _(mo, sys):
     return (installed,)
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(installed):
     assert installed
     import numpy as np
@@ -39,26 +39,31 @@ def _(installed):
     return ai, np
 
 
-@app.cell
-def _(ai):
-    ai.theme_switch()  # light / dark widgets (STYLE-007)
-    return
-
-
-@app.cell
+@app.cell(hide_code=True)
 def _(mo):
     mo.md("""
+    [⬅ Back to the examples](https://s-celles.github.io/anywidget-instruments/try/)
+
     # PID tuning
 
     A first-order process with dead time, `K = 2`, `τ = 20 s`, `θ = 4 s`, is
     controlled by a PID (derivative on the measurement, anti-windup). The
     setpoint steps from 20 to 50 at t = 10 s. Turn the knobs: marimo recomputes
     the closed-loop response and the indicators.
+
+    > **The code is hidden.** To see it, open the **⋯** menu at the top right
+    > and choose **Show code**; in the marimo editor, click a cell's collapsed code.
     """)
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
+def _(ai):
+    ai.theme_switch()  # light / system / dark theme (STYLE-008)
+    return
+
+
+@app.cell(hide_code=True)
 def _(ai, mo):
     kp = mo.ui.anywidget(ai.Knob(1.2, min=0, max=5, step=0.05, label="Kp", size=(120, 120)))
     ti = mo.ui.anywidget(ai.Knob(20, min=1, max=100, step=1, unit="s", label="Ti", size=(120, 120)))
@@ -67,7 +72,7 @@ def _(ai, mo):
     return kp, td, ti
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(ai, np):
     def closed_loop(kp, ti, td, gain=2.0, tau=20.0, delay=4.0, dt=0.2, duration=200.0):
         """SP, PV and OP of the loop, one row per sample."""
@@ -93,7 +98,7 @@ def _(ai, np):
     return closed_loop, metrics
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(ai, closed_loop, kp, metrics, mo, td, ti):
     rows = closed_loop(kp.value["value"], ti.value["value"], td.value["value"])
     overshoot, settling = metrics(rows)

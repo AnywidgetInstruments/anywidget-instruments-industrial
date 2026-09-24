@@ -34,8 +34,12 @@ export async function runNotebook(page, name) {
   // On a freshly started server, "Run All Cells" can be issued before the
   // kernel accepts it (or a late kernel dialog swallows it): nothing runs.
   // Check that execution started and issue it again otherwise.
-  const prompts = page.locator(".jp-CodeCell .jp-InputPrompt");
-  const started = async () => (await prompts.allTextContents()).some((t) => /\[(\d+|\*)\]/.test(t));
+  // Input prompts are not shown for cells whose code is hidden (the example
+  // notebooks): output prompts and the busy indicator also tell.
+  const prompts = page.locator(".jp-CodeCell .jp-InputPrompt, .jp-CodeCell .jp-OutputPrompt");
+  const busy = page.locator(".jp-Notebook-ExecutionIndicator[data-status='busy']");
+  const started = async () =>
+    (await busy.isVisible().catch(() => false)) || (await prompts.allTextContents()).some((t) => /\[(\d+|\*)\]/.test(t));
   for (let attempt = 0; attempt < 3; attempt++) {
     await page.locator(".jp-Notebook").click();
     await page.keyboard.press("Escape");

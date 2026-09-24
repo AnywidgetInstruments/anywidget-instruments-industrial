@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 STYLES: tuple[str, ...] = ("modern", "classic", "system")
-THEMES: tuple[str, ...] = ("auto", "light", "dark")
+THEMES: tuple[str, ...] = ("auto", "light", "dark", "system")
 
 _default_style = "modern"
 _default_theme = "auto"
@@ -30,8 +30,10 @@ def get_default_style() -> str:
 def set_theme(theme: str) -> None:
     """Switch every open widget, and the widgets created afterwards, to ``theme``.
 
-    ``"light"`` and ``"dark"`` force the palette whatever the host; ``"auto"``
-    lets the style decide (``"system"`` follows the host theme) (STYLE-007).
+    ``"light"`` and ``"dark"`` force the palette whatever the host;
+    ``"system"`` follows the host or operating system color scheme whatever
+    the style; ``"auto"`` lets the style decide (the ``"system"`` style
+    follows the host, the others stay light) (STYLE-007, STYLE-008).
     """
     global _default_theme
     if theme not in THEMES:
@@ -51,15 +53,15 @@ def get_default_theme() -> str:
     return _default_theme
 
 
-def theme_switch(label: str = "Dark mode", **kwargs: Any) -> Any:
-    """A slide switch that toggles :func:`set_theme` between light and dark.
+def theme_switch(label: str = "Theme", **kwargs: Any) -> Any:
+    """A :class:`ThemeSwitch` (light / system / dark) for every widget.
 
     Put it at the top of a notebook or app::
 
         ai.theme_switch()
-    """
-    from ._boolean import SlideSwitch
 
-    switch = SlideSwitch(_default_theme == "dark", label=label, **kwargs)
-    switch.on_change(lambda change: set_theme("dark" if change["new"] else "light"))
-    return switch
+    In marimo the page follows the switch as well (STYLE-008).
+    """
+    from ._themeswitch import ThemeSwitch
+
+    return ThemeSwitch(label=label, **kwargs)

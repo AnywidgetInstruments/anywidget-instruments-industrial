@@ -8,6 +8,8 @@ Generated from the docstrings (DOC-001).
 ::: anywidget_instruments.Panel
 ::: anywidget_instruments.batch
 ::: anywidget_instruments.set_default_style
+::: anywidget_instruments.set_theme
+::: anywidget_instruments.theme_switch
 ::: anywidget_instruments.set_heartbeat
 
 ## Numeric
@@ -33,6 +35,8 @@ Generated from the docstrings (DOC-001).
 ::: anywidget_instruments.ToggleSwitch
 ::: anywidget_instruments.RockerSwitch
 ::: anywidget_instruments.SlideSwitch
+
+::: anywidget_instruments.ThemeSwitch
 ::: anywidget_instruments.PushButton
 ::: anywidget_instruments.EmergencyStop
 

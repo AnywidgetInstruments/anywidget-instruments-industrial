@@ -20,3 +20,16 @@ test("marimo: reactive re-execution and liveness", async ({ page }) => {
   await page.waitForTimeout(12_000);
   await expect(knob).not.toHaveClass(/awi-stale/);
 });
+
+test("marimo: the theme switch sets the page theme (STYLE-008)", async ({ page }) => {
+  await page.goto("http://localhost:2718/");
+  const sw = widget(page, "Marimo theme");
+  await expect(sw.getByRole("radio", { name: "☾ Dark" })).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator("body")).toHaveClass(/\blight-theme\b/);
+  await sw.getByRole("radio", { name: "☾ Dark" }).click();
+  await expect(page.locator("body")).toHaveClass(/\bdark-theme\b/);
+  await expect(widget(page, "Marimo knob")).toHaveClass(/awi-theme-dark/);
+  await sw.getByRole("radio", { name: "☀ Light" }).click();
+  await expect(page.locator("body")).toHaveClass(/\blight-theme\b/);
+  await expect(widget(page, "Marimo knob")).toHaveClass(/awi-theme-light/);
+});

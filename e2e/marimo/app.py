@@ -13,6 +13,12 @@ def _():
 
 
 @app.cell
+def _(ai):
+    ai.theme_switch(label="Marimo theme")
+    return
+
+
+@app.cell
 def _(ai, mo):
     knob = mo.ui.anywidget(ai.Knob(10, step=1, label="Marimo knob"))
     knob

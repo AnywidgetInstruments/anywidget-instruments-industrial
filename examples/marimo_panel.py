@@ -3,7 +3,7 @@ import marimo
 app = marimo.App()
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
     import marimo as mo
 
@@ -12,13 +12,26 @@ def _():
     return ai, mo
 
 
-@app.cell
-def _(ai):
-    ai.theme_switch()  # light / dark widgets (STYLE-007)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(
+        """
+        [⬅ Back to the examples](https://s-celles.github.io/anywidget-instruments/examples/)
+
+        > **The code is hidden.** To see it, open the **⋯** menu at the top right
+        > and choose **Show code**; in the marimo editor, click a cell's collapsed code.
+        """
+    )
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
+def _(ai):
+    ai.theme_switch()  # light / system / dark theme (STYLE-008)
+    return
+
+
+@app.cell(hide_code=True)
 def _(ai, mo):
     setpoint = mo.ui.anywidget(ai.Knob(50, step=1, unit="%", label="Setpoint"))
     run = mo.ui.anywidget(ai.ToggleSwitch(label="Run"))
@@ -26,7 +39,7 @@ def _(ai, mo):
     return run, setpoint
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(ai, run, setpoint):
     # re-executed by marimo whenever the knob or the switch changes (GEN-011)
     level = setpoint.value["value"] if run.value["value"] else 0.0

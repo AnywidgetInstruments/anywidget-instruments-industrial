@@ -5,7 +5,7 @@ import marimo
 app = marimo.App(width="medium")
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
     import sys
 
@@ -14,7 +14,7 @@ def _():
     return mo, sys
 
 
-@app.cell
+@app.cell(hide_code=True)
 async def _(mo, sys):
     # In the browser the package is not on the package index: install the
     # wheel built with the site. Locally it is already installed.
@@ -29,7 +29,7 @@ async def _(mo, sys):
     return (installed,)
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(installed):
     assert installed
     import numpy as np
@@ -39,24 +39,29 @@ def _(installed):
     return ai, np
 
 
-@app.cell
-def _(ai):
-    ai.theme_switch()  # light / dark widgets (STYLE-007)
-    return
-
-
-@app.cell
+@app.cell(hide_code=True)
 def _(mo):
     mo.md("""
+    [⬅ Back to the examples](https://s-celles.github.io/anywidget-instruments/try/)
+
     # Signal analysis
 
     A 1 s record sampled at 2 kHz: choose the waveform, its frequency and the
     noise level. The spectrum, the RMS level and the dominant frequency follow.
+
+    > **The code is hidden.** To see it, open the **⋯** menu at the top right
+    > and choose **Show code**; in the marimo editor, click a cell's collapsed code.
     """)
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
+def _(ai):
+    ai.theme_switch()  # light / system / dark theme (STYLE-008)
+    return
+
+
+@app.cell(hide_code=True)
 def _(ai, mo):
     shape = mo.ui.anywidget(
         ai.SelectorSwitch("SINE", positions=["SINE", "SQUARE", "TRIANGLE"], label="Waveform")
@@ -69,7 +74,7 @@ def _(ai, mo):
     return freq, noise, shape
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(ai, freq, mo, noise, np, shape):
     fs, n = 2000.0, 2000
     t = np.arange(n) / fs

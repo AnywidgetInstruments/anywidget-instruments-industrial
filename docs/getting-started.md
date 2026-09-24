@@ -126,14 +126,19 @@ widget.
 
 ## Light and dark theme
 
-`theme` is `"auto"` (the style decides; `"system"` follows the host),
-`"light"` or `"dark"`, whatever the host theme (STYLE-007).
-`ai.set_theme("dark")` switches every open widget and the ones created
-afterwards; `ai.theme_switch()` returns a ready-made switch doing it, shown at
-the top of every example and demo.
+`theme` is `"light"` or `"dark"` (whatever the host theme), `"system"`
+(follows the host or the operating system color scheme) or `"auto"` (the
+style decides: the `"system"` style follows the host, the others stay light)
+(STYLE-007). `ai.set_theme("dark")` switches every open widget and the ones
+created afterwards.
+
+`ai.theme_switch()` returns a three-position switch, **☀ Light · ◐ System ·
+☾ Dark**, shown at the top of every example and demo (STYLE-008). In marimo
+the whole page follows it; JupyterLab and Notebook 7 keep their own theme
+setting (*Settings ▸ Theme*), which the `"system"` position follows.
 
 ```python
-ai.theme_switch()  # a "Dark mode" slide switch
+ai.theme_switch()  # light / system / dark
 ai.set_theme("dark")  # or from code
 ```
 

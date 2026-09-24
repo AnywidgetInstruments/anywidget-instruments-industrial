@@ -8,6 +8,18 @@
 | marimo in the browser (WebAssembly) | tested (docs workflow) | no threads: heartbeat disabled; see [Try it in the browser](try.md) |
 | JupyterLite (Pyodide) | tested (docs workflow) | no threads: heartbeat disabled |
 | VS Code, Google Colab | expected (anywidget hosts) | not covered by automated tests |
+| [KaimonSlate.jl](https://github.com/kahliburke/KaimonSlate.jl) (Julia) | expected, front end only | see below; not covered by automated tests |
+
+## KaimonSlate.jl
+
+[KaimonSlate.jl](https://github.com/kahliburke/KaimonSlate.jl), a reactive
+Julia notebook, hosts anywidget front-end modules through its `SlateAFM`
+extension (`pypi_afm` loads a published anywidget; see its
+[documentation](https://kahliburke.github.io/KaimonSlate.jl/dev/)). There the widgets are
+front ends bound to a dictionary of traits: the Python side of this package
+(validation, callbacks, alarm logic, binary chart data, heartbeats) does not
+run. Set the `_heartbeat` trait to `0`, or the widgets report **⚠ NO KERNEL**
+after a few seconds.
 
 ## Stale-data indication (ROB-001)
 

@@ -45,6 +45,21 @@ test.describe("every widget", () => {
     await expect(widget(page, "PushButton").locator(".awi-lit")).toHaveCount(0);
   });
 
+  test("ThemeSwitch: both directions (STYLE-008)", async () => {
+    const w = widget(page, "ThemeSwitch");
+    await w.scrollIntoViewIfNeeded();
+    try {
+      await w.getByRole("radio", { name: "☾ Dark" }).click();
+      await expect.poll(() => py(`print(W["ThemeSwitch"].value, W["Knob"].theme)`)).toBe("dark dark");
+      await expect(widget(page, "Knob")).toHaveClass(/awi-theme-dark/);
+      await py(`W["ThemeSwitch"].value = "light"`);
+      await expect(w.getByRole("radio", { name: "☀ Light" })).toHaveAttribute("aria-checked", "true");
+    } finally {
+      await py(`W["ThemeSwitch"].value = "auto"`);
+    }
+    await expect(widget(page, "Knob")).not.toHaveClass(/awi-theme-(dark|light)/);
+  });
+
   test("LED: kernel -> front", async () => {
     await widget(page, "LED").scrollIntoViewIfNeeded(); // off-screen widgets skip drawing (PERF-005)
     await py('W["LED"].value = True');

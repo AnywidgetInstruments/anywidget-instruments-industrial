@@ -7,7 +7,9 @@ SCADA objects (valves, pumps, motors, pipes, alarm banner, synoptic).
 
 Built on [anywidget](https://anywidget.dev), the widgets run in **JupyterLab,
 Jupyter Notebook 7, VS Code, Google Colab and marimo**, with no JavaScript
-toolchain and no network access at runtime.
+toolchain and no network access at runtime. Their front ends also run in
+[KaimonSlate.jl](https://github.com/kahliburke/KaimonSlate.jl), a Julia
+notebook (see [Hosts](hosts.md)).
 
 ![Widget gallery](img/gallery-modern.png)
 

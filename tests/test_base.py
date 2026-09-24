@@ -145,14 +145,24 @@ def test_set_theme_switches_open_and_new_widgets():
     assert knob.theme == "auto"
 
 
-def test_theme_switch_toggles_the_theme():
+def test_theme_switch_has_three_positions():
+    """STYLE-008: light / system / dark switch driving every widget."""
     try:
         tank = ai.Tank()
         switch = ai.theme_switch()
-        assert switch.value is False and switch.label == "Dark mode"
-        switch.value = True
-        assert tank.theme == "dark"
-        switch.value = False
-        assert tank.theme == "light"
+        assert isinstance(switch, ai.ThemeSwitch) and switch.page_theme
+        assert switch.value == "auto" and switch.label == "Theme"
+        for position in ai.THEME_SWITCH_POSITIONS:
+            switch.value = position
+            assert tank.theme == position and ai.Knob().theme == position
+        with pytest.raises(t.TraitError):
+            switch.value = "sepia"
+        ai.set_theme("dark")
+        assert ai.theme_switch().value == "dark"  # starts from the current theme
     finally:
         ai.set_theme("auto")
+
+
+def test_system_theme():
+    assert "system" in ai.THEMES
+    assert ai.Gauge(theme="system").theme == "system"

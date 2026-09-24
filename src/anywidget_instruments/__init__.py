@@ -58,6 +58,7 @@ from ._style import (
     set_theme,
     theme_switch,
 )
+from ._themeswitch import THEME_SWITCH_POSITIONS, ThemeSwitch
 
 __version__ = "0.1.0.dev0"
 
@@ -82,6 +83,7 @@ __all__ = [
     "STACK_STATES",
     "STYLES",
     "THEMES",
+    "THEME_SWITCH_POSITIONS",
     "AlarmBanner",
     "AlarmIndicator",
     "AlarmList",
@@ -120,6 +122,7 @@ __all__ = [
     "StateMachine",
     "SynopticCanvas",
     "Tank",
+    "ThemeSwitch",
     "Thermometer",
     "ToggleSwitch",
     "VUMeter",

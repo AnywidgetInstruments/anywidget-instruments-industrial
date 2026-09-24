@@ -624,3 +624,11 @@
   .awi-root.awi-state-active_unacknowledged .awi-alarm-shape,
   .awi-root.awi-state-cleared_unacknowledged .awi-alarm-shape { stroke: var(--awi-fg); stroke-width: 2.5; stroke-dasharray: 3 2; }
 }
+
+/* theme switch (STYLE-008): segmented light / system / dark */
+.awi-root.awi-themeswitch > .awi-body { display: flex; align-items: stretch; border: 1px solid var(--awi-face-stroke); border-radius: 6px; overflow: hidden; background: var(--awi-face); }
+.awi-root .awi-theme-opt { flex: 1; font: inherit; font-size: 12px; padding: 0 6px; border: 0; border-left: 1px solid var(--awi-face-stroke); background: var(--awi-face); color: var(--awi-fg); cursor: pointer; }
+.awi-root .awi-theme-opt:first-child { border-left: 0; }
+.awi-root .awi-theme-opt.awi-on { background: var(--awi-fg); color: var(--awi-face); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.awi-root .awi-theme-opt:focus-visible { outline: 2px solid var(--awi-accent); outline-offset: -3px; }
+.awi-root .awi-theme-opt:disabled { cursor: not-allowed; opacity: 0.6; }

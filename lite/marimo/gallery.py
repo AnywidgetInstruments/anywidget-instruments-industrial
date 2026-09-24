@@ -6,7 +6,7 @@ import marimo
 app = marimo.App(width="medium")
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
     import sys
 
@@ -15,7 +15,7 @@ def _():
     return mo, sys
 
 
-@app.cell
+@app.cell(hide_code=True)
 async def _(mo, sys):
     # In the browser the package is not on the package index: install the
     # wheel built with the site. Locally it is already installed.
@@ -30,7 +30,7 @@ async def _(mo, sys):
     return (installed,)
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(installed):
     assert installed
     import numpy as np
@@ -40,24 +40,29 @@ def _(installed):
     return ai, np
 
 
-@app.cell
-def _(ai):
-    ai.theme_switch()  # light / dark widgets (STYLE-007)
-    return
-
-
-@app.cell
+@app.cell(hide_code=True)
 def _(mo):
     mo.md("""
+    [⬅ Back to the examples](https://s-celles.github.io/anywidget-instruments/try/)
+
     # anywidget-instruments in marimo
 
     Turn the knobs and flip the switch: marimo re-runs the cells that read
     them, and the indicators follow. Everything runs in your browser.
+
+    > **The code is hidden.** To see it, open the **⋯** menu at the top right
+    > and choose **Show code**; in the marimo editor, click a cell's collapsed code.
     """)
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
+def _(ai):
+    ai.theme_switch()  # light / system / dark theme (STYLE-008)
+    return
+
+
+@app.cell(hide_code=True)
 def _(ai, mo):
     setpoint = mo.ui.anywidget(ai.Knob(60, step=1, unit="%", label="Setpoint"))
     gain = mo.ui.anywidget(ai.Knob(1.0, min=0, max=2, step=0.05, label="Gain"))
@@ -66,7 +71,7 @@ def _(ai, mo):
     return gain, run, setpoint
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(ai, gain, mo, run, setpoint):
     level = setpoint.value["value"] * gain.value["value"] if run.value["value"] else 0.0
     level = min(level, 100.0)
@@ -83,7 +88,7 @@ def _(ai, gain, mo, run, setpoint):
     return (level,)
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(ai, level, np):
     t = np.arange(500) / 100
     chart = ai.WaveformChart(

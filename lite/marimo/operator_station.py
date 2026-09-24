@@ -5,7 +5,7 @@ import marimo
 app = marimo.App(width="medium")
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
     import sys
 
@@ -14,7 +14,7 @@ def _():
     return mo, sys
 
 
-@app.cell
+@app.cell(hide_code=True)
 async def _(mo, sys):
     # In the browser the package is not on the package index: install the
     # wheel built with the site. Locally it is already installed.
@@ -29,7 +29,7 @@ async def _(mo, sys):
     return (installed,)
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(installed):
     assert installed
     import numpy as np
@@ -39,15 +39,11 @@ def _(installed):
     return ai, np
 
 
-@app.cell
-def _(ai):
-    ai.theme_switch()  # light / dark widgets (STYLE-007)
-    return
-
-
-@app.cell
+@app.cell(hide_code=True)
 def _(mo):
     mo.md("""
+    [⬅ Back to the examples](https://s-celles.github.io/anywidget-instruments/try/)
+
     # Operator station
 
     A filling line follows the machine state model: press **Reset**, then
@@ -55,11 +51,20 @@ def _(mo):
     light, the temperature loop, the annunciator and the alarm list follow the
     line; after 20 s in Execute the capper jams and the line suspends. The
     simulation clock below drives the model once per second.
+
+    > **The code is hidden.** To see it, open the **⋯** menu at the top right
+    > and choose **Show code**; in the marimo editor, click a cell's collapsed code.
     """)
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
+def _(ai):
+    ai.theme_switch()  # light / system / dark theme (STYLE-008)
+    return
+
+
+@app.cell(hide_code=True)
 def _(ai):
     machine = ai.StateMachine(label="Line state", size=(560, 250))
     light = ai.StackLight(
@@ -90,13 +95,13 @@ def _(ai):
     return alarms, annunciator, count, heater, light, machine, sim
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(mo):
     tick = mo.ui.refresh(options=["1s"], default_interval="1s", label="Simulation clock")
     return (tick,)
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(alarms, annunciator, count, heater, light, machine, mo, tick):
     mo.vstack(
         [
@@ -109,7 +114,7 @@ def _(alarms, annunciator, count, heater, light, machine, mo, tick):
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(alarms, annunciator, count, heater, light, machine, sim, tick):
     _ = tick.value  # re-run once per clock tick
     PATTERN = {
