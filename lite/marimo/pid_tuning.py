@@ -51,6 +51,11 @@ def _(mo):
     setpoint steps from 20 to 50 at t = 10 s. Turn the knobs: marimo recomputes
     the closed-loop response and the indicators.
 
+    **References:** ISA-101 (high-performance analog indicator). These
+    standards inspired the widgets; the library does not claim conformity
+    with them ([Standards and
+    references](https://s-celles.github.io/anywidget-instruments/standards/)).
+
     > **The code is hidden.** To see it, open the **⋯** menu at the top right
     > and choose **Show code**; in the marimo editor, click a cell's collapsed code.
     """)

@@ -51,6 +51,11 @@ def _(mo):
     start and the high-level alarms; **trip P-101** to see the standby take over,
     then **reset** the fault. One clock tick simulates 5 s.
 
+    **References:** ISA-18.2 / IEC 62682 (alarm list), ISA-5.1 (tags, pump
+    symbol), IEC 60073 (push-button colors). These standards inspired the
+    widgets; the library does not claim conformity with them ([Standards and
+    references](https://s-celles.github.io/anywidget-instruments/standards/)).
+
     > **The code is hidden.** To see it, open the **⋯** menu at the top right
     > and choose **Show code**; in the marimo editor, click a cell's collapsed code.
     """)

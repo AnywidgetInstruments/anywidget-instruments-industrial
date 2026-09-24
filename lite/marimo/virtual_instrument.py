@@ -52,6 +52,11 @@ def _(mo):
     illuminated push button to switch the output on, a screen and a display
     to read. Turn a knob and the screen and the display follow.
 
+    **References:** SI prefixes (engineering units). These standards
+    inspired the widgets; the library does not claim conformity with them
+    ([Standards and
+    references](https://s-celles.github.io/anywidget-instruments/standards/)).
+
     > **The code is hidden.** To see it, open the **⋯** menu at the top right
     > and choose **Show code**; in the marimo editor, click a cell's collapsed code.
     """)

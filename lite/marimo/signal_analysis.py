@@ -49,6 +49,11 @@ def _(mo):
     A 1 s record sampled at 2 kHz: choose the waveform, its frequency and the
     noise level. The spectrum, the RMS level and the dominant frequency follow.
 
+    **References:** SI prefixes (engineering units). These standards
+    inspired the widgets; the library does not claim conformity with them
+    ([Standards and
+    references](https://s-celles.github.io/anywidget-instruments/standards/)).
+
     > **The code is hidden.** To see it, open the **⋯** menu at the top right
     > and choose **Show code**; in the marimo editor, click a cell's collapsed code.
     """)

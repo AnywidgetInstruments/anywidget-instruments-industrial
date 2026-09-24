@@ -50,6 +50,10 @@ def _(mo):
     Turn the knobs and flip the switch: marimo re-runs the cells that read
     them, and the indicators follow. Everything runs in your browser.
 
+    **References:** IEC 60073 (lamp colors). These standards inspired the
+    widgets; the library does not claim conformity with them ([Standards and
+    references](https://s-celles.github.io/anywidget-instruments/standards/)).
+
     > **The code is hidden.** To see it, open the **⋯** menu at the top right
     > and choose **Show code**; in the marimo editor, click a cell's collapsed code.
     """)

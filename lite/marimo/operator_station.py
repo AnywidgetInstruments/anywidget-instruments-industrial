@@ -52,6 +52,13 @@ def _(mo):
     line; after 20 s in Execute the capper jams and the line suspends. The
     simulation clock below drives the model once per second.
 
+    **References:** ISA-TR88.00.02 (PackML machine states), ISA-18.1
+    (annunciator sequences), ISA-18.2 / IEC 62682 (alarm list, shelving),
+    ISA-101 (PID faceplate), IEC 60073 (stack light colors). These standards
+    inspired the widgets; the library does not claim conformity with them
+    ([Standards and
+    references](https://s-celles.github.io/anywidget-instruments/standards/)).
+
     > **The code is hidden.** To see it, open the **⋯** menu at the top right
     > and choose **Show code**; in the marimo editor, click a cell's collapsed code.
     """)

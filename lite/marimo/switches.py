@@ -52,6 +52,11 @@ def _(mo):
     released. Operate them with the mouse, by touch, with the keyboard, or
     through the list under each selector.
 
+    **References:** IEC 60073 (lamp colors), ISA-5.1 (pump and motor
+    symbols). These standards inspired the widgets; the library does not
+    claim conformity with them ([Standards and
+    references](https://s-celles.github.io/anywidget-instruments/standards/)).
+
     > **The code is hidden.** To see it, open the **⋯** menu at the top right
     > and choose **Show code**; in the marimo editor, click a cell's collapsed code.
     """)
