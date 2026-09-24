@@ -48,6 +48,8 @@ function resolve(t, name) {
 
 const modern = tokens("\n.awi-root {\n");
 const darkSystem = { ...modern, ...tokens(":is([data-jp-theme-light=\"false\"]") };
+const darkTheme = { ...modern, ...tokens(".awi-root.awi-root.awi-root.awi-theme-dark {") };
+const lightTheme = { ...modern, ...tokens(".awi-root.awi-root.awi-root.awi-theme-light {") };
 
 const TEXT = [
   ["--awi-fg", "--awi-face"], ["--awi-fg", "--awi-plot-bg"], ["--awi-muted", "--awi-face"],
@@ -67,7 +69,7 @@ const GRAPHICS = [
   ["--awi-stack-red", "--awi-face"], ["--awi-stack-green", "--awi-face"], ["--awi-stack-blue", "--awi-face"],
 ];
 
-describe.each([["modern", modern], ["system (dark)", darkSystem]])("%s palette", (_name, t) => {
+describe.each([["modern", modern], ["system (dark)", darkSystem], ["theme dark", darkTheme], ["theme light", lightTheme]])("%s palette", (_name, t) => {
   it.each(TEXT)("text %s on %s >= 4.5", (fg, bg) => {
     expect(contrast(resolve(t, fg), resolve(t, bg))).toBeGreaterThanOrEqual(4.5);
   });
@@ -89,5 +91,13 @@ describe("priority chips without their own background", () => {
     const rules = [...css.matchAll(/([^{}]*\.awi-prio-chip[^{}]*)\{([^}]*)\}/g)].filter(([, , body]) => /background:\s*none/.test(body));
     expect(rules.length).toBeGreaterThan(0);
     for (const [, selector, body] of rules) expect(body, selector.trim()).toMatch(/(^|;)\s*color:\s*var\(--awi-fg\)/);
+  });
+});
+
+describe("hidden elements", () => {
+  // panels styled with display: flex (axes panel, cursor bar...) must still
+  // disappear when their hidden attribute is set
+  it("the hidden attribute overrides display rules", () => {
+    expect(css).toMatch(/\.awi-root \[hidden\] \{ display: none !important; \}/);
   });
 });

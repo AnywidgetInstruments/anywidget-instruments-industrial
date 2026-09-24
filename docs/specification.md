@@ -269,6 +269,7 @@ Requirements use identifiers `<GROUP>-<NNN>` with priorities:
 | STYLE-004 | S | The library shall provide a global function to set the default style for all widgets created afterwards. |
 | STYLE-005 | C | Where a skin is supplied, the widget shall replace the default drawing of the named parts (housing, needle, knob, background) with the supplied SVG or raster images. |
 | STYLE-006 | M | If a supplied skin SVG contains scripts, event handler attributes or external references, then the library shall strip them before rendering. |
+| STYLE-007 | S | Every widget shall accept a `theme` of `auto`, `light` or `dark`; `light` and `dark` shall apply their palette whatever the host theme, and the library shall provide a function switching every open widget, and a ready-made switch that the examples and demos show. |
 
 ---
 
@@ -448,6 +449,7 @@ state model).
 | Alarm display | AlarmIndicator, AlarmBanner | SCADA-005 to SCADA-008 |
 | Modern / Classic / System styles | `style` trait | STYLE-001 to STYLE-004 |
 | Custom control parts | Skins | STYLE-005, STYLE-006 |
+| Light / dark theme switch | `theme` trait, `set_theme`, `theme_switch` | STYLE-007 |
 | Control / indicator switch | `mode` trait | API-003, API-004 |
 | Analog bar with normal band | AnalogIndicator | IND-001 to IND-003 |
 | Selector switch, key switch | SelectorSwitch | IND-010 to IND-013 |
@@ -475,4 +477,4 @@ state model).
 | 0.2 | Moved into the repository; DOC-003 withdrawn; component traceability table made product-neutral. |
 | 0.3 | Industrial operator objects (IND): analog indicator, selector switch, stack light, PID faceplate, annunciator, alarm list, state machine. |
 | 0.4 | DOC-007: safety notice. |
-| 0.5 | API-014 (graphic and form entry for every control), NUM-010 (numeric entry field with range check), CHART-108 (axis ranges set by the user). |
+| 0.5 | API-014 (graphic and form entry for every control), NUM-010 (numeric entry field with range check), CHART-108 (axis ranges set by the user), STYLE-007 (light / dark theme). |

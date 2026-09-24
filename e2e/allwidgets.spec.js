@@ -270,7 +270,9 @@ test.describe("every widget", () => {
   test("WaveformChart: typed axis ranges reach the kernel (CHART-108)", async () => {
     const w = widget(page, "WaveformChart");
     await w.scrollIntoViewIfNeeded();
+    await expect(w.locator(".awi-axes-panel")).toBeHidden(); // opens on demand only
     await w.getByRole("button", { name: "Set the axis ranges" }).click();
+    await expect(w.locator(".awi-axes-panel")).toBeVisible();
     await w.getByRole("textbox", { name: "Y minimum" }).fill("-2");
     await w.getByRole("textbox", { name: "Y maximum" }).fill("8");
     await w.getByRole("button", { name: "Apply" }).click();

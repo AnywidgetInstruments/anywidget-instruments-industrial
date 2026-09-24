@@ -4,7 +4,7 @@
 // intended visual change.
 import { expect, test } from "@playwright/test";
 
-for (const [name, query] of [["modern", "style=modern"], ["classic", "style=classic"], ["system-dark", "style=system&dark"]]) {
+for (const [name, query] of [["modern", "style=modern"], ["classic", "style=classic"], ["system-dark", "style=system&dark"], ["modern-theme-dark", "style=modern&theme=dark"]]) {
   test(`preview renders unchanged: ${name}`, async ({ page }) => {
     await page.setViewportSize({ width: 1300, height: 900 });
     await page.goto(`http://127.0.0.1:8766/js/preview/index.html?${query}&visual`);

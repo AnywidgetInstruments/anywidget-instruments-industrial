@@ -85,6 +85,7 @@ JupyterLab / Notebook 7 / marimo (`e2e/`).
 | STYLE-001 … STYLE-004 | M/S | ✅ | modern / classic / system (dark hosts), CSS custom properties, `set_default_style` |
 | STYLE-005 | C | ✅ | Skin parts `background`, `housing`, `knob`, `needle` |
 | STYLE-006 | M | ✅ | Sanitized in the kernel and again in the browser |
+| STYLE-007 | S | ✅ | `theme` trait, `set_theme()`, `theme_switch()` in every example and demo; contrast audit of both forced palettes (js), visual baseline of the dark theme |
 
 ## PERF, A11Y, ROB, SEC
 | ID | Pri | Status | Notes |

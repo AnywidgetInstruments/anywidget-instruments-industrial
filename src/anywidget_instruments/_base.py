@@ -13,7 +13,7 @@ from traitlets.traitlets import EventHandler
 
 from . import _dispatch, _liveness
 from ._sanitize import sanitize_svg
-from ._style import STYLES, get_default_style
+from ._style import STYLES, THEMES, get_default_style, get_default_theme
 
 _STATIC = pathlib.Path(__file__).parent / "static"
 
@@ -76,6 +76,8 @@ class InstrumentWidget(anywidget.AnyWidget):
         ``(width, height)`` in CSS pixels; drawings are vector based and stay sharp.
     style
         Visual style: ``"modern"``, ``"classic"`` or ``"system"``.
+    theme
+        ``"auto"``, ``"light"`` or ``"dark"``; see :func:`anywidget_instruments.set_theme`.
     """
 
     _esm = _STATIC / "index.js"
@@ -91,6 +93,8 @@ class InstrumentWidget(anywidget.AnyWidget):
     tooltip = t.Unicode("").tag(sync=True)
     size = t.Tuple(t.CInt(), t.CInt(), default_value=(160, 160)).tag(sync=True)
     style = t.Enum(list(STYLES), default_value="modern").tag(sync=True)
+    #: ``"auto"`` (the style decides), ``"light"`` or ``"dark"`` (STYLE-007).
+    theme = t.Enum(list(THEMES), default_value="auto").tag(sync=True)
     #: Optional skin: mapping part name -> SVG source (sanitized, STYLE-005/006).
     skin = t.Dict(value_trait=t.Unicode(), default_value={}).tag(sync=True)
     #: Kernel session id and heartbeat interval used for stale detection (ROB-001).
@@ -105,6 +109,7 @@ class InstrumentWidget(anywidget.AnyWidget):
 
     def __init__(self, **kwargs: Any) -> None:
         kwargs.setdefault("style", get_default_style())
+        kwargs.setdefault("theme", get_default_theme())
         kwargs.setdefault("mode", self._default_mode)
         kwargs.setdefault("size", self._default_size)
         kwargs.setdefault("_heartbeat", _liveness.get_heartbeat())

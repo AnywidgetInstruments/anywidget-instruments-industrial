@@ -169,7 +169,61 @@
   --awi-pointer: var(--jp-ui-font-color0, #111827);
 }
 
+/* STYLE-007: explicit theme, whatever the host (repeated class for precedence
+ * over the host-theme rules above). Dark widgets get their own background. */
+.awi-root.awi-root.awi-root.awi-theme-dark {
+  --awi-bg: #111827;
+  --awi-fg: #e5e7eb;
+  --awi-muted: #9ca3af;
+  --awi-face: #1f2937;
+  --awi-face-stroke: #6b7280;
+  --awi-plot-bg: #111827;
+  --awi-grid: #374151;
+  --awi-accent: #60a5fa;
+  --awi-fill: #60a5fa;
+  --awi-track: #374151;
+  --awi-knob: #4b5563;
+  --awi-knob-stroke: #9ca3af;
+  --awi-pointer: #f9fafb;
+  --awi-alarm-lo: #fbbf24;
+  --awi-alarm-hi: #fbbf24;
+  --awi-alarm-lolo: #f87171;
+  --awi-alarm-hihi: #f87171;
+  --awi-trace-0: #60a5fa;
+  --awi-trace-6: #f472b6;
+  --awi-trace-7: #84cc16;
+  --awi-hp-track: #374151;
+  --awi-hp-normal: #6b7280;
+  --awi-hp-pointer: #e5e7eb;
+  --awi-stack-blue: #3b82f6;
+  --awi-proc-off: #1f2937;
+  --awi-pipe: #6b7280;
+}
+.awi-root.awi-root.awi-root.awi-theme-light {
+  --awi-bg: transparent;
+  --awi-fg: #1f2937;
+  --awi-muted: #6b7280;
+  --awi-face: #f9fafb;
+  --awi-face-stroke: #9ca3af;
+  --awi-plot-bg: #ffffff;
+  --awi-grid: #e5e7eb;
+  --awi-track: #e5e7eb;
+  --awi-knob: #d1d5db;
+  --awi-pointer: #111827;
+  --awi-alarm-lo: #b45309;
+  --awi-alarm-hi: #b45309;
+  --awi-alarm-lolo: #b91c1c;
+  --awi-alarm-hihi: #b91c1c;
+  --awi-hp-track: #e5e7eb;
+  --awi-hp-normal: #b6bcc6;
+  --awi-hp-pointer: #374151;
+  --awi-stack-blue: #2563eb;
+}
+.awi-root.awi-theme-dark { border-radius: 6px; }
+
 /* ---- layout ------------------------------------------------------------ */
+/* the hidden attribute always wins over display rules below */
+.awi-root [hidden] { display: none !important; }
 .awi-root .awi-label { font-size: 12px; font-weight: 600; text-align: center; max-width: max(var(--awi-w), 120px); overflow-wrap: break-word; }
 .awi-root .awi-body { position: relative; outline: none; border-radius: 6px; touch-action: none; }
 .awi-root .awi-body:focus-visible { box-shadow: 0 0 0 2px var(--awi-accent); }

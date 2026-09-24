@@ -3,7 +3,7 @@
 import { html, safeColor } from "./dom.js";
 import { liveness, recordBeat } from "./liveness.js";
 
-export const COMMON_TRAITS = ["mode", "label", "disabled", "visible", "tooltip", "size", "style", "skin", "_heartbeat"];
+export const COMMON_TRAITS = ["mode", "label", "disabled", "visible", "tooltip", "size", "style", "theme", "skin", "_heartbeat"];
 
 const STALE_TEXT = { stale: "⚠ STALE — kernel lost", nokernel: "⚠ NO KERNEL — read-only" };
 
@@ -120,6 +120,8 @@ export class BaseView {
     r.classList.toggle("awi-control", this.get("mode") === "control");
     r.classList.toggle("awi-disabled", !!this.get("disabled"));
     for (const s of ["modern", "classic", "system"]) r.classList.toggle(`awi-style-${s}`, this.get("style") === s);
+    // STYLE-007: explicit light / dark theme ("auto" follows the style and the host)
+    for (const t of ["light", "dark"]) r.classList.toggle(`awi-theme-${t}`, this.get("theme") === t);
     r.style.display = this.get("visible") ? "" : "none";
     r.style.setProperty("--awi-w", `${w}px`);
     r.style.setProperty("--awi-h", `${h}px`);

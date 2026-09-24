@@ -13,6 +13,12 @@ def _():
 
 
 @app.cell
+def _(ai):
+    ai.theme_switch()  # light / dark widgets (STYLE-007)
+    return
+
+
+@app.cell
 def _(ai, mo):
     setpoint = mo.ui.anywidget(ai.Knob(50, step=1, unit="%", label="Setpoint"))
     run = mo.ui.anywidget(ai.ToggleSwitch(label="Run"))

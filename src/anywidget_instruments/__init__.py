@@ -47,7 +47,15 @@ from ._process import PIPE_SHAPES, Motor, Pipe, ProcessObject, Pump, SynopticCan
 from ._sanitize import sanitize_svg
 from ._scada import ALARM_PRIORITIES, ALARM_STATES, AlarmBanner, AlarmIndicator, alarm_transition
 from ._statemachine import PACKML_COMMANDS, PACKML_MODEL, StateMachine
-from ._style import STYLES, get_default_style, set_default_style
+from ._style import (
+    STYLES,
+    THEMES,
+    get_default_style,
+    get_default_theme,
+    set_default_style,
+    set_theme,
+    theme_switch,
+)
 
 __version__ = "0.1.0.dev0"
 
@@ -69,6 +77,7 @@ __all__ = [
     "STACK_COLORS",
     "STACK_STATES",
     "STYLES",
+    "THEMES",
     "AlarmBanner",
     "AlarmIndicator",
     "AlarmList",
@@ -118,9 +127,12 @@ __all__ = [
     "compute_alarm_level",
     "eng_scale",
     "get_default_style",
+    "get_default_theme",
     "get_heartbeat",
     "sanitize_svg",
     "set_default_style",
     "set_heartbeat",
+    "set_theme",
+    "theme_switch",
     "unpack_bits",
 ]

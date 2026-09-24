@@ -42,7 +42,7 @@ function model(state) {
     emit: (e, ...a) => (handlers[e] || []).forEach((h) => h(...a)),
   };
 }
-const base = { mode: "control", disabled: false, visible: true, tooltip: "", style, skin: {}, update_rate: 30, animate: false, animation_ms: 200 };
+const base = { mode: "control", disabled: false, visible: true, tooltip: "", style, theme: params.get("theme") || "auto", skin: {}, update_rate: 30, animate: false, animation_ms: 200 };
 const num = { ...base, min: 0, max: 100, step: 0, unit: "", scale: "linear", ticks: 5, minor_ticks: 4, format: "%.1f", alarm_level: "normal", lolo: null, lo: null, hi: null, hihi: null, show_limits: false, peak: null, peak_hold: false };
 const bool = { ...base, value: false, default_state: false, mechanical_action: "switch_when_pressed", confirm: false, _pressed: false };
 const specs = [

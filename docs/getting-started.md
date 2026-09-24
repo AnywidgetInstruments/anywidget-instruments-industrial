@@ -124,6 +124,19 @@ CSS custom property scoped to `.awi-root` (for example `--awi-fill`,
 `--awi-needle`, `--awi-alarm-hi`), so you can override it per page or per
 widget.
 
+## Light and dark theme
+
+`theme` is `"auto"` (the style decides; `"system"` follows the host),
+`"light"` or `"dark"`, whatever the host theme (STYLE-007).
+`ai.set_theme("dark")` switches every open widget and the ones created
+afterwards; `ai.theme_switch()` returns a ready-made switch doing it, shown at
+the top of every example and demo.
+
+```python
+ai.theme_switch()  # a "Dark mode" slide switch
+ai.set_theme("dark")  # or from code
+```
+
 ## marimo
 
 ```python

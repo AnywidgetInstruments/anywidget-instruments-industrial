@@ -40,6 +40,12 @@ def _(installed):
 
 
 @app.cell
+def _(ai):
+    ai.theme_switch()  # light / dark widgets (STYLE-007)
+    return
+
+
+@app.cell
 def _(mo):
     mo.md("""
     # Signal analysis

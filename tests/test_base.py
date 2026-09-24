@@ -130,3 +130,29 @@ def test_on_change_decorator_with_arguments():
 def test_safety_related_classes_refer_to_the_safety_notice(name):
     doc = getattr(ai, name).__doc__
     assert "safety notice" in doc and "DOC-007" in doc
+
+
+# -- STYLE-007: light / dark theme -----------------------------------------------------------
+def test_set_theme_switches_open_and_new_widgets():
+    try:
+        knob = ai.Knob()
+        ai.set_theme("dark")
+        assert knob.theme == "dark" and ai.Gauge().theme == "dark"
+        with pytest.raises(ValueError, match="theme"):
+            ai.set_theme("blue")
+    finally:
+        ai.set_theme("auto")
+    assert knob.theme == "auto"
+
+
+def test_theme_switch_toggles_the_theme():
+    try:
+        tank = ai.Tank()
+        switch = ai.theme_switch()
+        assert switch.value is False and switch.label == "Dark mode"
+        switch.value = True
+        assert tank.theme == "dark"
+        switch.value = False
+        assert tank.theme == "light"
+    finally:
+        ai.set_theme("auto")
