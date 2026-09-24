@@ -5,8 +5,9 @@
 | JupyterLab 4 | tested (E2E) | nested widgets in `SynopticCanvas` supported |
 | Jupyter Notebook 7 | tested (E2E) | |
 | marimo | tested (E2E) | wrap controls with `mo.ui.anywidget(...)` for reactive re-execution |
+| marimo in the browser (WebAssembly) | tested (docs workflow) | no threads: heartbeat disabled; see [Try it in the browser](try.md) |
+| JupyterLite (Pyodide) | tested (docs workflow) | no threads: heartbeat disabled |
 | VS Code, Google Colab | expected (anywidget hosts) | not covered by automated tests |
-| JupyterLite (Pyodide) | supported | no threads: heartbeat disabled |
 
 ## Stale-data indication (ROB-001)
 

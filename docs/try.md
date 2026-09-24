@@ -1,20 +1,20 @@
 # Try it in the browser
 
-Every demo below runs in your browser, in two flavours: as a
-[marimo](https://marimo.io) reactive app, or as a notebook in
-[JupyterLite](https://jupyterlite.readthedocs.io). Python runs in the browser
-through Pyodide, so there is nothing to install. The first load downloads
-the Python runtime and takes a few seconds (DOC-006).
+The demos are [marimo](https://marimo.io) reactive apps that run in your
+browser: Python runs through Pyodide, so there is nothing to install. The
+first load downloads the Python runtime and takes a few seconds. Each demo is
+also available as a notebook in [JupyterLite](https://jupyterlite.readthedocs.io)
+(DOC-006).
 
-| Demo | What it shows | marimo | JupyterLite |
-|---|---|---|---|
-| **Gallery** | Every widget family: knobs and indicators, Boolean controls, charts, alarms, styles | <a href="../marimo/gallery/">open</a> | <a href="../lite/lab/index.html?path=gallery.ipynb">open</a> |
-| **PID tuning** | Closed-loop step response of a process with dead time; overshoot and settling time follow the Kp, Ti, Td knobs | <a href="../marimo/pid_tuning/">open</a> | <a href="../lite/lab/index.html?path=pid_tuning.ipynb">open</a> |
-| **Operator station** | Filling line following the machine state model, with stack light, PID faceplate, annunciator and alarm list | <a href="../marimo/operator_station/">open</a> | <a href="../lite/lab/index.html?path=operator_station.ipynb">open</a> |
-| **Signal analysis** | Waveform selector, frequency and noise knobs; signal, spectrum, RMS level and dominant frequency | <a href="../marimo/signal_analysis/">open</a> | <a href="../lite/lab/index.html?path=signal_analysis.ipynb">open</a> |
+| Demo (marimo) | What it shows | Also in JupyterLite |
+|---|---|---|
+| <a href="../marimo/gallery/">**Gallery**</a> | Every widget family: knobs and indicators, Boolean controls, charts, alarms, styles | <a href="../lite/lab/index.html?path=gallery.ipynb">notebook</a> |
+| <a href="../marimo/pid_tuning/">**PID tuning**</a> | Closed-loop step response of a process with dead time; overshoot and settling time follow the Kp, Ti, Td knobs | <a href="../lite/lab/index.html?path=pid_tuning.ipynb">notebook</a> |
+| <a href="../marimo/operator_station/">**Operator station**</a> | Filling line following the machine state model, with stack light, PID faceplate, annunciator and alarm list | <a href="../lite/lab/index.html?path=operator_station.ipynb">notebook</a> |
+| <a href="../marimo/signal_analysis/">**Signal analysis**</a> | Waveform selector, frequency and noise knobs; signal, spectrum, RMS level and dominant frequency | <a href="../lite/lab/index.html?path=signal_analysis.ipynb">notebook</a> |
 
-In **marimo**, the demos run as apps with their code shown: cells that read a
-control re-run when it changes. In **JupyterLite**, run all the cells first;
+The marimo apps show their code next to the outputs: cells that read a
+control re-run when it changes. In JupyterLite, run all the cells first;
 callbacks then update the indicators.
 
 The package is not on the package index yet, so both deployments install the

@@ -54,7 +54,7 @@ station objects), examples, the API reference, the
 [specification](docs/specification.md) and its
 [requirements status](docs/requirements-status.md).
 [Try it in your browser](https://s-celles.github.io/anywidget-instruments/try/),
-with nothing to install (marimo and JupyterLite demos).
+with nothing to install (marimo apps, also as JupyterLite notebooks).
 
 ![Widget gallery](docs/img/gallery-modern.png)
 
