@@ -31,12 +31,17 @@ chart data, heartbeats) does not run.
   peak hold) is computed by the front end and written back to the trait
   dictionary (HOST-002, HOST-004).
 - The Boolean widgets, `SelectorSwitch`, `StackLight`, `Pipe`,
-  `DeviationIndicator` and `ThemeSwitch` read their traits through their
-  schema; a selector resolves its position and a stack light its states as
-  the Python classes do. `AlarmIndicator` applies an acknowledgement itself
-  and still sends the `ack` message. Latches are host logic: a latched
-  push button stays set until the host resets it, and so does the
-  emergency stop. The theme switch changes the page theme only.
+  `DeviationIndicator`, `ThemeSwitch`, the compact indicators and
+  `EventLog` read their traits through their schema; a selector resolves
+  its position and a stack light its states as the Python classes do, and
+  `BarGraph` computes its per-bar alarm levels. `AlarmIndicator` applies
+  an acknowledgement itself, and the `Valve`, `Pump` and `Motor` faceplates
+  apply auto / manual and, with `simulate`, the simulated state; both still
+  send their message to the host. Latches are host logic: a latched push
+  button stays set until the host resets it, and so does the emergency
+  stop. The theme switch changes the page theme only. `Sparkline` and
+  `KPITile` draw the history the host sends (`snapshot` and `append`
+  messages of float32 values, described in `contract.json`).
 - The other widgets are being migrated (see the
   [migration inventory](dev/frontend-migration-inventory.md)): until then,
   their derived traits and chart data need a host
