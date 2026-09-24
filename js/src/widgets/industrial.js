@@ -2,9 +2,9 @@
 // (IND-010..013) and StackLight (IND-020..022).
 import { clear, html, svg, svgText } from "../core/dom.js";
 import { formatValue, tickFormat } from "../core/format.js";
-import { parseNumber, ticks } from "../core/scale.js";
+import { linearHit, parseNumber, ticks } from "../core/scale.js";
 import { BaseView } from "../core/view.js";
-import { NumericView } from "./numeric.js";
+import { NumericView, svgPoint } from "./numeric.js";
 
 // ---------------------------------------------------------------------------
 // AnalogIndicator: grey scale, shaded normal band, limit marks, pointer
@@ -14,6 +14,13 @@ export class AnalogIndicatorView extends NumericView {
     super(model, el, ["orientation", "normal_lo", "normal_hi", "target"], { role: "slider" });
     this.svgEl = svg("svg", { class: "awi-svg", "aria-hidden": "true" });
     this.body.appendChild(this.svgEl);
+    // direct manipulation in control mode (API-014): drag along the scale
+    const hit = (e, final) => {
+      if (!this.track) return;
+      const p = svgPoint(this.svgEl, e);
+      this.commitFraction(linearHit(this.vertical ? p.y : p.x, this.track.a0, this.track.a1), final);
+    };
+    this.drag(this.svgEl, { start: (e) => hit(e, false), move: (e) => hit(e, false), end: (e) => hit(e, true) });
     this.schedule();
   }
 
@@ -34,6 +41,7 @@ export class AnalogIndicatorView extends NumericView {
     const v = this.vertical;
     // track geometry: [a0, a1] along the scale, [b0, b1] across it
     const t = v ? { a0: h - 10, a1: 10, b0: w - 30, b1: w - 18 } : { a0: 12, a1: w - 12, b0: 14, b1: 26 };
+    this.track = t;
     const at = (f) => t.a0 + f * (t.a1 - t.a0);
     const rect = (f0, f1, b0, b1, cls) => {
       const [p, q] = [at(f0), at(f1)].sort((x, y) => x - y);
@@ -100,6 +108,11 @@ export class SelectorView extends BaseView {
     this.svgEl = svg("svg", { class: "awi-svg", viewBox: "0 0 100 100", "aria-hidden": "true" });
     this.body.appendChild(this.svgEl);
     this.stateEl = html("div", { cls: "awi-value-row" }, [html("span", { cls: "awi-value" })]);
+    // form entry (API-014): the list of positions, in control mode
+    this.choice = html("select", { cls: "awi-choice", attrs: { "data-lm-suppress-shortcuts": "true" } });
+    this.choice.addEventListener("change", () => this.select(this.choice.value));
+    this.choice.addEventListener("keydown", (e) => e.stopPropagation());
+    this.stateEl.appendChild(this.choice);
     this.root.appendChild(this.stateEl);
     this.body.setAttribute("aria-labelledby", this.labelEl.id);
     this.body.addEventListener("keydown", (e) => this.onKey(e));
@@ -185,6 +198,21 @@ export class SelectorView extends BaseView {
     }
     const text = `${value}${locked ? " · LOCKED" : ""}`;
     this.stateEl.firstChild.textContent = text;
+    const list = this.get("mode") === "control";
+    this.choice.hidden = !list;
+    // with the list shown, the text only says whether the key switch is locked
+    if (list) this.stateEl.firstChild.textContent = locked ? "LOCKED" : "";
+    this.stateEl.firstChild.hidden = list && !locked;
+    if (list) {
+      const labels = [...this.choice.options].map((o) => o.value);
+      if (labels.join("\u0000") !== pos.join("\u0000")) {
+        clear(this.choice);
+        for (const p of pos) this.choice.appendChild(html("option", { text: p, attrs: { value: p } }));
+      }
+      this.choice.value = value;
+      this.choice.disabled = !this.canOperate;
+      this.choice.setAttribute("aria-label", `${this.get("label") || "Selector"} position${locked ? " (locked)" : ""}`);
+    }
     const b = this.body;
     b.tabIndex = this.get("mode") === "control" ? 0 : -1;
     b.setAttribute("role", this.get("mode") === "control" ? "slider" : "img");

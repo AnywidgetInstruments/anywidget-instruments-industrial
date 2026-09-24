@@ -134,3 +134,23 @@ def test_synoptic_background_types():
     assert syn.background_mime == "image/svg+xml"
     with pytest.raises(t.TraitError):
         syn.background = b"GIF89a"
+
+
+# -- API-014: control valve position demand -------------------------------------------------
+def test_valve_position_demand_from_the_faceplate():
+    v = ai.Valve(position=20, simulate=True, auto=False)
+    events = []
+    v.on_command(events.append)
+    v._handle_front_msg(v, {"type": "command", "command": "position", "value": 65}, [])
+    assert v.position == 65 and v.value == "open"
+    assert events[-1]["command"] == "position" and events[-1]["value"] == 65
+    for bad in (120, -1, "x"):
+        v._handle_front_msg(v, {"type": "command", "command": "position", "value": bad}, [])
+    assert v.position == 65 and len(events) == 1
+    v.auto = True  # operator actions are manual only
+    v._handle_front_msg(v, {"type": "command", "command": "position", "value": 10}, [])
+    assert v.position == 65
+    v.demand_position(0)
+    assert v.value == "closed"
+    with pytest.raises(ValueError, match="between 0 and 100"):
+        v.demand_position(150)

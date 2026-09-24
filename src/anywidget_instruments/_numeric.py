@@ -48,6 +48,11 @@ class NumericWidget(InstrumentWidget):
     ``%.3g`` general, ``%.3n`` engineering (exponent multiple of 3) and
     ``%.3s`` SI prefix (m, µ, k, M ...).
 
+    Input (API-014): in control mode the value can be set on the drawing (drag,
+    wheel, arrow keys) or typed in the value field (``entry=True``, the
+    default). Typed values are snapped to ``step``; a value outside
+    [``min``, ``max``] is rejected, or clamped when ``coerce`` is set (NUM-010).
+
     Alarms: ``lolo``, ``lo``, ``hi``, ``hihi``, ``deadband``; the resulting level
     is published in ``alarm_level``. ``show_limits`` draws them on the scale.
 
@@ -66,6 +71,8 @@ class NumericWidget(InstrumentWidget):
     format = t.Unicode("%.1f").tag(sync=True)
     coerce = t.Bool(False).tag(sync=True)
     update_rate = t.Float(30.0, min=1.0).tag(sync=True)
+    #: Show an editable value field in control mode (API-014, NUM-010).
+    entry = t.Bool(True).tag(sync=True)
     animate = t.Bool(False).tag(sync=True)
     animation_ms = t.Int(200, min=0, max=300).tag(sync=True)
 
@@ -107,6 +114,20 @@ class NumericWidget(InstrumentWidget):
     def _on_scale_change(self, _change: Any) -> None:
         if self.max > self.min:
             self._check_scale()
+
+    def set_state(self, sync_data: Any) -> None:
+        # NUM-010: the kernel applies the range check of the entry field to every
+        # value received from the front end; a rejected value is sent back.
+        if "value" in sync_data and not self.coerce:
+            try:
+                v = float(sync_data["value"])
+            except (TypeError, ValueError):
+                v = math.nan
+            if math.isfinite(v) and not self.min <= v <= self.max:
+                sync_data = {k: val for k, val in sync_data.items() if k != "value"}
+                self.send_state("value")
+        if sync_data:
+            super().set_state(sync_data)
 
     @t.validate("value")
     def _coerce_value(self, proposal: Any) -> float:

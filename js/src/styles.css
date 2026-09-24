@@ -176,6 +176,20 @@
 .awi-root .awi-svg { width: 100%; height: 100%; display: block; overflow: visible; }
 .awi-root.awi-meter .awi-svg { overflow: hidden; border-radius: 6px; }
 .awi-root .awi-value-row { display: flex; gap: 6px; align-items: baseline; font-size: 13px; font-variant-numeric: tabular-nums; }
+/* form entry (API-014, NUM-010) */
+.awi-root.awi-has-entry .awi-value { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.awi-root .awi-entry { font: inherit; width: 8ch; padding: 1px 4px; text-align: right; border: 1px solid var(--awi-face-stroke); border-radius: 3px; background: var(--awi-plot-bg); color: var(--awi-fg); font-variant-numeric: tabular-nums; }
+.awi-root .awi-entry:focus-visible { outline: 2px solid var(--awi-accent); outline-offset: 0; }
+.awi-root .awi-entry[aria-invalid="true"] { border-color: var(--awi-alarm-hihi); border-width: 2px; }
+.awi-root .awi-entry:disabled { opacity: 0.6; }
+.awi-root .awi-choice { font: inherit; font-size: 12px; padding: 1px 4px; border: 1px solid var(--awi-face-stroke); border-radius: 3px; background: var(--awi-plot-bg); color: var(--awi-fg); }
+.awi-root .awi-fp-position { align-items: center; }
+.awi-root .awi-cursor-bar { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 11px; max-width: var(--awi-w); }
+.awi-root .awi-cursor-field { display: inline-flex; align-items: baseline; gap: 4px; }
+.awi-root .awi-cursor-bar .awi-entry { width: 7ch; font-size: 11px; }
+.awi-root .awi-fp-slider { width: 96px; accent-color: var(--awi-accent); }
+.awi-root .awi-faceplate .awi-entry { width: 5ch; }
+.awi-root .awi-entry-msg { font-size: 10px; font-weight: 700; color: var(--awi-alarm-hihi); max-width: max(var(--awi-w), 160px); text-align: center; }
 .awi-root .awi-badge { font-size: 10px; font-weight: 700; padding: 0 4px; border-radius: 3px; border: 1px solid currentColor; }
 .awi-root.awi-control .awi-body { cursor: grab; }
 .awi-root.awi-control.awi-dragging .awi-body { cursor: grabbing; }
@@ -431,6 +445,8 @@
 .awi-root .awi-pid-pv-bar { fill: var(--awi-hp-pointer); }
 .awi-root .awi-pid-op-bar { fill: var(--awi-hp-normal); stroke: var(--awi-hp-pointer); stroke-width: 1; }
 .awi-root .awi-pid-sp-mark { fill: none; stroke: var(--awi-fg); stroke-width: 1.5; }
+.awi-root .awi-pid-drag-sp .awi-pid-sp-mark { fill: var(--awi-face); stroke-width: 2.5; cursor: ns-resize; }
+.awi-root .awi-pid-drag-sp, .awi-root .awi-pid-drag-op { cursor: ns-resize; touch-action: none; }
 .awi-root.awi-pidfaceplate:is(.awi-alarm-lo, .awi-alarm-hi) .awi-pid-pv-bar { fill: var(--awi-alarm-hi); }
 .awi-root.awi-pidfaceplate:is(.awi-alarm-lolo, .awi-alarm-hihi) .awi-pid-pv-bar { fill: var(--awi-alarm-hihi); }
 .awi-root .awi-pid-rows { display: grid; gap: 2px; }

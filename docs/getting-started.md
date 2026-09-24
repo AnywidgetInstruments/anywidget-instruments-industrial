@@ -70,6 +70,30 @@ if start.read_latched():
     ...
 ```
 
+## Two ways to set a value
+
+Every control can be operated in two ways (API-014): directly on its drawing
+(drag, click, mouse wheel, arrow keys) or through a form entry.
+
+| Widget | On the drawing | Form entry |
+|---|---|---|
+| Numeric controls: `Knob`, `Dial`, `FillSlide`, and every numeric indicator switched to `mode="control"` (`Gauge`, `Meter`, `Compass`, `Tank`, `Thermometer`, `VUMeter`, `SevenSegment`, `AnalogIndicator`) | drag the pointer, needle, level or display; wheel; arrow keys | value field |
+| `SelectorSwitch` | click a position, arrow keys | list of positions |
+| `PIDFaceplate` | drag the SP marker (AUTO) or the OP bar (MAN) | SP / OP fields |
+| `Valve` (control valve, faceplate) | position slider | position field |
+| Graph cursors | drag the cursor | cursor position field |
+
+The value field accepts `12.5`, `12,5`, `1e3`, SI prefixes (`4.7 k`, `250 m`)
+and the widget unit (`250 mV` for a unit of `V`). A confirmed entry (Enter, or
+leaving the field) is snapped to `step`; a text that is not a number or a value
+outside [`min`, `max`] is rejected with a message giving the range (with
+`coerce=True` it is clamped instead) (NUM-010). The kernel applies the same
+check to every value received from the front end. Escape restores the
+current value. Set `entry=False` to hide the field.
+
+Two-state controls (switches, push buttons, emergency stop), whose drawing
+already is the input, and display-only objects have no form entry.
+
 ## Keyboard
 
 Controls are operable with the keyboard: arrows (± step), Page Up/Down

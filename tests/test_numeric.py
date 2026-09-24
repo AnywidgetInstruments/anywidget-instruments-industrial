@@ -170,3 +170,24 @@ def test_size_validation():
         ai.Knob(size=(0, 10))
     assert ai.Knob(size=(80, 80)).size == (80, 80)
     assert ai.FillSlide(orientation="vertical").size == (80, 240)
+
+
+# -- NUM-010: the kernel applies the entry range check to front-end values -----------------
+def test_front_end_values_outside_the_range_are_sent_back():
+    k = ai.Knob(5, max=10)
+    resent = []
+    k.send_state = lambda key=None: resent.append(key)
+    k.set_state({"value": 50})
+    assert k.value == 5.0 and resent == ["value"]
+    k.set_state({"value": 7})
+    assert k.value == 7.0
+    k.coerce = True
+    k.set_state({"value": 50})
+    assert k.value == 10.0  # clamped instead (NUM-008)
+
+
+def test_kernel_values_outside_the_range_are_kept():
+    k = ai.Knob(5, max=10)
+    k.value = 50  # NUM-006: shown with an out-of-range marker
+    assert k.value == 50.0
+    assert k.entry is True

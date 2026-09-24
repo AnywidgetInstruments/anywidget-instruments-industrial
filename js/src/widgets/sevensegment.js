@@ -1,5 +1,6 @@
 // Seven-segment numeric display (NUM-109).
 import { clear, safeColor, svg } from "../core/dom.js";
+import { keyStep } from "../core/scale.js";
 import { NumericView } from "./numeric.js";
 
 //   aaa
@@ -49,6 +50,18 @@ export class SevenSegmentView extends NumericView {
     this.svgEl = svg("svg", { class: "awi-svg", "aria-hidden": "true", preserveAspectRatio: "xMidYMid meet" });
     this.body.appendChild(this.svgEl);
     this.valueRow.classList.add("awi-sr-only-when-segments");
+    // direct manipulation in control mode (API-014): drag up / down, one
+    // keyboard step per 8 px
+    let y0 = 0;
+    let v0 = 0;
+    this.drag(this.svgEl, {
+      start: (e) => {
+        y0 = e.clientY;
+        v0 = Number.isFinite(this.value) ? this.value : this.min;
+      },
+      move: (e) => this.commit(v0 + Math.round((y0 - e.clientY) / 8) * keyStep(this.min, this.max, this.step)),
+      end: (e) => this.commit(v0 + Math.round((y0 - e.clientY) / 8) * keyStep(this.min, this.max, this.step), true),
+    });
     this.schedule();
   }
 

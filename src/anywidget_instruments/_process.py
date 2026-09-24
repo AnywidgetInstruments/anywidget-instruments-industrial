@@ -77,7 +77,11 @@ class Valve(ProcessObject):
     """On/off or control valve (SCADA-001).
 
     ``value``: ``"open"``, ``"closed"``, ``"transit"`` or ``"fault"``.
-    ``position``: optional opening in % for control valves.
+    ``position``: optional opening in % for control valves (feedback).
+
+    For a control valve (``position`` set), the faceplate also takes a
+    position demand in manual mode, with a slider or a typed value (API-014):
+    :meth:`on_command` callbacks receive ``{"command": "position", "value": %}``.
     """
 
     _kind = t.Unicode("valve").tag(sync=True)
@@ -91,6 +95,41 @@ class Valve(ProcessObject):
         if self.simulate and self.position is not None and name in ("open", "close"):
             self.position = 100.0 if name == "open" else 0.0
         super().command(name)
+
+    def demand_position(self, percent: float) -> None:
+        """Position demand (0 to 100 %) as if the operator used the faceplate."""
+        v = float(percent)
+        if not 0.0 <= v <= 100.0:
+            raise ValueError(f"Valve position demand must be between 0 and 100 %, got {v}")
+        if self.simulate:
+            self.position = v
+            self.value = "open" if v > 0 else "closed"
+        with _dispatch.batch():
+            for cb in list(self._command_callbacks):
+                _dispatch.call(
+                    self,
+                    cb,
+                    {"name": "command", "command": "position", "value": v, "owner": self},
+                    self._callback_priority,
+                )
+
+    def _handle_front_msg(self, widget: Any, content: Any, buffers: Any) -> None:
+        if isinstance(content, dict) and content.get("command") == "position":
+            v = content.get("value")
+            if isinstance(v, bool) or not isinstance(v, (int, float)):
+                return
+            ok = (
+                content.get("type") == "command"
+                and self.mode == "control"
+                and not self.disabled
+                and not self.auto
+                and self.position is not None
+                and 0.0 <= v <= 100.0
+            )
+            if ok:
+                self.demand_position(float(v))
+            return
+        super()._handle_front_msg(widget, content, buffers)
 
 
 class Pump(ProcessObject):

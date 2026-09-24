@@ -2,8 +2,9 @@
 // operator entries with mode rules and confirmation of large changes.
 import { clear, html, svg, svgText } from "../core/dom.js";
 import { formatValue, tickFormat, withUnit } from "../core/format.js";
-import { parseNumber, ticks, toFraction } from "../core/scale.js";
+import { fromFraction, linearHit, parseNumber, ticks, toFraction } from "../core/scale.js";
 import { BaseView } from "../core/view.js";
+import { svgPoint } from "./numeric.js";
 
 const ALARM_TEXT = { lolo: "LOLO", lo: "LO", hi: "HI", hihi: "HIHI" };
 const EDITABLE_IN = { sp: "AUTO", op: "MAN" };
@@ -52,6 +53,9 @@ export class PIDView extends BaseView {
     this.note = html("div", { cls: "awi-pid-note", attrs: { role: "status", "aria-live": "polite" } });
     b.append(this.head, this.svgEl, table, this.note);
     this.pending = null;
+    // direct manipulation (API-014): drag the SP marker in AUTO, the OP bar in MAN
+    this.preview = null;
+    this.svgEl.addEventListener("pointerdown", (e) => this.startDrag(e));
     this.listen("msg:custom", (msg) => {
       if (msg && msg.type === "rejected") this.showNote(`✖ ${msg.reason}`);
     });
@@ -97,6 +101,44 @@ export class PIDView extends BaseView {
     this.pending = field;
     this.showNote(`Change ${field.toUpperCase()} ${formatValue(this.num(field), fmt)} → ${formatValue(d.value, fmt)}?`, [ok, cancel]);
     ok.focus();
+  }
+
+  /** Field and value under the pointer, or null when that field is not editable now. */
+  dragTarget(e) {
+    const g = this.barGeom;
+    if (!g) return null;
+    const p = svgPoint(this.svgEl, e);
+    const field = p.x >= g.op[0] ? "op" : p.x <= g.pv[1] ? "sp" : null;
+    if (!field || EDITABLE_IN[field] !== this.get("loop_mode")) return null;
+    const [a, b] = field === "sp" ? [this.num("pv_min"), this.num("pv_max")] : [this.num("op_min"), this.num("op_max")];
+    return { field, value: fromFraction(linearHit(p.y, g.y0, g.y1), a, b) };
+  }
+
+  startDrag(e) {
+    if (!this.interactive || this.get("mode") !== "control" || e.button !== 0) return;
+    const first = this.dragTarget(e);
+    if (!first) return;
+    e.preventDefault();
+    this.svgEl.setPointerCapture?.(e.pointerId);
+    const move = (ev) => {
+      const t = this.dragTarget(ev);
+      if (t && t.field === first.field) this.preview = t;
+      this.drawBars();
+    };
+    const up = (ev) => {
+      this.svgEl.removeEventListener("pointermove", move);
+      this.svgEl.removeEventListener("pointerup", up);
+      this.svgEl.removeEventListener("pointercancel", up);
+      const t = ev.type === "pointerup" ? this.preview : null;
+      this.preview = null;
+      this.drawBars();
+      if (t) this.enter(t.field, Number(t.value.toPrecision(12)));
+    };
+    this.preview = first;
+    this.drawBars();
+    this.svgEl.addEventListener("pointermove", move);
+    this.svgEl.addEventListener("pointerup", up);
+    this.svgEl.addEventListener("pointercancel", up);
   }
 
   setMode(m) {
@@ -170,7 +212,8 @@ export class PIDView extends BaseView {
       const v = this.num(k);
       if (v !== null) s.appendChild(svg("path", { class: `awi-ai-limit awi-ai-limit-${k}`, d: `M${pvX - 4} ${yOf(v, pmin, pmax)}H${pvX + barW + 4}` }));
     }
-    const sy = yOf(this.num("sp"), pmin, pmax);
+    const spShown = this.preview?.field === "sp" ? this.preview.value : this.num("sp");
+    const sy = yOf(spShown, pmin, pmax);
     s.appendChild(svg("path", { class: "awi-pid-sp-mark", d: `M${pvX + barW + 2} ${sy}L${pvX + barW + 12} ${sy - 6}L${pvX + barW + 12} ${sy + 6}Z` }));
     s.appendChild(svgText("SP", { class: "awi-tick-label", x: pvX + barW + 14, y: sy, "dominant-baseline": "central" }));
     const tk = ticks(pmin, pmax, 4, 0);
@@ -182,8 +225,14 @@ export class PIDView extends BaseView {
     s.appendChild(svgText("PV", { class: "awi-tick-label", x: pvX + barW / 2, y: h - 2, "text-anchor": "middle" }));
     // OP column
     const opX = w - 50;
+    this.barGeom = { pv: [0, pvX + barW + 30], op: [opX - 8, w], y0, y1 };
+    const loop = this.get("loop_mode");
+    const drag = this.get("mode") === "control" && this.interactive;
+    s.classList.toggle("awi-pid-drag-sp", drag && loop === "AUTO");
+    s.classList.toggle("awi-pid-drag-op", drag && loop === "MAN");
     s.appendChild(svg("rect", { class: "awi-ai-track", x: opX, y: y1, width: 18, height: y0 - y1 }));
-    const oy = yOf(this.num("op"), omin, omax);
+    const opShown = this.preview?.field === "op" ? this.preview.value : this.num("op");
+    const oy = yOf(opShown, omin, omax);
     s.appendChild(svg("rect", { class: "awi-pid-op-bar", x: opX, y: oy, width: 18, height: y0 - oy }));
     s.appendChild(svgText(formatValue(omax, tf), { class: "awi-tick-label", x: opX + 22, y: y1, "dominant-baseline": "central" }));
     s.appendChild(svgText(formatValue(omin, tf), { class: "awi-tick-label", x: opX + 22, y: y0, "dominant-baseline": "central" }));

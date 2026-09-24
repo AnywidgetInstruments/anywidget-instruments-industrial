@@ -7,7 +7,7 @@
 | Project | anywidget-instruments (working name) |
 | Document type | Software requirements specification |
 | Notation | EARS (Easy Approach to Requirements Syntax) |
-| Version | 0.4 |
+| Version | 0.5 |
 | Date | 2026-09-24 |
 | Status | Baseline for version 1.0 |
 
@@ -114,6 +114,7 @@ Requirements use identifiers `<GROUP>-<NNN>` with priorities:
 | API-011 | M | While `disabled` is true, the widget shall render in a greyed style and shall reject user input. |
 | API-012 | S | The library shall provide a `Panel` layout helper arranging widgets in a grid with labels, compatible with ipywidgets `HBox`, `VBox` and `GridBox`. |
 | API-013 | C | The library shall provide serialization of a panel's widget values to and from a dictionary, to support saving and restoring a panel state. |
+| API-014 | M | Every control whose value is a number or one choice among several shall offer two ways of setting it: direct manipulation of its drawing (drag, click) and a form entry (a numeric field, or a list of the choices). Controls with two states or momentary actions (switches, push buttons, emergency stop), and display-only objects, are exempt; the documentation shall list them. |
 
 ---
 
@@ -132,6 +133,7 @@ Requirements use identifiers `<GROUP>-<NNN>` with priorities:
 | NUM-007 | M | If the value is NaN or infinite, then the numeric widget shall display a distinct invalid state and shall not move its pointer. |
 | NUM-008 | S | Where `coerce` is enabled, the numeric widget shall also clamp the synchronized `value` itself to [`min`, `max`]. |
 | NUM-009 | S | While the user is dragging a numeric control, the control shall send intermediate values at most at the rate set by `update_rate` (default 30 Hz), and shall always send the final value on release. |
+| NUM-010 | M | Where a numeric widget is in control mode and `entry` is enabled (the default), it shall show its value in an editable field; when the user confirms an entry, the widget shall snap it to `step` and shall reject, with a message naming the range, a text that is not a number or a value outside [`min`, `max`] (clamped instead where `coerce` is enabled); the kernel shall apply the same range check to every value received from the front end. |
 
 ### 4.2 Numeric Widget Catalog
 
@@ -472,3 +474,4 @@ state model).
 | 0.2 | Moved into the repository; DOC-003 withdrawn; component traceability table made product-neutral. |
 | 0.3 | Industrial operator objects (IND): analog indicator, selector switch, stack light, PID faceplate, annunciator, alarm list, state machine. |
 | 0.4 | DOC-007: safety notice. |
+| 0.5 | API-014 (graphic and form entry for every control), NUM-010 (numeric entry field with range check). |

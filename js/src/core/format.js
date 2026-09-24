@@ -80,3 +80,22 @@ export function tickFormat(fmt) {
   const type = m ? m[3] : "f";
   return type === "f" || type === "g" ? "%.4g" : `%.2${type}`;
 }
+
+const PREFIX = { y: -24, z: -21, a: -18, f: -15, p: -12, n: -9, u: -6, "µ": -6, m: -3, k: 3, M: 6, G: 9, T: 12, P: 15, E: 18 };
+const ENTRY = /^([-+]?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?)\s*([yzafpnuµmkMGTPE]?)$/i;
+
+/**
+ * Parse a number typed by the user (NUM-010): decimal comma or point,
+ * exponent, optional SI prefix and optional trailing unit
+ * ("2,5", "1e3", "4.7 k", "250 mV" with unit "V"). Returns NaN otherwise.
+ */
+export function parseEntry(text, unit = "") {
+  let t = String(text ?? "").trim().replace(",", ".");
+  if (unit && t.endsWith(unit)) t = t.slice(0, -unit.length).trim();
+  const m = ENTRY.exec(t);
+  if (!m) return Number.NaN;
+  // an "e"/"E" alone is the exponent-less prefix E (exa) only when not part of the number
+  const exp = m[2] ? PREFIX[m[2]] ?? PREFIX[m[2].toLowerCase()] : 0;
+  if (exp === undefined) return Number.NaN;
+  return Number(m[1]) * 10 ** exp;
+}

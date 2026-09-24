@@ -1,13 +1,17 @@
 // Shared behaviour of numeric widgets: value text, alarm and range badges,
 // keyboard / wheel interaction and ARIA attributes.
 import { html, parseSkin, svg } from "../core/dom.js";
+import { checkEntry } from "../core/entry.js";
 import { formatValue, withUnit } from "../core/format.js";
 import { fromFraction, keyStep, parseNumber, position, snap, toFraction } from "../core/scale.js";
 import { BaseView } from "../core/view.js";
 
+export { checkEntry };
+
 export const NUMERIC_TRAITS = [
   "value", "min", "max", "step", "unit", "scale", "ticks", "minor_ticks", "format",
   "lolo", "lo", "hi", "hihi", "show_limits", "alarm_level", "animate", "animation_ms",
+  "entry", "coerce",
 ];
 
 const ALARM_TEXT = { lolo: "LOLO", lo: "LO", hi: "HI", hihi: "HIHI" };
@@ -19,8 +23,27 @@ export class NumericView extends BaseView {
     this.valueRow = html("div", { cls: "awi-value-row" });
     this.valueText = html("span", { cls: "awi-value" });
     this.badge = html("span", { cls: "awi-badge" });
-    this.valueRow.append(this.valueText, this.badge);
-    this.root.appendChild(this.valueRow);
+    // form entry (API-014, NUM-010): editable value in control mode
+    this.entryEl = html("input", { cls: "awi-entry", attrs: { type: "text", inputmode: "decimal", autocomplete: "off", spellcheck: "false", "data-lm-suppress-shortcuts": "true" } });
+    this.entryUnit = html("span", { cls: "awi-entry-unit" });
+    this.entryMsg = html("div", { cls: "awi-entry-msg", attrs: { role: "alert" } });
+    this.entryEl.addEventListener("keydown", (e) => {
+      e.stopPropagation();
+      if (e.key === "Enter") {
+        e.preventDefault();
+        this.commitEntry();
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        this.resetEntry();
+        this.entryEl.blur();
+      }
+    });
+    this.entryEl.addEventListener("input", () => this.showEntryError(""));
+    this.entryEl.addEventListener("blur", () => {
+      if (this.entryEl.value !== this._entryShown) this.commitEntry();
+    });
+    this.valueRow.append(this.valueText, this.entryEl, this.entryUnit, this.badge);
+    this.root.append(this.valueRow, this.entryMsg);
     this.body.tabIndex = 0;
     this.body.setAttribute("aria-labelledby", this.labelEl.id);
     this.body.addEventListener("keydown", (e) => this.onKey(e));
@@ -76,6 +99,7 @@ export class NumericView extends BaseView {
 
     const text = withUnit(formatValue(v, this.get("format")), this.get("unit"));
     this.valueText.textContent = text;
+    this.renderEntry(v);
     // A11Y-003: state conveyed by text, not only by color.
     const parts = [];
     if (p.over) parts.push("▲ OVER");
@@ -95,6 +119,48 @@ export class NumericView extends BaseView {
     if (!this.get("label")) b.setAttribute("aria-label", this.kind);
     else b.removeAttribute("aria-label");
     b.tabIndex = this.get("mode") === "control" ? 0 : -1;
+  }
+
+  /** Show the entry field in control mode (NUM-010), without disturbing typing. */
+  renderEntry(v) {
+    const on = this.get("mode") === "control" && this.get("entry") !== false;
+    this.root.classList.toggle("awi-has-entry", on);
+    this.entryEl.hidden = !on;
+    this.entryUnit.hidden = !on || !this.get("unit");
+    this.valueText.setAttribute("aria-hidden", on ? "true" : "false");
+    if (!on) {
+      this.showEntryError("");
+      return;
+    }
+    this.entryEl.disabled = !this.interactive;
+    this.entryUnit.textContent = this.get("unit") || "";
+    const label = this.get("label") || this.kind;
+    this.entryEl.setAttribute("aria-label", `${label} value (${formatValue(this.min, this.get("format"))} to ${formatValue(this.max, this.get("format"))})`);
+    if (document.activeElement !== this.entryEl) this.resetEntry(v);
+  }
+
+  resetEntry(v = this.value) {
+    this._entryShown = Number.isFinite(v) ? formatValue(v, this.get("format")) : "";
+    this.entryEl.value = this._entryShown;
+    this.entryEl.placeholder = Number.isFinite(v) ? "" : formatValue(v);
+    this.showEntryError("");
+  }
+
+  showEntryError(reason) {
+    this.entryMsg.textContent = reason;
+    this.entryMsg.hidden = !reason;
+    if (reason) this.entryEl.setAttribute("aria-invalid", "true");
+    else this.entryEl.removeAttribute("aria-invalid");
+  }
+
+  /** Validate and send the typed value (NUM-010); rejected entries stay for correction. */
+  commitEntry() {
+    if (!this.interactive) return this.resetEntry();
+    const r = checkEntry(this.entryEl.value, { min: this.min, max: this.max, step: this.step, unit: this.get("unit") || "", coerce: !!this.get("coerce"), format: this.get("format") });
+    if (!r.ok) return this.showEntryError(r.reason);
+    this.showEntryError("");
+    this.commit(r.value, true);
+    this.resetEntry(r.value);
   }
 
   /**

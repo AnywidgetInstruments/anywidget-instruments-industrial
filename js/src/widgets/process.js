@@ -2,6 +2,7 @@
 // Pipe (SCADA-004), SynopticCanvas (SCADA-010).
 import { clear, html, safeColor, svg, svgText } from "../core/dom.js";
 import { BaseView } from "../core/view.js";
+import { checkEntry } from "../core/entry.js";
 
 const STATE_TEXT = {
   open: "OPEN", closed: "CLOSED", transit: "TRANSIT", fault: "FAULT",
@@ -42,6 +43,8 @@ export class ProcessView extends BaseView {
     if (!this.faceplate) return;
     this.faceplate.remove();
     this.faceplate = null;
+    this.fpMain = null;
+    this.fpPos = null;
     document.removeEventListener("pointerdown", this._outside, true);
     if (OPEN.current === this) OPEN.current = null;
     if (refocus) this.body.focus({ preventScroll: true });
@@ -64,8 +67,14 @@ export class ProcessView extends BaseView {
   }
 
   renderFaceplate() {
-    const fp = this.faceplate;
-    if (!fp) return;
+    if (!this.faceplate) return;
+    // the position row is kept across renders: typing must survive feedback updates
+    if (!this.fpMain) {
+      this.fpMain = html("div");
+      this.faceplate.appendChild(this.fpMain);
+    }
+    if (this.fpMain.parentNode !== this.faceplate) this.faceplate.prepend(this.fpMain);
+    const fp = this.fpMain;
     clear(fp);
     const head = html("div", { cls: "awi-faceplate-head" }, [
       html("span", { text: this.get("tag") || this.get("label") || this.kind }),
@@ -91,6 +100,42 @@ export class ProcessView extends BaseView {
       cmds.appendChild(b);
     }
     fp.appendChild(cmds);
+    this.renderPositionRow();
+  }
+
+  /** Control valve position demand (API-014): slider and typed value, manual mode only. */
+  renderPositionRow() {
+    const pos = this.get("position");
+    const show = this.kind === "valve" && pos !== null && pos !== undefined;
+    if (!show) {
+      this.fpPos?.row.remove();
+      return;
+    }
+    if (!this.fpPos || this.fpPos.row.parentNode !== this.faceplate) {
+      const slider = html("input", { cls: "awi-fp-slider", attrs: { type: "range", min: "0", max: "100", step: "1", "aria-label": "Position demand %", "data-lm-suppress-shortcuts": "true" } });
+      const field = html("input", { cls: "awi-entry", attrs: { type: "text", inputmode: "decimal", "aria-label": "Position demand % (0 to 100)", "data-lm-suppress-shortcuts": "true" } });
+      const msg = html("div", { cls: "awi-entry-msg", attrs: { role: "alert" } });
+      const send = (v) => this.interactive && this.model.send({ type: "command", command: "position", value: v });
+      slider.addEventListener("change", () => send(Number(slider.value)));
+      field.addEventListener("keydown", (e) => {
+        e.stopPropagation();
+        if (e.key !== "Enter") return;
+        e.preventDefault();
+        const r = checkEntry(field.value, { min: 0, max: 100, unit: "%", format: "%.0f" });
+        msg.textContent = r.ok ? "" : r.reason;
+        field.toggleAttribute("aria-invalid", !r.ok);
+        if (r.ok) send(r.value);
+      });
+      const row = html("div", { cls: "awi-fp-row awi-fp-position" }, [html("span", { text: "Position %" }), slider, field, msg]);
+      this.fpPos = { row, slider, field, msg };
+      this.faceplate.appendChild(row);
+    }
+    const { slider, field } = this.fpPos;
+    const manual = !this.get("auto");
+    slider.disabled = !manual;
+    field.disabled = !manual;
+    if (document.activeElement !== slider) slider.value = String(Math.round(pos));
+    if (document.activeElement !== field) field.value = String(Math.round(pos));
   }
 
   send(command) {

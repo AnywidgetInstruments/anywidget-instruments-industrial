@@ -208,4 +208,62 @@ test.describe("every widget", () => {
     await expect(w.locator(".awi-sm-label-current")).toHaveText("▶ Idle");
     await expect(w.getByRole("button", { name: "Start", exact: true })).toBeEnabled();
   });
+
+  // API-014: every control can also be set by a form entry
+  test("numeric entry: typed value reaches the kernel, out of range is rejected", async () => {
+    await widget(page, "Knob").scrollIntoViewIfNeeded();
+    await py('W["Knob"].mode = "control"; W["Knob"].value = 10; W["Knob"].step = 1')
+    const field = widget(page, "Knob").getByRole("textbox", { name: /Knob value/ });
+    await field.fill("37");
+    await field.press("Enter");
+    await expect.poll(() => py('print(W["Knob"].value)')).toBe("37.0");
+    await field.fill("250");
+    await field.press("Enter");
+    await expect(widget(page, "Knob").locator(".awi-entry-msg")).toContainText("Out of range");
+    await expect.poll(() => py('print(W["Knob"].value)')).toBe("37.0");
+  });
+
+  test("SelectorSwitch: position list", async () => {
+    await widget(page, "SelectorSwitch").scrollIntoViewIfNeeded();
+    await widget(page, "SelectorSwitch").getByRole("combobox").selectOption("HAND");
+    await expect.poll(() => py('print(W["SelectorSwitch"].value)')).toBe("HAND");
+  });
+
+  test("PIDFaceplate: drag the setpoint marker", async () => {
+    const w = widget(page, "PIDFaceplate");
+    await w.scrollIntoViewIfNeeded();
+    await py('W["PIDFaceplate"].loop_mode = "AUTO"; W["PIDFaceplate"].sp = 40.0')
+    const bars = w.locator(".awi-pid-bars");
+    const box = await bars.boundingBox();
+    // viewBox 240 x 116, scaled to fit ("meet"); the PV scale spans y = 102 (0) .. 8 (100)
+    const k = Math.min(box.width / 240, box.height / 116);
+    const top = box.y + (box.height - 116 * k) / 2;
+    const yFor = (v) => top + (102 - (v / 100) * 94) * k;
+    await page.mouse.move(box.x + (box.width - 240 * k) / 2 + 57 * k, yFor(40));
+    await page.mouse.down();
+    await page.mouse.move(box.x + (box.width - 240 * k) / 2 + 57 * k, yFor(70), { steps: 5 });
+    await page.mouse.up();
+    await expect.poll(async () => Number(await py('print(W["PIDFaceplate"].sp)'))).toBeGreaterThan(65);
+  });
+
+  test("Valve: position demand from the faceplate", async () => {
+    await py('W["Valve"].position = 20.0; W["Valve"].auto = False')
+    const w = widget(page, "Valve");
+    await w.scrollIntoViewIfNeeded();
+    await w.locator(":scope > .awi-body").click();
+    const field = w.getByRole("textbox", { name: /Position demand/ });
+    await field.fill("65");
+    await field.press("Enter");
+    await expect.poll(() => py('print(W["Valve"].position)')).toBe("65.0");
+    await page.keyboard.press("Escape");
+  });
+
+  test("WaveformChart: typed cursor position", async () => {
+    const w = widget(page, "WaveformChart");
+    await w.scrollIntoViewIfNeeded();
+    const field = w.getByRole("textbox", { name: /Position of cursor/ }).first();
+    await field.fill("2");
+    await field.press("Enter");
+    await expect.poll(() => py('print(W["WaveformChart"].cursors[0]["x"])')).toBe("2.0");
+  });
 });

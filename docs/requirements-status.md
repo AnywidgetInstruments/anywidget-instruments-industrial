@@ -30,6 +30,7 @@ JupyterLab / Notebook 7 / marimo (`e2e/`).
 | API-010 | S | ✅ | `size`; SVG / DPR-aware canvas |
 | API-011 | M | ✅ | js |
 | API-012 | S | ✅ | `Panel` |
+| API-014 | M | ✅ | Drawing and form entry for every control (see [Getting started](getting-started.md#two-ways-to-set-a-value)); vitest, e2e |
 | API-013 | C | ✅ | `Panel.to_dict()` / `from_dict()` |
 
 ## NUM – Numeric widgets
@@ -37,6 +38,7 @@ JupyterLab / Notebook 7 / marimo (`e2e/`).
 |---|---|---|---|
 | NUM-001 … NUM-007 | M | ✅ | Nice ticks (exact divisions for Compass), log scale, format spec, step/clamp, out-of-range marker, invalid state (js + py) |
 | NUM-008, NUM-009 | S | ✅ | `coerce`; `update_rate` throttling |
+| NUM-010 | M | ✅ | Value field: parsing (decimal comma, exponent, SI prefix, unit), step, range check with message, kernel check of front-end values (js, py, e2e) |
 | NUM-101 … NUM-104, NUM-106 … NUM-108 | M | ✅ | Knob, Dial (multi-turn), Gauge, Meter, Tank, Thermometer, FillSlide |
 | NUM-105, NUM-109, NUM-110 | S | ✅ | VUMeter, SevenSegment, peak hold / decay |
 | NUM-111 | C | ✅ | `animate` (≤ 300 ms) |

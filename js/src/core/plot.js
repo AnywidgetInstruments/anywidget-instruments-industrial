@@ -1,6 +1,7 @@
 // Base view of every graph: canvas plot area, axes, zoom tool, cursors,
 // annotations and export (CHART-104..107).
-import { html, safeColor } from "./dom.js";
+import { clear, html, safeColor } from "./dom.js";
+import { checkEntry } from "./entry.js";
 import { formatValue } from "./format.js";
 import { niceTicks, parseNumber } from "./scale.js";
 import { BaseView } from "./view.js";
@@ -49,8 +50,10 @@ export class PlotView extends BaseView {
     this.body.setAttribute("role", "img");
     this.toolbar = html("div", { cls: "awi-toolbar", attrs: { role: "toolbar", "aria-label": "Graph tools" } });
     this.root.insertBefore(this.toolbar, this.body);
+    // form entry for cursor positions (API-014): one field per cursor
+    this.cursorBar = html("div", { cls: "awi-cursor-bar", attrs: { role: "group", "aria-label": "Cursor positions" } });
     this.legend = html("div", { cls: "awi-legend" });
-    this.root.appendChild(this.legend);
+    this.root.append(this.cursorBar, this.legend);
     this.zoom = null;
     this.tool = "none";
     this.dragCursor = null; // { index, x }
@@ -86,6 +89,57 @@ export class PlotView extends BaseView {
       btn("PNG", "Download image as PNG", () => this.exportPng()),
       btn("SVG", "Download image as SVG", () => this.exportSvg()),
     ];
+  }
+
+  /** Cursor position fields (API-014); fields being edited are left alone. */
+  renderCursorFields() {
+    const cursors = this.get("cursors") || [];
+    const fields = [...this.cursorBar.querySelectorAll("input")];
+    if (fields.length !== cursors.length) {
+      clear(this.cursorBar);
+      cursors.forEach((cur, i) => {
+        const field = html("input", { cls: "awi-entry", attrs: { type: "text", inputmode: "decimal", "data-lm-suppress-shortcuts": "true" } });
+        const msg = html("span", { cls: "awi-entry-msg", attrs: { role: "alert" } });
+        field.addEventListener("keydown", (e) => {
+          e.stopPropagation();
+          if (e.key === "Enter") {
+            e.preventDefault();
+            this.setCursorFromField(i, field, msg);
+          } else if (e.key === "Escape") {
+            field.blur();
+            this.schedule();
+          }
+        });
+        field.addEventListener("blur", () => this.schedule());
+        const name = html("span", { cls: "awi-cursor-name" });
+        this.cursorBar.appendChild(html("label", { cls: "awi-cursor-field" }, [name, field, html("span", { cls: "awi-entry-unit" }), msg]));
+      });
+    }
+    const unit = this.get("x_unit") || "";
+    [...this.cursorBar.children].forEach((row, i) => {
+      const cur = cursors[i];
+      const [name, field, unitEl] = row.children;
+      name.textContent = `${cur.name || `C${i + 1}`} x =`;
+      unitEl.textContent = unit;
+      field.setAttribute("aria-label", `Position of cursor ${cur.name || i + 1}`);
+      field.disabled = !this.canInteract;
+      if (document.activeElement !== field) field.value = formatValue(parseNumber(cur.x), "%.4g");
+    });
+    this.cursorBar.hidden = cursors.length === 0;
+  }
+
+  setCursorFromField(i, field, msg) {
+    if (!this.canInteract) return;
+    const [a, b] = this.fullRange().x;
+    const r = checkEntry(field.value, { min: Math.min(a, b), max: Math.max(a, b), unit: this.get("x_unit") || "", format: "%.4g" });
+    msg.textContent = r.ok ? "" : r.reason;
+    field.toggleAttribute("aria-invalid", !r.ok);
+    if (!r.ok) return;
+    const cursors = (this.get("cursors") || []).map((cur, k) => (k === i ? { ...cur, x: r.value } : cur));
+    this.model.set("cursors", cursors);
+    this.model.save_changes();
+    field.blur();
+    this.schedule();
   }
 
   resetZoom() {
@@ -366,6 +420,7 @@ export class PlotView extends BaseView {
 
   renderCommon() {
     super.renderCommon();
+    this.renderCursorFields();
     this.zoomBtn.setAttribute("aria-pressed", String(this.tool === "zoom"));
     for (const b of this.exportBtns) b.hidden = !this.get("export");
   }
