@@ -52,10 +52,9 @@ ai.Panel([gain, level, run, stop], columns=4)
 widget catalog (numeric, Boolean, graphs, displays, supervisory and operator
 station objects), examples, the API reference, the
 [specification](docs/specification.md) and its
-[requirements status](docs/requirements-status.md). Try the widgets in your
-browser, with nothing to install, in
-[marimo](https://s-celles.github.io/anywidget-instruments/marimo/) or
-[JupyterLite](https://s-celles.github.io/anywidget-instruments/lite/lab/index.html?path=gallery.ipynb).
+[requirements status](docs/requirements-status.md).
+[Try it in your browser](https://s-celles.github.io/anywidget-instruments/try/),
+with nothing to install (marimo and JupyterLite demos).
 
 ![Widget gallery](docs/img/gallery-modern.png)
 

@@ -19,7 +19,7 @@ nav:
   - Getting started: getting-started.md
   - Widget catalog: widgets.md
   - Examples: examples.md
-  - Try it in the browser: lite.md
+  - Try it in the browser: try.md
   - Guides:
       - Alarm conventions: alarm-conventions.md
       - Hosts and liveness: hosts.md

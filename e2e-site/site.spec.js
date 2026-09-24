@@ -1,7 +1,8 @@
 // DOC-006: the in-browser deployments of the documentation site (marimo
-// WebAssembly export and JupyterLite) load the package wheel and render
-// working widgets. Needs the built site in site/ and network access
-// (Pyodide and its packages come from a CDN): run by the Docs workflow.
+// WebAssembly exports and JupyterLite) load the package wheel and render
+// working widgets, for every demo notebook. Needs the built site in site/
+// and network access (Pyodide and its packages come from a CDN): run by the
+// Docs workflow.
 import { expect, test } from "@playwright/test";
 import { widget } from "../e2e/helpers.js";
 
@@ -19,31 +20,64 @@ test.afterEach(async ({ page }, testInfo) => {
   }
 });
 
-test("marimo WebAssembly export", async ({ page }) => {
-  await page.goto("/marimo/");
-  const setpoint = widget(page, "Setpoint");
-  await expect(setpoint.locator(".awi-value")).toHaveText(/^60\.0\b/, { timeout: 240_000 });
-  const level = widget(page, "Level").locator(":scope > .awi-body");
-  await expect(level).toHaveAttribute("aria-valuenow", "60");
-  // GEN-011: the dependent cell re-runs in the browser
-  await setpoint.locator(".awi-body").focus();
-  await page.keyboard.press("ArrowUp");
-  await expect(level).toHaveAttribute("aria-valuenow", "61", { timeout: 30_000 });
-});
+const LOAD = { timeout: 240_000 };
+const body = (page, label) => widget(page, label).locator(":scope > .awi-body");
 
-test("JupyterLite gallery", async ({ page }) => {
-  await page.goto("/lite/lab/index.html?path=gallery.ipynb");
-  await page.locator(".jp-Notebook").waitFor({ timeout: 120_000 });
-  await expect(page.locator(".jp-Notebook-ExecutionIndicator[data-status='idle']")).toBeVisible({ timeout: 240_000 });
-  await page.locator(".jp-Notebook").click();
-  await page.keyboard.press("Escape");
-  await page.getByRole("menuitem", { name: "Run", exact: true }).click();
-  await page.getByRole("menuitem", { name: "Run All Cells", exact: true }).click();
-  const knob = widget(page, "Knob (control)");
-  await expect(knob.locator(".awi-value")).toHaveText(/^30/, { timeout: 240_000 });
-  await knob.scrollIntoViewIfNeeded();
-  await knob.locator(":scope > .awi-body").focus();
+async function nudge(page, label) {
+  await body(page, label).scrollIntoViewIfNeeded();
+  await body(page, label).focus();
   await page.keyboard.press("ArrowUp");
-  // kernel callback in Pyodide: knob -> gauge
-  await expect(widget(page, "Gauge").locator(":scope > .awi-body")).toHaveAttribute("aria-valuenow", "31", { timeout: 30_000 });
+}
+
+// One scenario per demo: something computed in Python must follow an input.
+const DEMOS = {
+  gallery: async (page, lite) => {
+    const [control, indicator, start] = lite ? ["Knob (control)", "Gauge", "31"] : ["Setpoint", "Level", "61"];
+    await expect(body(page, control)).toHaveAttribute("aria-valuenow", lite ? "30" : "60", LOAD);
+    await nudge(page, control);
+    await expect(body(page, indicator)).toHaveAttribute("aria-valuenow", start, { timeout: 30_000 });
+  },
+  pid_tuning: async (page) => {
+    const text = widget(page, "Overshoot").locator(".awi-value");
+    await expect(text).toHaveText(/%$/, LOAD);
+    const before = await text.textContent();
+    await nudge(page, "Kp");
+    await expect(text).not.toHaveText(before, { timeout: 30_000 });
+  },
+  operator_station: async (page) => {
+    const machine = widget(page, "Line state");
+    await expect(machine.locator(".awi-sm-label-current")).toHaveText("▶ Stopped", LOAD);
+    await machine.getByRole("button", { name: "Reset", exact: true }).click();
+    // Resetting completes by itself on the simulation clock
+    await expect(machine.locator(".awi-sm-label-current")).toHaveText("▶ Idle", { timeout: 30_000 });
+  },
+  signal_analysis: async (page) => {
+    await expect(body(page, "Dominant frequency (Hz)")).toHaveAttribute("aria-valuenow", "50", LOAD);
+    await nudge(page, "Frequency");
+    await expect(body(page, "Dominant frequency (Hz)")).toHaveAttribute("aria-valuenow", "51", { timeout: 30_000 });
+  },
+};
+
+for (const [name, scenario] of Object.entries(DEMOS)) {
+  test(`marimo: ${name}`, async ({ page }) => {
+    await page.goto(`/marimo/${name}/`);
+    await scenario(page, false);
+  });
+
+  test(`JupyterLite: ${name}`, async ({ page }) => {
+    await page.goto(`/lite/lab/index.html?path=${name}.ipynb`);
+    await page.locator(".jp-Notebook").waitFor({ timeout: 120_000 });
+    await expect(page.locator(".jp-Notebook-ExecutionIndicator[data-status='idle']")).toBeVisible(LOAD);
+    await page.locator(".jp-Notebook").click();
+    await page.keyboard.press("Escape");
+    await page.getByRole("menuitem", { name: "Run", exact: true }).click();
+    await page.getByRole("menuitem", { name: "Run All Cells", exact: true }).click();
+    await scenario(page, true);
+    await expect(page.locator(".jp-OutputArea-output[data-mime-type='application/vnd.jupyter.error']")).toHaveCount(0);
+  });
+}
+
+test("marimo: the former address redirects to the gallery", async ({ page }) => {
+  await page.goto("/marimo/");
+  await expect(page).toHaveURL(/\/marimo\/gallery\/$/);
 });

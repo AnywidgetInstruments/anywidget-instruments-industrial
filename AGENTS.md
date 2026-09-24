@@ -25,7 +25,8 @@ revision history).
 | `e2e/` | Playwright end-to-end tests (JupyterLab, Notebook 7, marimo, visual, performance) |
 | `e2e-site/` | Browser tests of the built site's in-browser deployments (`npm run test:site`, run by the Docs workflow) |
 | `examples/` | Example notebooks and a marimo app |
-| `docs/` | MkDocs site; `lite/` holds the JupyterLite content and `lite/marimo/` the marimo WebAssembly notebook |
+| `docs/` | MkDocs site |
+| `lite/` | In-browser demos: `content/*.ipynb` (JupyterLite) and `marimo/*.py` (marimo WebAssembly), no threads; listed in `docs/try.md` |
 
 ## Commands
 

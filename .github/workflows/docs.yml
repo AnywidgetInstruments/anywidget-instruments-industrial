@@ -35,13 +35,18 @@ jobs:
       - name: JupyterLite with the package wheel
         working-directory: lite
         run: jupyter lite build --contents content --piplite-wheels ../dist/*.whl --output-dir ../site/lite
-      - name: marimo WebAssembly export with the package wheel
+      - name: marimo WebAssembly exports with the package wheel
         run: |
           mkdir -p lite/marimo/public
           cp dist/*.whl lite/marimo/public/
           (cd dist && ls *.whl) > lite/marimo/public/wheel.txt
-          marimo export html-wasm lite/marimo/instruments.py -o site/marimo --mode run --show-code
-          rm -f site/marimo/CLAUDE.md
+          for nb in lite/marimo/*.py; do
+            name=$(basename "$nb" .py)
+            marimo export html-wasm "$nb" -o "site/marimo/$name" --mode run --show-code
+            rm -f "site/marimo/$name/CLAUDE.md"
+          done
+          # former single-notebook address
+          printf '<!doctype html><meta http-equiv="refresh" content="0; url=gallery/">\n' > site/marimo/index.html
       - name: In-browser deployments work (DOC-006)
         run: |
           npx playwright install --with-deps chromium
