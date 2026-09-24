@@ -2,6 +2,7 @@
 // tests/parity/*.json, also run by tests/test_parity.py.
 import { describe, expect, test } from "vitest";
 import alarmCases from "../../tests/parity/alarm_level.json";
+import annCases from "../../tests/parity/annunciator.json";
 import barCases from "../../tests/parity/bars.json";
 import numericCases from "../../tests/parity/numeric.json";
 import peakCases from "../../tests/parity/peak.json";
@@ -11,6 +12,7 @@ import resolvedCases from "../../tests/parity/resolved.json";
 import machineCases from "../../tests/parity/statemachine.json";
 import stateCases from "../../tests/parity/states.json";
 import { type AlarmLevel, type AlarmLimits, computeAlarmLevel } from "../src/contract/alarm.js";
+import { type AnnEvent, annunciatorTransition, hornOn, type Panel, panelAction, type Sequence, setProcess } from "../src/contract/annunciator.js";
 import { barLevels, normalizeBars } from "../src/contract/bars.js";
 import { selectorValue, stackStates } from "../src/contract/industrial.js";
 import { coerceValue, validScale } from "../src/contract/numeric.js";
@@ -175,6 +177,24 @@ describe("PID faceplate operator rules", () => {
           if (r.ok) Object.assign(state, r.changes);
         }
         for (const [name, v] of Object.entries(expected)) expect(state[name], `${c.name}: ${JSON.stringify(step)} ${name}`).toEqual(v);
+      }
+    });
+  }
+});
+
+describe("annunciator", () => {
+  test("every transition of the three sequences", () => {
+    for (const [state, active, event, sequence, expected] of annCases.transitions as Array<[string, boolean, AnnEvent, Sequence, string]>) {
+      expect(annunciatorTransition(state, active, event, sequence), `${state} ${active} ${event} ${sequence}`).toBe(expected);
+    }
+  });
+  for (const c of annCases.scenarios) {
+    test(c.name, () => {
+      let p: Panel = { sequence: c.sequence as Sequence, firstOut: c.first_out, silenced: false, windows: c.windows.map((tag) => ({ tag, text: tag, color: "amber", active: false, state: "normal", first: false })) };
+      for (const [[action, arg], windows, horn] of c.steps as Array<[[string, [string, boolean] | null], Record<string, [string, boolean]>, boolean]>) {
+        p = action === "set" ? setProcess(p, ...(arg as [string, boolean])) : panelAction(p, action as "acknowledge" | "reset" | "silence");
+        const got = Object.fromEntries(p.windows.map((w) => [w.tag, [w.state, w.first]]));
+        expect([got, hornOn(p)], `${c.name}: ${action}`).toEqual([windows, horn]);
       }
     });
   }

@@ -9,6 +9,7 @@
 import type { AnyModel, Traits } from "../core/model.js";
 import { BY_KIND } from "../generated/contract.js";
 import { type AlarmLevel, computeAlarmLevel } from "./alarm.js";
+import { hornOn, normalizeWindows, type Panel, panelAction, type Sequence, setProcess } from "./annunciator.js";
 import { barLevels, normalizeBars } from "./bars.js";
 import { coerceValue } from "./numeric.js";
 import { nextPeak, type PeakState } from "./peak.js";
@@ -215,6 +216,85 @@ export function pidState(read: (name: string) => unknown): PIDState {
   return { ...s, ...clampedSpOp(s) };
 }
 
+/** Per-model annunciator state that is not a trait: the horn silence and the last process conditions seen. */
+const PANELS = new WeakMap<object, { silenced: boolean; active: Map<string, boolean> }>();
+
+function panelOf(model: AnyModel, read: (name: string) => unknown): Panel {
+  const reg = PANELS.get(model);
+  return { windows: normalizeWindows(read("value")), sequence: read("sequence") as Sequence, firstOut: !!read("first_out"), silenced: !!reg?.silenced };
+}
+
+function writePanel(model: AnyModel<Traits>, p: Panel): void {
+  const reg = PANELS.get(model);
+  if (reg) {
+    reg.silenced = p.silenced;
+    reg.active = new Map(p.windows.map((w) => [w.tag, w.active]));
+  }
+  const horn = hornOn(p);
+  if (JSON.stringify(model.get("value")) === JSON.stringify(p.windows) && model.get("horn") === horn) return;
+  model.set("value", p.windows);
+  model.set("horn", horn);
+  model.save_changes();
+}
+
+/**
+ * Operator action on an annunciator without a host (IND-043): applied to the
+ * windows and the horn, written back. Returns false when a host owns the state.
+ */
+export function annunciatorAction(model: AnyModel, action: "acknowledge" | "reset" | "silence"): boolean {
+  const contract = contractOf(model);
+  if (!contract || hostOwnsState(model)) return false;
+  writePanel(model as AnyModel<Traits>, panelAction(panelOf(model, reader(model, contract)), action));
+  return true;
+}
+
+/** Window states and horn of an annunciator (IND-041, IND-042): process conditions written by the host. */
+function attachAnnunciator(model: AnyModel<Traits>, contract: WidgetContract): () => void {
+  const read = reader(model, contract);
+  const initial = normalizeWindows(read("value"));
+  const sounding = initial.some((w) => w.state === "alert" || w.state === "ringback");
+  // an active window still "normal" (e.g. given by a host without states) goes through the sequence
+  PANELS.set(model, { silenced: sounding && !read("horn"), active: new Map(initial.map((w) => [w.tag, w.active && w.state !== "normal"])) });
+  let writing = false;
+  const guarded = (f: () => void) => (): void => {
+    if (writing || hostOwnsState(model)) return;
+    writing = true;
+    try {
+      f();
+    } finally {
+      writing = false;
+    }
+  };
+  const onValue = guarded(() => {
+    const reg = PANELS.get(model) as { silenced: boolean; active: Map<string, boolean> };
+    let p = panelOf(model, read);
+    // a changed (or new) process condition goes through the sequence
+    for (const w of p.windows) {
+      const before = reg.active.get(w.tag) ?? false;
+      if (before !== w.active) {
+        w.active = before;
+        p = setProcess(p, w.tag, !before);
+      }
+    }
+    writePanel(model, p);
+  });
+  const onSequence = guarded(() => {
+    const p = panelOf(model, read);
+    for (const w of p.windows) {
+      w.state = w.active ? "alert" : "normal";
+      w.first = false;
+    }
+    writePanel(model, p);
+  });
+  model.on("change:value", onValue);
+  model.on("change:sequence", onSequence);
+  onValue();
+  return () => {
+    model.off("change:value", onValue);
+    model.off("change:sequence", onSequence);
+  };
+}
+
 /**
  * Model-level hook (AFM `initialize`): keep the derived traits of a widget
  * with a schema up to date when no host owns the state. Returns a cleanup.
@@ -227,5 +307,6 @@ export function attachDerived(model: AnyModel, { clock = monotonic }: { clock?: 
   if (contract?.traits.alarm_levels?.writer === "derived") cleanups.push(attachBarLevels(model, contract));
   if (contract?.traits.available_commands?.writer === "derived") cleanups.push(attachStateMachine(model, contract));
   if (contract?.traits.loop_mode && contract.traits.value?.writer === "derived") cleanups.push(attachPidSummary(model, contract));
+  if (contract?.traits.horn?.writer === "derived") cleanups.push(attachAnnunciator(model, contract));
   return () => cleanups.forEach((c) => c());
 }

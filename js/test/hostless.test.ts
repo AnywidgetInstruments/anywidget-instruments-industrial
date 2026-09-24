@@ -495,6 +495,40 @@ describe("PID faceplate without a kernel", () => {
   });
 });
 
+describe("Annunciator without a kernel", () => {
+  const states = (m: { get(k: string): unknown }) => Object.fromEntries((m.get("value") as Array<{ tag: string; state: string; first: boolean }>).map((w) => [w.tag, [w.state, w.first]]));
+  const press = (el: HTMLElement, key: string) => (el.querySelector(`.awi-ann-${key}`) as HTMLButtonElement).click();
+
+  test("process conditions from the host, operator buttons on the front end", async () => {
+    const windows = [{ tag: "PAH-101", text: "Pressure high" }, { tag: "TAL-102", text: "Temperature low", color: "red" }];
+    const { model, el } = mount({ ...defaults("Annunciator"), value: windows, sequence: "R", first_out: true });
+    await frame();
+    expect(states(model)).toEqual({ "PAH-101": ["normal", false], "TAL-102": ["normal", false] });
+    model.push("value", [{ ...windows[0], active: true }, windows[1]]); // the host raises a condition
+    expect(states(model)).toEqual({ "PAH-101": ["alert", true], "TAL-102": ["normal", false] });
+    expect(model.get("horn")).toBe(true);
+    press(el, "silence");
+    expect(model.get("horn")).toBe(false);
+    press(el, "acknowledge");
+    expect(states(model)["PAH-101"]).toEqual(["acknowledged", true]);
+    const acked = model.get("value") as Array<Record<string, unknown>>;
+    model.push("value", [{ ...acked[0], active: false }, acked[1]]); // the condition clears: ringback
+    expect(states(model)["PAH-101"]).toEqual(["ringback", true]);
+    expect(model.get("horn")).toBe(true);
+    press(el, "reset");
+    expect(states(model)["PAH-101"]).toEqual(["normal", false]);
+    expect(model.saved.at(-1)).toMatchObject({ horn: false });
+  });
+
+  test("windows given active by the host start in alert", async () => {
+    const { model } = mount({ ...defaults("Annunciator"), value: [{ tag: "XA-1", active: true }] });
+    await frame();
+    expect(states(model)).toEqual({ "XA-1": ["alert", false] });
+    model.push("sequence", "M");
+    expect(states(model)).toEqual({ "XA-1": ["alert", false] });
+  });
+});
+
 describe("Tank without a kernel", () => {
   test("indicator by default, markers read through the schema", async () => {
     const { root, body, el } = mount({ ...defaults("Tank"), value: 3.2, max: 4, unit: "m", markers: [0.5, "x", 3.5], hi: 3, hihi: 3.5 });

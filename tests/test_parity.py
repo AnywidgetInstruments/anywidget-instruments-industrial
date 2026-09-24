@@ -213,3 +213,26 @@ def test_pid_operator_rules(case: dict[str, Any]) -> None:
             fp._handle_front_msg(fp, {"type": "loop_mode", "mode": step[1]}, [])
         for name, v in expected.items():
             assert getattr(fp, name) == v, (case["name"], step, name)
+
+
+ANN = _load("annunciator.json")
+
+
+def test_annunciator_transition_table() -> None:
+    from anywidget_instruments._annunciator import annunciator_transition
+
+    for state, active, event, sequence, expected in ANN["transitions"]:
+        assert annunciator_transition(state, active, event, sequence) == expected
+
+
+@pytest.mark.parametrize("case", ANN["scenarios"], ids=[c["name"] for c in ANN["scenarios"]])
+def test_annunciator_scenarios(case: dict[str, Any]) -> None:
+    ann = ai.Annunciator([(tag, tag) for tag in case["windows"]], sequence=case["sequence"])
+    ann.first_out = case["first_out"]
+    for (action, arg), windows, horn in case["steps"]:
+        if action == "set":
+            ann.set(*arg)
+        else:
+            getattr(ann, action)()
+        got = {w["tag"]: [w["state"], w["first"]] for w in ann.value}
+        assert (got, ann.horn) == (windows, horn), (case["name"], action, arg)

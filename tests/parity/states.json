@@ -496,6 +496,15 @@
         "hi": 100,
         "deadband": 1
       }
+    },
+    {
+      "widget": "Annunciator",
+      "traits": {
+        "columns": 12,
+        "sequence": "M",
+        "first_out": true,
+        "test": true
+      }
     }
   ]
 }

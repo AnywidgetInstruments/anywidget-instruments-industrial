@@ -137,7 +137,7 @@ describe("Annunciator (IND-040..043)", () => {
     { tag: "LAL-2", text: "Level low", color: "amber", active: false, state: "ringback", first: false },
     { tag: "XA-3", text: "Fault", color: "amber", active: false, state: "normal", first: false },
   ];
-  const ann = { _kind: "annunciator", value: windows, columns: 3, sequence: "R", first_out: true, horn: true, test: false, size: [420, 170] };
+  const ann = { _kind: "annunciator", _session: "kernel", value: windows, columns: 3, sequence: "R", first_out: true, horn: true, test: false, size: [420, 170] };
 
   it("states each window in text: first out, alarm, ringback", async () => {
     const { el } = mount(ann);

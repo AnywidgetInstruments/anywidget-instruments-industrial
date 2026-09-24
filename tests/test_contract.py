@@ -93,6 +93,7 @@ MIGRATED = {
     "EventLog",
     "StateMachine",
     "PIDFaceplate",
+    "Annunciator",
 }
 
 

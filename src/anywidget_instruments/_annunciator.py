@@ -7,7 +7,7 @@ from typing import Any
 
 import traitlets as t
 
-from ._base import Callback, InstrumentWidget, _report_callback_error
+from ._base import Callback, InstrumentWidget, _report_callback_error, size_trait
 
 ANN_SEQUENCES: tuple[str, ...] = ("A", "M", "R")
 ANN_STATES: tuple[str, ...] = ("normal", "alert", "acknowledged", "ringback")
@@ -77,6 +77,7 @@ class Annunciator(InstrumentWidget):
 
     _kind = t.Unicode("annunciator").tag(sync=True)
     _default_size = (420, 170)
+    size = size_trait(*_default_size)
     value = t.List(t.Dict(), read_only=True).tag(sync=True)
     columns = t.Int(4, min=1, max=12).tag(sync=True)
     sequence = t.Enum(list(ANN_SEQUENCES), default_value="A").tag(sync=True)

@@ -1,13 +1,22 @@
 // Annunciator panel (IND-040..043): alarm windows following an ISA-18.1
 // sequence, first-out mark, horn indicator and operator push buttons.
+import type { AnnWindow } from "../contract/annunciator.js";
+import { annunciatorAction, hostOwnsState } from "../contract/derived.js";
 import { clear, html } from "../core/dom.js";
+import type { AnyModel } from "../core/model.js";
 import { BaseView } from "../core/view.js";
+import type { AnnunciatorTraits } from "../generated/contract.js";
 
 // State conveyed by text as well as by light and flash pattern (A11Y-003).
-const STATE_TEXT = { normal: "", alert: "ALARM", acknowledged: "ACK", ringback: "RINGBACK" };
+const STATE_TEXT: Record<string, string> = { normal: "", alert: "ALARM", acknowledged: "ACK", ringback: "RINGBACK" };
 
-export class AnnunciatorView extends BaseView {
-  constructor(model, el) {
+export class AnnunciatorView extends BaseView<AnnunciatorTraits> {
+  readonly grid: HTMLDivElement;
+  readonly bar: HTMLDivElement;
+  readonly hornEl: HTMLSpanElement;
+  readonly buttons: Record<string, HTMLButtonElement>;
+
+  constructor(model: AnyModel<AnnunciatorTraits>, el: HTMLElement) {
     super(model, el, ["value", "columns", "sequence", "first_out", "horn", "test"]);
     const b = this.body;
     b.setAttribute("role", "group");
@@ -19,18 +28,18 @@ export class AnnunciatorView extends BaseView {
       const btn = html("button", { cls: `awi-ann-btn awi-ann-${key}`, text, attrs: { type: "button" } });
       if (key === "test") {
         // lamp test while the button is held (pointer or keyboard)
-        const on = (e) => {
+        const on = (e: Event): void => {
           e.preventDefault();
-          if (this.interactive) this.model.send({ type: "test", on: true });
+          this.lampTest(true);
         };
-        const off = () => this.interactive && this.model.send({ type: "test", on: false });
+        const off = (): void => this.lampTest(false);
         btn.addEventListener("pointerdown", on);
         btn.addEventListener("pointerup", off);
         btn.addEventListener("pointerleave", () => this.get("test") && off());
         btn.addEventListener("keydown", (e) => (e.key === " " || e.key === "Enter") && !e.repeat && on(e));
         btn.addEventListener("keyup", (e) => (e.key === " " || e.key === "Enter") && off());
       } else {
-        btn.addEventListener("click", () => this.interactive && this.model.send({ type: key }));
+        btn.addEventListener("click", () => this.action(key as "acknowledge" | "reset" | "silence"));
       }
       this.buttons[key] = btn;
     }
@@ -39,17 +48,36 @@ export class AnnunciatorView extends BaseView {
     this.schedule();
   }
 
-  draw() {
-    const windows = this.get("value") || [];
+  /**
+   * Operator push button (IND-043): always sent to the host; applied by the
+   * front end when no host owns the state (HOST-004).
+   */
+  action(key: "acknowledge" | "reset" | "silence"): void {
+    if (!this.interactive) return;
+    this.model.send({ type: key });
+    annunciatorAction(this.model as unknown as AnyModel, key);
+  }
+
+  lampTest(on: boolean): void {
+    if (!this.interactive) return;
+    this.model.send({ type: "test", on });
+    if (!hostOwnsState(this.model as unknown as AnyModel)) {
+      this.model.set("test", on);
+      this.model.save_changes();
+    }
+  }
+
+  override draw(): void {
+    const windows = (this.get("value") || []) as Partial<AnnWindow>[];
     const test = !!this.get("test");
     this.grid.style.gridTemplateColumns = `repeat(${Math.max(1, this.get("columns") || 4)}, 1fr)`;
     clear(this.grid);
-    const summary = [];
+    const summary: string[] = [];
     for (const w of windows) {
       const state = test ? "test" : w.state;
       const cell = html("div", { cls: `awi-ann-window awi-ann-${w.color || "amber"} awi-ann-st-${state}${w.first ? " awi-ann-first" : ""}` });
-      cell.append(html("div", { cls: "awi-ann-tag", text: w.tag }), html("div", { cls: "awi-ann-text", text: w.text || "" }));
-      const status = test ? "TEST" : [w.first ? "1ST" : "", STATE_TEXT[w.state] || ""].filter(Boolean).join(" · ");
+      cell.append(html("div", { cls: "awi-ann-tag", text: w.tag ?? "" }), html("div", { cls: "awi-ann-text", text: w.text || "" }));
+      const status = test ? "TEST" : [w.first ? "1ST" : "", STATE_TEXT[w.state ?? "normal"] || ""].filter(Boolean).join(" · ");
       cell.appendChild(html("div", { cls: "awi-ann-status", text: status }));
       cell.setAttribute("role", "img");
       cell.setAttribute("aria-label", `${w.tag} ${w.text || ""}: ${status || "normal"}`);
