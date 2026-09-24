@@ -6,6 +6,7 @@ from typing import Any
 
 import traitlets as t
 
+from ._base import mode_trait, size_trait
 from ._numeric import NumericWidget
 
 
@@ -24,6 +25,8 @@ class NumericEntry(NumericWidget):
     _kind = t.Unicode("numericentry").tag(sync=True)
     _default_mode = "control"
     _default_size = (180, 230)
+    mode = mode_trait(_default_mode)
+    size = size_trait(*_default_size)
     confirm_delta = t.Float(None, allow_none=True).tag(sync=True)
     format = t.Unicode("%.2f").tag(sync=True)
 

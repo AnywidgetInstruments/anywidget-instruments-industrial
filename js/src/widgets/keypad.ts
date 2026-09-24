@@ -2,13 +2,15 @@
 import { html } from "../core/dom.js";
 import { checkEntry } from "../core/entry.js";
 import { formatValue, withUnit } from "../core/format.js";
+import type { AnyModel } from "../core/model.js";
 import { parseNumber } from "../core/scale.js";
 import { BaseView } from "../core/view.js";
+import type { NumericEntryTraits } from "../generated/contract.js";
 
 const TRAITS = ["value", "min", "max", "unit", "format", "confirm_delta", "coerce"];
 
 /** Keys: [text, action, accessible name]; four per row. */
-export const KEYS = [
+export const KEYS: Array<[string, string, string]> = [
   ["7", "7", "7"], ["8", "8", "8"], ["9", "9", "9"], ["⌫", "back", "Backspace"],
   ["4", "4", "4"], ["5", "5", "5"], ["6", "6", "6"], ["C", "clear", "Clear the entry"],
   ["1", "1", "1"], ["2", "2", "2"], ["3", "3", "3"], ["±", "sign", "Change the sign"],
@@ -16,7 +18,7 @@ export const KEYS = [
 ];
 
 /** Draft text after pressing `key` (digits, ".", "back", "clear", "sign"). */
-export function editDraft(draft, key) {
+export function editDraft(draft: string | null | undefined, key: string): string {
   const d = draft ?? "";
   if (/^\d$/.test(key)) return d === "0" ? key : d === "-0" ? `-${key}` : d + key;
   if (key === ".") return d.includes(".") ? d : `${d === "" || d === "-" ? `${d}0` : d}.`;
@@ -26,11 +28,19 @@ export function editDraft(draft, key) {
   return d;
 }
 
-export class KeypadView extends BaseView {
-  constructor(model, el) {
+export class KeypadView extends BaseView<NumericEntryTraits> {
+  /** Text being typed; null while showing the value. */
+  draft: string | null;
+  /** Value waiting for confirmation (confirm_delta). */
+  armed: number | null;
+  readonly display: HTMLDivElement;
+  readonly msg: HTMLDivElement;
+  readonly keys: HTMLButtonElement[];
+
+  constructor(model: AnyModel<NumericEntryTraits>, el: HTMLElement) {
     super(model, el, TRAITS);
-    this.draft = null; // text being typed; null while showing the value
-    this.armed = null; // value waiting for confirmation (confirm_delta)
+    this.draft = null;
+    this.armed = null;
     const b = this.body;
     b.setAttribute("role", "group");
     b.setAttribute("aria-labelledby", this.labelEl.id);
@@ -44,7 +54,7 @@ export class KeypadView extends BaseView {
     });
     b.append(this.display, this.msg, html("div", { cls: "awi-kp-grid" }, this.keys));
     b.addEventListener("keydown", (e) => {
-      const map = { Enter: "enter", Escape: "cancel", Backspace: "back", Delete: "clear", ",": ".", ".": ".", "-": "sign" };
+      const map: Record<string, string> = { Enter: "enter", Escape: "cancel", Backspace: "back", Delete: "clear", ",": ".", ".": ".", "-": "sign" };
       const action = /^\d$/.test(e.key) ? e.key : map[e.key];
       if (!action) return;
       e.preventDefault();
@@ -54,7 +64,7 @@ export class KeypadView extends BaseView {
     this.schedule();
   }
 
-  press(action) {
+  press(action: string): void {
     if (!this.interactive) return;
     if (action === "cancel") {
       this.draft = null;
@@ -70,7 +80,7 @@ export class KeypadView extends BaseView {
     this.schedule();
   }
 
-  commit() {
+  commit(): void {
     if (this.draft === null || this.draft === "" || this.draft === "-") return;
     const r = checkEntry(this.draft, {
       min: parseNumber(this.get("min")),
@@ -98,7 +108,7 @@ export class KeypadView extends BaseView {
     this.msg.textContent = "";
   }
 
-  draw() {
+  override draw(): void {
     const unit = this.get("unit") || "";
     const editing = this.draft !== null;
     const text = editing ? `${this.draft || "…"}${unit ? ` ${unit}` : ""}` : withUnit(formatValue(parseNumber(this.get("value")), this.get("format")), unit);

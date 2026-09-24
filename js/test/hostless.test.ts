@@ -134,6 +134,8 @@ const NUMERIC = [
   ["Thermometer", 120],
   ["FillSlide", 100],
   ["SevenSegment", 1e9],
+  ["AnalogIndicator", 100],
+  ["Transmitter", 100],
 ] as const;
 
 describe.each(NUMERIC)("%s without a kernel", (title, max) => {
@@ -156,6 +158,31 @@ describe("Compass without a kernel", () => {
     model.push("value", 725);
     await frame();
     expect(body.getAttribute("aria-valuenow")).toBe("5");
+  });
+});
+
+describe("NumericEntry without a kernel", () => {
+  test("keypad entries are range checked and sent to the host", async () => {
+    const { model, el } = mount({ ...defaults("NumericEntry"), value: 1, max: 4, label: "Setpoint" });
+    await frame();
+    const key = (name: string) => (el.querySelector(`button[aria-label="${name}"]`) as HTMLButtonElement).click();
+    key("9");
+    key("Enter");
+    expect(el.querySelector(".awi-kp-msg")?.textContent).toContain("Out of range");
+    expect(model.get("value")).toBe(1);
+    key("Clear the entry");
+    key("3");
+    key("Enter");
+    expect(model.get("value")).toBe(3);
+    expect(model.saved.at(-1)).toMatchObject({ value: 3 });
+  });
+});
+
+describe("Transmitter without a kernel", () => {
+  test("an unknown status reads as the schema default", async () => {
+    const { root } = mount({ ...defaults("Transmitter"), value: 2, tag: "LT-101", status: "broken" });
+    await frame();
+    expect(root.classList.contains("awi-ne107-ok")).toBe(true);
   });
 });
 

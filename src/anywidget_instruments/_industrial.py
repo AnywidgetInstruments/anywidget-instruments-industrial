@@ -6,7 +6,7 @@ from typing import Any
 
 import traitlets as t
 
-from ._base import InstrumentWidget
+from ._base import InstrumentWidget, mode_trait, size_trait
 from ._numeric import NumericWidget
 
 STACK_COLORS: tuple[str, ...] = ("red", "amber", "green", "blue", "white")
@@ -25,6 +25,8 @@ class AnalogIndicator(NumericWidget):
     _kind = t.Unicode("analogindicator").tag(sync=True)
     _default_mode = "indicator"
     _default_size = (240, 56)
+    mode = mode_trait(_default_mode)
+    size = size_trait(*_default_size)
     orientation = t.Enum(["horizontal", "vertical"], default_value="horizontal").tag(sync=True)
     normal_lo = t.Float(None, allow_none=True).tag(sync=True)
     normal_hi = t.Float(None, allow_none=True).tag(sync=True)

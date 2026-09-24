@@ -6,6 +6,7 @@ from typing import Any
 
 import traitlets as t
 
+from ._base import mode_trait, size_trait
 from ._numeric import NumericWidget
 
 #: Device status categories (after NAMUR NE 107), ``"ok"`` meaning normal.
@@ -31,6 +32,8 @@ class Transmitter(NumericWidget):
     _kind = t.Unicode("transmitter").tag(sync=True)
     _default_mode = "indicator"
     _default_size = (110, 84)
+    mode = mode_trait(_default_mode)
+    size = size_trait(*_default_size)
     tag = t.Unicode("").tag(sync=True)
     status = t.Enum(list(DEVICE_STATUSES), default_value="ok").tag(sync=True)
     #: Optional detail of the status (for example the diagnostic message).

@@ -1,9 +1,13 @@
 // Transmitter: instrument bubble, value and device status (IND-080..083).
 import { clear, html, svg, svgText } from "../core/dom.js";
+import type { AnyModel } from "../core/model.js";
+import type { TransmitterTraits } from "../generated/contract.js";
 import { NumericView } from "./numeric.js";
 
+type Status = TransmitterTraits["status"];
+
 /** Device status: symbol (shape, not only color) and text (IND-081). */
-export const DEVICE_STATUS = {
+export const DEVICE_STATUS: Record<Status, { symbol: string; text: string }> = {
   ok: { symbol: "", text: "OK" },
   failure: { symbol: "✕", text: "FAILURE" },
   check: { symbol: "▲", text: "FUNCTION CHECK" },
@@ -12,7 +16,7 @@ export const DEVICE_STATUS = {
 };
 
 /** "LT-101" → ["LT", "101"]; "PT101A" → ["PT", "101A"]. */
-export function splitTag(tag) {
+export function splitTag(tag: unknown): [string, string] {
   const s = String(tag ?? "").trim();
   const dash = s.indexOf("-");
   if (dash > 0) return [s.slice(0, dash), s.slice(dash + 1)];
@@ -20,8 +24,11 @@ export function splitTag(tag) {
   return m ? [m[1], m[2]] : [s, ""];
 }
 
-export class TransmitterView extends NumericView {
-  constructor(model, el) {
+export class TransmitterView extends NumericView<TransmitterTraits> {
+  readonly svgEl: SVGElement;
+  readonly statusEl: HTMLDivElement;
+
+  constructor(model: AnyModel<TransmitterTraits>, el: HTMLElement) {
     super(model, el, ["tag", "status", "status_text"], { role: "meter" });
     this.svgEl = svg("svg", { class: "awi-svg", "aria-hidden": "true" });
     this.body.appendChild(this.svgEl);
@@ -30,12 +37,13 @@ export class TransmitterView extends NumericView {
     this.schedule();
   }
 
-  get status() {
+  /** Device status (read through the schema: unknown values read as "ok"). */
+  get status(): Status {
     const s = this.get("status");
     return DEVICE_STATUS[s] ? s : "ok";
   }
 
-  renderCommon() {
+  override renderCommon(): void {
     super.renderCommon();
     const st = this.status;
     const info = DEVICE_STATUS[st];
@@ -58,7 +66,7 @@ export class TransmitterView extends NumericView {
     if (tag && !this.get("label")) b.setAttribute("aria-label", tag);
   }
 
-  draw() {
+  override draw(): void {
     const [w, h] = this.get("size");
     const s = this.svgEl;
     s.setAttribute("viewBox", `0 0 ${w} ${h}`);
@@ -77,12 +85,12 @@ export class TransmitterView extends NumericView {
     const x = cx + r * 0.75;
     const y = cy - r * 0.75;
     const k = Math.max(7, r * 0.3);
-    const shape = {
+    const shape = ({
       failure: () => svg("circle", { cx: x, cy: y, r: k }),
       check: () => svg("path", { d: `M${x} ${y - k}L${x + k} ${y + k * 0.8}L${x - k} ${y + k * 0.8}Z` }),
       out_of_spec: () => svg("path", { d: `M${x} ${y - k}L${x + k} ${y}L${x} ${y + k}L${x - k} ${y}Z` }),
       maintenance: () => svg("rect", { x: x - k * 0.85, y: y - k * 0.85, width: k * 1.7, height: k * 1.7, rx: 2 }),
-    }[st];
+    } as Record<string, () => SVGElement>)[st];
     if (shape) {
       const g = svg("g", { class: `awi-ne107-symbol awi-ne107-symbol-${st}` });
       g.appendChild(shape());

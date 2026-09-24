@@ -127,6 +127,47 @@
         "min": -1000000000.0,
         "max": 1000000000.0
       }
+    },
+    {
+      "widget": "Compass",
+      "traits": {
+        "value": 359.5,
+        "format": "%.1f"
+      }
+    },
+    {
+      "widget": "AnalogIndicator",
+      "traits": {
+        "value": 57,
+        "normal_lo": 40,
+        "normal_hi": 70,
+        "target": 55,
+        "orientation": "vertical",
+        "size": [
+          70,
+          220
+        ],
+        "show_limits": false
+      }
+    },
+    {
+      "widget": "Transmitter",
+      "traits": {
+        "value": "nan",
+        "tag": "LT-101",
+        "status": "maintenance",
+        "status_text": "sensor drift",
+        "format": "%.3f"
+      }
+    },
+    {
+      "widget": "NumericEntry",
+      "traits": {
+        "value": 2.2,
+        "max": 4,
+        "confirm_delta": 0.5,
+        "mode": "control"
+      }
     }
   ]
 }
