@@ -105,6 +105,11 @@ const specs = [
   { ...num, _kind: "transmitter", mode: "indicator", label: "Transmitter", value: 2.41, min: 0, max: 4, unit: "m", format: "%.2f", tag: "LT-101", status: "ok", status_text: "", size: [110, 84] },
   { ...num, _kind: "transmitter", mode: "indicator", label: "Transmitter (maint.)", value: 24.6, min: 0, max: 60, unit: "L/s", format: "%.1f", tag: "FT-102", status: "maintenance", status_text: "", size: [110, 84] },
   { ...num, _kind: "transmitter", mode: "indicator", label: "Transmitter (failure)", value: 71.3, min: 0, max: 150, unit: "°C", format: "%.1f", tag: "TT-103", status: "failure", status_text: "", size: [110, 84] },
+  { ...base, _kind: "deviation", mode: "indicator", label: "Deviation", value: 52.3, setpoint: 50, tolerance: 1.5, span: 5, unit: "°C", format: "%.1f", size: [220, 44] },
+  { ...base, _kind: "sparkline", mode: "indicator", label: "Sparkline", value: 2.31, history: 60, unit: "m", format: "%.2f", size: [160, 36] },
+  { ...base, _kind: "bargraph", mode: "indicator", label: "BarGraph", value: [62, 64.5, 58, 83.1], bars: [{ label: "Z1", normal_lo: 55, normal_hi: 70 }, { label: "Z2", normal_lo: 55, normal_hi: 70 }, { label: "Z3", normal_lo: 55, normal_hi: 70 }, { label: "Z4", normal_lo: 55, normal_hi: 70, hi: 80, hihi: 90 }], min: 0, max: 100, unit: "°C", format: "%.1f", alarm_levels: ["normal", "normal", "normal", "hi"], deadband: 0, size: [240, 160] },
+  { ...base, _kind: "kpitile", mode: "indicator", label: "KPITile (OEE)", value: 84.6, target: 85, higher_is_better: true, unit: "%", format: "%.1f", show_sparkline: true, history: 30, size: [190, 96] },
+  { ...base, _kind: "numericentry", label: "NumericEntry", value: 2.2, min: 0, max: 4, step: 0, unit: "m", format: "%.2f", confirm_delta: 1, coerce: false, size: [180, 230] },
   { ...base, _kind: "selectorswitch", label: "SelectorSwitch", value: "AUTO", positions: ["HAND", "OFF", "AUTO"], keyed: false, locked: false, default_position: null, spring_return: [], size: [140, 130] },
   { ...base, _kind: "selectorswitch", label: "Key switch (locked)", value: "REMOTE", positions: ["LOCAL", "REMOTE"], keyed: true, locked: true, default_position: null, spring_return: [], size: [140, 130] },
   { ...base, _kind: "stacklight", mode: "indicator", label: "StackLight", value: ["blink", "off", "on", "off"], tiers: ["red", "amber", "green", "blue"], labels: ["Fault", "Warning", "Running", "Call"], buzzer: true, size: [140, 200] },
@@ -155,6 +160,12 @@ for (const s of specs) {
     const n = 100, bits = new Uint8Array(n), an = new Float32Array(n);
     for (let i = 0; i < n; i++) { an[i] = Math.sin(i / 8); bits[i] = an[i] > 0.9 ? 1 : 0; }
     m.emit("msg:custom", { type: "data", n_samples: n, n_lines: 1, n_analog: n, n_traces: 1 }, [new DataView(bits.buffer), new DataView(an.buffer)]);
+  }
+  if (s._kind === "sparkline" || s._kind === "kpitile") {
+    const n = s._kind === "sparkline" ? 60 : 30, v = new Float32Array(n);
+    for (let i = 0; i < n; i++) v[i] = s._kind === "sparkline" ? 2 + 0.6 * Math.sin(i / 7) + 0.05 * rand() : 82 + 3 * Math.sin(i / 5) + rand();
+    v[n - 1] = s.value;
+    m.emit("msg:custom", { type: "snapshot", n }, [new DataView(v.buffer)]);
   }
   if (s._kind === "trendchart") {
     // fixed times (UTC 08:00) for reproducible screenshots

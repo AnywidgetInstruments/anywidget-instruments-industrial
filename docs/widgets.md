@@ -9,12 +9,13 @@ by default; every widget switches with `mode`.
 
 | Group | Widgets | Standards followed |
 |---|---|---|
-| Controls, continuous | `Knob` (C), `Dial` (C), `FillSlide` (C); a numeric entry field on every numeric control | |
+| Controls, continuous | `Knob` (C), `Dial` (C), `FillSlide` (C), `NumericEntry` (C, keypad); a numeric entry field on every numeric control | |
 | Controls, discrete | `PushButton` (C), `ToggleSwitch` (C), `RockerSwitch` (C), `SlideSwitch` (C), `SelectorSwitch` (C), `EmergencyStop` (C) | IEC 60073 (button and lamp colors) |
 | Indicators, analog | `Gauge`, `Meter`, `VUMeter`, `Tank`, `Thermometer`, `SevenSegment`, `Compass`, `AnalogIndicator` (I) | ISA-101 (`AnalogIndicator`) |
 | Indicators, discrete | `LED`, `StackLight` (I) | IEC 60073 |
 | Graphs, time | `WaveformChart`, `IntensityChart`, `DigitalWaveformGraph`, `MixedSignalGraph` (I) | |
-| Graphs, trends | `TrendChart` | ISA-101 |
+| Graphs, trends | `TrendChart`, `Sparkline` (I) | ISA-101 |
+| Compact indicators | `DeviationIndicator`, `BarGraph`, `KPITile` (I) | ISA-101, ISO 22400 (`oee`) |
 | Graphs, specialized | `PolarPlot`, `SmithChart`, `RadarChart`, `PictureControl` | |
 | Alarms and events | `AlarmIndicator`, `AlarmBanner`, `AlarmList`, `Annunciator`, `EventLog` | ISA-18.1, ISA-18.2 / IEC 62682 |
 | Process symbols | `Valve`, `Pump`, `Motor`, `Pipe` (faceplates) | ISA-5.1 (symbols) |
@@ -233,3 +234,65 @@ log.connect(pump_mode, category="operator", source="Pump mode")
 log.events  # list of dicts, oldest first
 ```
 
+### DeviationIndicator
+
+A centre-zero bar of the deviation between a value and its setpoint, over
+`±span`. The tolerance band `±tolerance` is shaded; inside it the bar is
+grey, outside it the bar takes the alarm color and reads **▲ HIGH** or
+**▼ LOW**. The signed deviation is written next to the bar.
+
+```python
+dev = ai.DeviationIndicator(52.3, setpoint=50, tolerance=1.5, span=5, unit="°C")
+dev.deviation, dev.out_of_tolerance  # (2.3, True)
+```
+
+### Sparkline
+
+A small trend without axes of the last `history` values, with the last
+value written next to it and the minimum (hollow dot) and maximum (filled
+dot) marked. Values travel as binary buffers.
+
+```python
+spark = ai.Sparkline(history=60, unit="m", format="%.2f")
+spark.append(2.31)  # one value
+spark.append(level_array)  # or many
+```
+
+### BarGraph
+
+Aligned bars on a shared scale, one per `bars` entry (a label, or a dict
+with `label`, `normal_lo`, `normal_hi`, `lolo`, `lo`, `hi`, `hihi`). Bars are
+grey with the normal band shaded and the limits marked; a bar in alarm is
+drawn in the alarm color and labelled with its level. `alarm_levels` gives
+the level of each bar.
+
+```python
+zones = ai.BarGraph(bars=["Z1", "Z2", {"label": "Z3", "hi": 80}], unit="°C", max=100)
+zones.value = [62.0, 64.5, 83.1]
+zones.alarm_levels  # ['normal', 'normal', 'hi']
+```
+
+### KPITile
+
+A key performance indicator: the value, the target and the difference to
+the target with its direction (▲ / ▼) and whether it is on the good side
+(✓ / ✗, after `higher_is_better`), with an optional sparkline of the last
+`history` values. `oee(availability, performance, quality)` computes the
+overall equipment effectiveness in the manner of ISO 22400.
+
+```python
+tile = ai.KPITile(unit="%", target=85, label="OEE")
+tile.append(ai.oee(0.9, 0.95, 0.99) * 100)  # 84.6 %, "▼ -0.4 % vs target 85.0 % ✗"
+```
+
+### NumericEntry
+
+A numeric keypad with a display, for touch panels. The operator types a
+value on the keys or the keyboard (digits, `.`, `-`, Backspace, Delete);
+Enter commits it after the range check of the numeric controls, Escape
+discards it. With `confirm_delta`, a change larger than that asks for a
+second Enter.
+
+```python
+sp = ai.NumericEntry(2.2, min=0, max=4, unit="m", label="Level setpoint", confirm_delta=0.5)
+```

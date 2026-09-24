@@ -670,3 +670,51 @@
 .awi-root .awi-ev-alarm { border-color: var(--awi-danger); border-left-width: 4px; }
 .awi-root .awi-ev-operator { border-color: var(--awi-accent); border-left-width: 4px; }
 .awi-root .awi-ev-state { border-left-width: 4px; }
+
+/* deviation indicator (IND-100): grey inside the tolerance, alarm color outside */
+.awi-root .awi-dev-track { fill: var(--awi-hp-track, var(--awi-track)); stroke: var(--awi-face-stroke); }
+.awi-root .awi-dev-band { fill: var(--awi-hp-normal, var(--awi-grid)); opacity: 0.6; }
+.awi-root .awi-dev-bar { fill: var(--awi-hp-pointer, var(--awi-fg)); }
+.awi-root.awi-dev-out .awi-dev-bar { fill: var(--awi-alarm-hi); }
+.awi-root .awi-dev-zero { stroke: var(--awi-fg); stroke-width: 1.5; }
+.awi-root .awi-dev-tick { fill: var(--awi-muted); font-size: 9px; }
+.awi-root .awi-dev-over { fill: var(--awi-alarm-hi); font-size: 9px; }
+
+/* sparkline (IND-101) */
+.awi-root .awi-spark-line { fill: none; stroke: var(--awi-fg); stroke-width: 1.3; }
+.awi-root .awi-spark-min { fill: var(--awi-face); stroke: var(--awi-fg); stroke-width: 1.2; }
+.awi-root .awi-spark-max { fill: var(--awi-fg); }
+.awi-root .awi-spark-value { fill: var(--awi-fg); font-size: 12px; font-weight: 600; }
+
+/* bar graph (IND-102): grey scale, color only in alarm */
+.awi-root .awi-bar-track { fill: var(--awi-hp-track, var(--awi-track)); stroke: var(--awi-face-stroke); }
+.awi-root .awi-bar-normal { fill: var(--awi-hp-normal, var(--awi-grid)); opacity: 0.7; }
+.awi-root .awi-bar-fill { fill: var(--awi-hp-pointer, var(--awi-fg)); opacity: 0.85; }
+.awi-root .awi-bar-alarm.awi-bar-hi, .awi-root .awi-bar-alarm.awi-bar-lo { fill: var(--awi-alarm-hi); opacity: 1; }
+.awi-root .awi-bar-alarm.awi-bar-hihi, .awi-root .awi-bar-alarm.awi-bar-lolo { fill: var(--awi-alarm-hihi); opacity: 1; }
+.awi-root .awi-bar-limit { stroke: var(--awi-fg); stroke-width: 1; }
+.awi-root .awi-bar-limit-hihi, .awi-root .awi-bar-limit-lolo { stroke-width: 2; }
+.awi-root .awi-bar-grid { stroke: var(--awi-grid); stroke-dasharray: 2 3; }
+.awi-root .awi-bar-tick { fill: var(--awi-muted); font-size: 9px; }
+.awi-root .awi-bar-label { fill: var(--awi-fg); font-size: 10px; font-weight: 600; }
+.awi-root .awi-bar-value { fill: var(--awi-fg); font-size: 10px; }
+.awi-root .awi-bar-value-alarm { font-weight: 700; }
+
+/* KPI tile (IND-103) */
+.awi-root.awi-kpitile .awi-body { display: flex; flex-direction: column; justify-content: center; gap: 2px; padding: 4px 8px; box-sizing: border-box; border: 1px solid var(--awi-face-stroke); border-radius: 6px; background: var(--awi-face); }
+.awi-root .awi-kpi-value { font-size: 24px; font-weight: 700; color: var(--awi-fg); font-variant-numeric: tabular-nums; }
+.awi-root .awi-kpi-delta { font-size: 10px; font-weight: 600; color: var(--awi-fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.awi-root.awi-kpi-bad .awi-kpi-delta { color: var(--awi-alarm-hihi); }
+.awi-root.awi-kpi-bad.awi-kpitile .awi-body { border-left: 4px solid var(--awi-alarm-hihi); }
+
+/* numeric keypad (IND-104) */
+.awi-root.awi-numericentry .awi-body { display: flex; flex-direction: column; gap: 4px; padding: 6px; box-sizing: border-box; border: 1px solid var(--awi-face-stroke); border-radius: 6px; background: var(--awi-face); }
+.awi-root .awi-kp-display { font-size: 18px; font-weight: 600; text-align: right; padding: 4px 6px; border: 1px solid var(--awi-face-stroke); border-radius: 4px; background: var(--awi-plot-bg); color: var(--awi-fg); font-variant-numeric: tabular-nums; min-height: 1.4em; }
+.awi-root .awi-kp-display.awi-kp-editing { border-color: var(--awi-accent); border-width: 2px; }
+.awi-root .awi-kp-msg { min-height: 1.2em; font-size: 10px; }
+.awi-root.awi-kp-armed .awi-kp-msg { font-weight: 700; }
+.awi-root .awi-kp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; flex: 1; }
+.awi-root .awi-kp-key { font: inherit; font-size: 15px; font-weight: 600; min-height: 32px; border: 1px solid var(--awi-face-stroke); border-radius: 4px; background: var(--awi-knob); color: var(--awi-fg); cursor: pointer; touch-action: manipulation; }
+.awi-root .awi-kp-key:focus-visible { outline: 2px solid var(--awi-accent); outline-offset: 1px; }
+.awi-root .awi-kp-key:disabled { opacity: 0.5; cursor: not-allowed; }
+.awi-root .awi-kp-enter { background: var(--awi-fg); color: var(--awi-face); }

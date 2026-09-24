@@ -120,7 +120,7 @@ JupyterLab / Notebook 7 / marimo (`e2e/`).
 | IND-070 … IND-075 | S/C | ✅ | `TrendChart`: pens with own scales, float64 times over binary buffers, live / history (◀ ▶, zoom, span, Live), limit and setpoint lines, `history` bound, cursors, time entry, CSV / PNG / SVG (py, js, e2e) |
 | IND-080 … IND-083 | S/C | ✅ | `Transmitter`: ISA-5.1 style bubble, NE 107 status by shape and text, **✕ BAD** and no `aria-valuenow` on failure, alarm limits (py, js, e2e) |
 | IND-090 … IND-093 | S/C | ✅ | `EventLog`: `log()`, `max_events`, category chips, filter by category and text, CSV, `connect()` / `disconnect()` audit trail (py, js, e2e) |
-| IND-100 … IND-104 | S | ⬜ | DeviationIndicator, Sparkline, BarGraph, KPITile, NumericEntry |
+| IND-100 … IND-104 | S | ✅ | `DeviationIndicator`, `Sparkline` (binary history), `BarGraph` (per-bar alarm levels), `KPITile` with `oee()`, `NumericEntry` keypad with range check and `confirm_delta` (py, js, e2e) |
 
 Tests: py (`tests/test_industrial.py`), js (`js/test/industrial.test.js`), e2e
 (`allwidgets.spec.js`, both directions for each object), visual baselines;

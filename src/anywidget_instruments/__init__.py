@@ -17,6 +17,7 @@ from ._boolean import (
     ToggleSwitch,
 )
 from ._chart import WaveformChart
+from ._compact import BarGraph, DeviationIndicator, KPITile, Sparkline, oee
 from ._dispatch import batch
 from ._eventlog import EVENT_CATEGORIES, EventLog
 from ._graph import GraphWidget
@@ -28,6 +29,7 @@ from ._graphs import (
     unpack_bits,
 )
 from ._industrial import STACK_COLORS, STACK_STATES, AnalogIndicator, SelectorSwitch, StackLight
+from ._keypad import NumericEntry
 from ._liveness import get_heartbeat, set_heartbeat
 from ._numeric import (
     Compass,
@@ -94,8 +96,10 @@ __all__ = [
     "AlarmList",
     "AnalogIndicator",
     "Annunciator",
+    "BarGraph",
     "BooleanWidget",
     "Compass",
+    "DeviationIndicator",
     "Dial",
     "DigitalWaveformGraph",
     "EmergencyStop",
@@ -105,10 +109,12 @@ __all__ = [
     "GraphWidget",
     "InstrumentWidget",
     "IntensityChart",
+    "KPITile",
     "Knob",
     "Meter",
     "MixedSignalGraph",
     "Motor",
+    "NumericEntry",
     "NumericWidget",
     "PIDFaceplate",
     "Panel",
@@ -124,6 +130,7 @@ __all__ = [
     "SevenSegment",
     "SlideSwitch",
     "SmithChart",
+    "Sparkline",
     "StackLight",
     "StateMachine",
     "SynopticCanvas",
@@ -144,6 +151,7 @@ __all__ = [
     "get_default_style",
     "get_default_theme",
     "get_heartbeat",
+    "oee",
     "sanitize_svg",
     "set_default_style",
     "set_heartbeat",

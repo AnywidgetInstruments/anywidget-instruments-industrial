@@ -136,6 +136,38 @@ test.describe("every widget", () => {
     await expect(w.locator("tbody tr")).toContainText("Pump started");
   });
 
+  test("Compact indicators: kernel -> front (IND-100 .. IND-103)", async () => {
+    const dev = widget(page, "DeviationIndicator");
+    await dev.scrollIntoViewIfNeeded();
+    await py('W["DeviationIndicator"].value = 53');
+    await expect(dev.locator(".awi-badge")).toHaveText("▲ HIGH");
+    await widget(page, "Sparkline").scrollIntoViewIfNeeded();
+    await py('W["Sparkline"].append([1.0, 3.0, 2.0])');
+    await expect(widget(page, "Sparkline").locator(":scope > .awi-body")).toHaveAttribute("aria-label", "Sparkline: last 2, min 1, max 3");
+    await widget(page, "BarGraph").scrollIntoViewIfNeeded();
+    await py('W["BarGraph"].value = [50.0, 85.0]');
+    await expect(widget(page, "BarGraph").locator(":scope > .awi-body")).toHaveAttribute("aria-label", "BarGraph: Z1 50.0, Z2 85.0 HI");
+    await widget(page, "KPITile").scrollIntoViewIfNeeded();
+    await py('W["KPITile"].value = 86.0');
+    await expect(widget(page, "KPITile").locator(".awi-kpi-delta")).toHaveText("▲ +1.0 % vs target 85.0 % ✓");
+  });
+
+  test("NumericEntry: keypad -> kernel with range check (IND-104)", async () => {
+    const w = widget(page, "NumericEntry");
+    await w.scrollIntoViewIfNeeded();
+    await w.getByRole("button", { name: "9", exact: true }).click();
+    await w.getByRole("button", { name: "Enter", exact: true }).click();
+    await expect(w.locator(".awi-kp-msg")).toContainText("Out of range");
+    await w.getByRole("button", { name: "Clear the entry" }).click();
+    await w.getByRole("button", { name: "3", exact: true }).click();
+    await w.getByRole("button", { name: "Decimal point" }).click();
+    await w.getByRole("button", { name: "5", exact: true }).click();
+    await w.getByRole("button", { name: "Enter", exact: true }).click();
+    await expect.poll(() => py('print(W["NumericEntry"].value)')).toBe("3.5");
+    await py('W["NumericEntry"].value = 1.25');
+    await expect(w.locator(".awi-kp-display")).toHaveText("1.25");
+  });
+
   test("TrendChart: both directions (IND-071, IND-072)", async () => {
     const w = widget(page, "TrendChart");
     await w.scrollIntoViewIfNeeded();

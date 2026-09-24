@@ -85,6 +85,12 @@ Generated from the docstrings (DOC-001).
 ::: anywidget_instruments.TrendChart
 ::: anywidget_instruments.Transmitter
 ::: anywidget_instruments.EventLog
+::: anywidget_instruments.DeviationIndicator
+::: anywidget_instruments.Sparkline
+::: anywidget_instruments.BarGraph
+::: anywidget_instruments.KPITile
+::: anywidget_instruments.oee
+::: anywidget_instruments.NumericEntry
 
 ## Utilities
 

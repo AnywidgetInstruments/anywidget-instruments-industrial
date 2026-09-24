@@ -19,7 +19,9 @@ import { RotaryView } from "./widgets/rotary.js";
 import { SevenSegmentView } from "./widgets/sevensegment.js";
 import { StateMachineView } from "./widgets/statemachine.js";
 import { ThemeSwitchView } from "./widgets/themeswitch.js";
+import { BarGraphView, DeviationView, KPITileView, SparklineView } from "./widgets/compact.js";
 import { EventLogView } from "./widgets/eventlog.js";
+import { KeypadView } from "./widgets/keypad.js";
 import { TransmitterView } from "./widgets/transmitter.js";
 import { TrendView } from "./widgets/trend.js";
 
@@ -66,6 +68,11 @@ const VIEWS = {
   trendchart: TrendView,
   transmitter: TransmitterView,
   eventlog: EventLogView,
+  deviation: DeviationView,
+  sparkline: SparklineView,
+  bargraph: BarGraphView,
+  kpitile: KPITileView,
+  numericentry: KeypadView,
 };
 
 function render({ model, el }) {
