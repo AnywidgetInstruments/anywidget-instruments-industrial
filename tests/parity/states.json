@@ -370,6 +370,39 @@
         "unit": "°C",
         "format": "%.1f"
       }
+    },
+    {
+      "widget": "Sparkline",
+      "traits": {
+        "history": 2,
+        "unit": "m",
+        "format": "%.2f"
+      }
+    },
+    {
+      "widget": "BarGraph",
+      "traits": {
+        "value": [
+          62.0,
+          "nan",
+          83.1
+        ],
+        "min": -10,
+        "max": 100,
+        "unit": "°C",
+        "deadband": 1
+      }
+    },
+    {
+      "widget": "KPITile",
+      "traits": {
+        "value": 84.6,
+        "target": 85,
+        "higher_is_better": false,
+        "show_sparkline": false,
+        "history": 2,
+        "unit": "%"
+      }
     }
   ]
 }

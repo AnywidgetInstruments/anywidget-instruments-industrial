@@ -27,6 +27,8 @@ function hostModel(state: State) {
       handlers[ev] = (handlers[ev] || []).filter((h) => h !== cb);
     },
     send: (_content: unknown): void => {},
+    /** A custom message sent by the host (msg:custom, with buffers). */
+    fireMsg: (content: unknown, buffers: ArrayBuffer[]) => fire("msg:custom", content, buffers),
     /** A value pushed by the host (e.g. a Julia cell re-run). */
     push(k: string, v: unknown) {
       traits[k] = v;
@@ -320,6 +322,40 @@ describe("Alarms and indicators without a kernel", () => {
     await frame();
     (sw.el.querySelector('button[data-value="dark"]') as HTMLButtonElement).click();
     expect(sw.model.get("value")).toBe("dark");
+  });
+});
+
+describe("Compact indicators without a kernel", () => {
+  test("a bar graph computes its alarm levels and writes them back", async () => {
+    const { model, body } = mount({ ...defaults("BarGraph"), bars: ["Z1", { label: "Z2", hi: 80 }], value: [50, 85], label: "Zones" });
+    await frame();
+    expect(model.get("alarm_levels")).toEqual(["normal", "hi"]);
+    expect(model.saved.at(-1)).toMatchObject({ alarm_levels: ["normal", "hi"] });
+    expect(body.getAttribute("aria-label")).toBe("Zones: Z1 50.0, Z2 85.0 HI");
+  });
+
+  test("a sparkline decodes history buffers given as ArrayBuffer (HOST-008)", async () => {
+    const sent: unknown[] = [];
+    const model = hostModel({ ...defaults("Sparkline"), label: "Level" });
+    model.send = (msg: unknown) => {
+      sent.push(msg);
+    };
+    const el = document.createElement("div");
+    document.body.appendChild(el);
+    widget.initialize({ model });
+    widget.render({ model, el });
+    expect(sent).toEqual([{ type: "sync_request" }]);
+    const fire = (msg: unknown, values: number[]) => model.fireMsg(msg, [new Float32Array(values).buffer]);
+    fire({ type: "snapshot", n: 3 }, [1, 3, 2]);
+    fire({ type: "append", n: 1 }, [2.5]);
+    await frame();
+    expect(el.querySelector(".awi-body")?.getAttribute("aria-label")).toBe("Level: last 2.5, min 1, max 3");
+  });
+
+  test("a KPI tile shows its difference to the target", async () => {
+    const { el } = mount({ ...defaults("KPITile"), value: 84.6, target: 85, unit: "%", label: "OEE" });
+    await frame();
+    expect(el.querySelector(".awi-kpi-delta")?.textContent).toBe("▼ -0.4 % vs target 85.0 % ✗");
   });
 });
 

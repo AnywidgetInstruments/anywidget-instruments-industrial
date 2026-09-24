@@ -133,6 +133,8 @@ class Sparkline(_HistoryMixin, InstrumentWidget):
     _kind = t.Unicode("sparkline").tag(sync=True)
     _default_mode = "indicator"
     _default_size = (160, 36)
+    mode = mode_trait(_default_mode)
+    size = size_trait(*_default_size)
     #: Last appended value.
     value = t.Float(_NAN, read_only=True).tag(sync=True, **float_serializers)
     history = t.Int(60, min=2).tag(sync=True)
@@ -180,6 +182,8 @@ class BarGraph(InstrumentWidget):
     _kind = t.Unicode("bargraph").tag(sync=True)
     _default_mode = "indicator"
     _default_size = (260, 160)
+    mode = mode_trait(_default_mode)
+    size = size_trait(*_default_size)
     value = t.List(t.Float(), default_value=[]).tag(sync=True, **float_serializers)
     bars: t.List[Any] = t.List().tag(sync=True)
     min = t.Float(0.0).tag(sync=True)
@@ -283,6 +287,8 @@ class KPITile(_HistoryMixin, InstrumentWidget):
     _kind = t.Unicode("kpitile").tag(sync=True)
     _default_mode = "indicator"
     _default_size = (190, 96)
+    mode = mode_trait(_default_mode)
+    size = size_trait(*_default_size)
     value = t.Float(_NAN).tag(sync=True, **float_serializers)
     target = t.Float(None, allow_none=True).tag(sync=True)
     higher_is_better = t.Bool(True).tag(sync=True)

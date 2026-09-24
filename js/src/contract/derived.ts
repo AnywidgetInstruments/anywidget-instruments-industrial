@@ -9,6 +9,7 @@
 import type { AnyModel, Traits } from "../core/model.js";
 import { BY_KIND } from "../generated/contract.js";
 import { type AlarmLevel, computeAlarmLevel } from "./alarm.js";
+import { barLevels, normalizeBars } from "./bars.js";
 import { coerceValue } from "./numeric.js";
 import { nextPeak, type PeakState } from "./peak.js";
 import type { WidgetContract } from "./spec.js";
@@ -103,6 +104,38 @@ function attachPeak(model: AnyModel<Traits>, contract: WidgetContract, clock: ()
   };
 }
 
+const BAR_INPUTS = ["value", "bars", "deadband", "alarm_levels", "_session"];
+
+/** alarm_levels of a bar graph (IND-102). */
+function attachBarLevels(model: AnyModel<Traits>, contract: WidgetContract): () => void {
+  const read = reader(model, contract);
+  let previous = (read("alarm_levels") as string[]) || [];
+  let writing = false;
+  const update = (): void => {
+    if (writing) return;
+    if (hostOwnsState(model)) {
+      previous = (read("alarm_levels") as string[]) || [];
+      return;
+    }
+    const levels = barLevels(read("value") as number[], normalizeBars(read("bars")), Number(read("deadband")) || 0, previous);
+    previous = levels;
+    if (JSON.stringify(model.get("alarm_levels")) !== JSON.stringify(levels)) {
+      writing = true;
+      try {
+        model.set("alarm_levels", levels);
+        model.save_changes();
+      } finally {
+        writing = false;
+      }
+    }
+  };
+  for (const name of BAR_INPUTS) model.on(`change:${name}`, update);
+  update();
+  return () => {
+    for (const name of BAR_INPUTS) model.off(`change:${name}`, update);
+  };
+}
+
 /**
  * Model-level hook (AFM `initialize`): keep the derived traits of a widget
  * with a schema up to date when no host owns the state. Returns a cleanup.
@@ -112,5 +145,6 @@ export function attachDerived(model: AnyModel, { clock = monotonic }: { clock?: 
   const cleanups: Array<() => void> = [];
   if (contract?.traits.alarm_level?.writer === "derived") cleanups.push(attachAlarmLevel(model, contract));
   if (contract?.traits.peak?.writer === "derived") cleanups.push(attachPeak(model, contract, clock));
+  if (contract?.traits.alarm_levels?.writer === "derived") cleanups.push(attachBarLevels(model, contract));
   return () => cleanups.forEach((c) => c());
 }

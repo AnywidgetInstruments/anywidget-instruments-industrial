@@ -1,0 +1,21 @@
+{
+  "description": "Bar graph (IND-102): bars as the kernel stores them, and per-bar alarm levels with hysteresis (each step sets the values; the levels of a step are the previous levels of the next one).",
+  "normalize": [
+    { "bars": ["Z1", "Z2"], "expected": [
+      { "label": "Z1", "normal_lo": null, "normal_hi": null, "lolo": null, "lo": null, "hi": null, "hihi": null },
+      { "label": "Z2", "normal_lo": null, "normal_hi": null, "lolo": null, "lo": null, "hi": null, "hihi": null } ] },
+    { "bars": [{ "hi": 80 }, { "label": "B", "lo": 5, "normal_lo": 10, "normal_hi": 60 }], "expected": [
+      { "label": "1", "normal_lo": null, "normal_hi": null, "lolo": null, "lo": null, "hi": 80, "hihi": null },
+      { "label": "B", "normal_lo": 10, "normal_hi": 60, "lolo": null, "lo": 5, "hi": null, "hihi": null } ] },
+    { "bars": [{ "label": "C", "hi": null }], "expected": [
+      { "label": "C", "normal_lo": null, "normal_hi": null, "lolo": null, "lo": null, "hi": null, "hihi": null } ] }
+  ],
+  "levels": [
+    { "name": "one bar in alarm, one without a value", "bars": ["Z1", { "label": "Z2", "hi": 80 }, { "label": "Z3", "hi": 80 }], "deadband": 0,
+      "steps": [[[50, 85], ["normal", "hi", "normal"]], [[50, 70, 90], ["normal", "normal", "hi"]]] },
+    { "name": "deadband per bar", "bars": [{ "label": "A", "hi": 80 }, { "label": "B", "lo": 20 }], "deadband": 2,
+      "steps": [[[81, 19], ["hi", "lo"]], [[79, 21], ["hi", "lo"]], [[77, 23], ["normal", "normal"]]] },
+    { "name": "non-finite values keep the level", "bars": [{ "label": "A", "hihi": 90 }], "deadband": 0,
+      "steps": [[[95], ["hihi"]], [["nan"], ["hihi"]], [[10], ["normal"]]] }
+  ]
+}

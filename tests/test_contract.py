@@ -83,6 +83,9 @@ MIGRATED = {
     "Pipe",
     "AlarmIndicator",
     "DeviationIndicator",
+    "Sparkline",
+    "BarGraph",
+    "KPITile",
 }
 
 
@@ -143,7 +146,11 @@ def test_trait_declarations(title: str, spec: dict[str, Any]) -> None:
         _check_type(where, trait, s)
         assert bool(trait.allow_none) == bool(s.get("nullable")), where
         assert bool(trait.read_only) == bool(s.get("readOnly")), where
-        assert (s["writer"] == "derived") == bool(trait.read_only), where
+        # derived traits are read-only; a read-only trait is derived or written by the host
+        if s["writer"] == "derived":
+            assert trait.read_only, where
+        if trait.read_only:
+            assert s["writer"] in ("derived", "host"), where
         encoded = trait.metadata.get("to_json") is _base.float_serializers["to_json"]
         if s["type"] == "number":
             assert encoded == bool(s.get("nonfinite")), f"{where}: float_serializers"

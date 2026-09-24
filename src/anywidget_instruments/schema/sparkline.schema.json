@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://s-celles.github.io/anywidget-instruments/schema/sparkline.schema.json",
+  "title": "Sparkline",
+  "description": "Compact trend of the last values, without axes (IND-101).",
+  "type": "object",
+  "x-awi-class": "Sparkline",
+  "allOf": [
+    {
+      "$ref": "instrument.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "sparkline",
+      "default": "sparkline",
+      "x-awi-writer": "host"
+    },
+    "mode": {
+      "default": "indicator"
+    },
+    "size": {
+      "default": [
+        160,
+        36
+      ]
+    },
+    "value": {
+      "$ref": "instrument.schema.json#/$defs/float",
+      "description": "Last appended value, written by the host with each append (the view shows the newest value of its history when it has one).",
+      "default": "nan",
+      "readOnly": true,
+      "x-awi-writer": "host"
+    },
+    "history": {
+      "type": "integer",
+      "minimum": 2,
+      "description": "Number of values kept and drawn.",
+      "default": 60,
+      "x-awi-writer": "host"
+    },
+    "unit": {
+      "type": "string",
+      "default": "",
+      "x-awi-writer": "host"
+    },
+    "format": {
+      "type": "string",
+      "description": "printf-like spec of the last value (NUM-004).",
+      "default": "%.4g",
+      "x-awi-writer": "host"
+    }
+  },
+  "x-awi-messages": [
+    {
+      "type": "snapshot",
+      "direction": "host-to-front",
+      "description": "Whole kept history of the sparkline, oldest first; replaces the view's history. Sent in reply to sync_request and when history changes.",
+      "fields": {
+        "n": {
+          "type": "integer",
+          "description": "Number of values in the buffer."
+        }
+      },
+      "buffers": [
+        {
+          "dtype": "<f4",
+          "shape": [
+            "n"
+          ],
+          "description": "Values, oldest first."
+        }
+      ]
+    },
+    {
+      "type": "append",
+      "direction": "host-to-front",
+      "description": "New values appended to the history (the last one is the newest).",
+      "fields": {
+        "n": {
+          "type": "integer"
+        }
+      },
+      "buffers": [
+        {
+          "dtype": "<f4",
+          "shape": [
+            "n"
+          ],
+          "description": "Values, oldest first."
+        }
+      ]
+    },
+    {
+      "type": "sync_request",
+      "direction": "front-to-host",
+      "description": "Sent by each new view: the host answers with a snapshot. A host without history can ignore it.",
+      "fields": {},
+      "buffers": []
+    }
+  ]
+}

@@ -2,11 +2,13 @@
 // tests/parity/*.json, also run by tests/test_parity.py.
 import { describe, expect, test } from "vitest";
 import alarmCases from "../../tests/parity/alarm_level.json";
+import barCases from "../../tests/parity/bars.json";
 import numericCases from "../../tests/parity/numeric.json";
 import peakCases from "../../tests/parity/peak.json";
 import resolvedCases from "../../tests/parity/resolved.json";
 import stateCases from "../../tests/parity/states.json";
 import { type AlarmLevel, type AlarmLimits, computeAlarmLevel } from "../src/contract/alarm.js";
+import { barLevels, normalizeBars } from "../src/contract/bars.js";
 import { selectorValue, stackStates } from "../src/contract/industrial.js";
 import { coerceValue, validScale } from "../src/contract/numeric.js";
 import { nextPeak, type PeakState } from "../src/contract/peak.js";
@@ -90,4 +92,20 @@ describe("resolved defaults", () => {
   test.each(resolvedCases.stacklight)("stack light $tiers from $value -> $expected", (c) => {
     expect(stackStates(c.tiers, c.value ?? [])).toEqual(c.expected);
   });
+});
+
+describe("bar graph", () => {
+  test.each(barCases.normalize)("bars %#", (c) => {
+    expect(normalizeBars(c.bars)).toEqual(c.expected);
+  });
+  for (const c of barCases.levels) {
+    test(c.name, () => {
+      const bars = normalizeBars(c.bars);
+      let levels: string[] = [];
+      for (const [values, expected] of c.steps as Array<[Array<number | string>, string[]]>) {
+        levels = barLevels(values.map(parseNumber), bars, c.deadband, levels);
+        expect(levels, `${c.name} at ${JSON.stringify(values)}`).toEqual(expected);
+      }
+    });
+  }
 });

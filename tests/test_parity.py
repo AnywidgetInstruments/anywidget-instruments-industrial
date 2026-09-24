@@ -88,8 +88,9 @@ STATES = _load("states.json")["states"]
 @pytest.mark.parametrize("case", STATES, ids=[f"{s['widget']}-{i}" for i, s in enumerate(STATES)])
 def test_states_are_accepted_unchanged(case: dict[str, Any]) -> None:
     cls = getattr(ai, case["widget"])
-    floats = {k for k, tr in cls.class_traits().items() if isinstance(tr, t.Float)}
-    traits = {k: _num(v) if k in floats else v for k, v in case["traits"].items()}
+    # decode as the kernel does when it receives JSON (from_json of each trait)
+    decoders = {k: tr.metadata.get("from_json") for k, tr in cls.class_traits().items()}
+    traits = {k: decoders[k](v, None) if decoders.get(k) else v for k, v in case["traits"].items()}
     w = cls(**traits)
     state = json.loads(json.dumps(w.get_state()))
     for name, v in case["traits"].items():
@@ -139,3 +140,19 @@ def test_stacklight_resolved_value(case: dict[str, Any]) -> None:
         light = ai.StackLight(value=case["value"])
         light.tiers = case["tiers"]
     assert light.value == case["expected"]
+
+
+BARS = _load("bars.json")
+
+
+@pytest.mark.parametrize("case", BARS["normalize"])
+def test_bars_normalized(case: dict[str, Any]) -> None:
+    assert ai.BarGraph(bars=case["bars"]).bars == case["expected"]
+
+
+@pytest.mark.parametrize("case", BARS["levels"], ids=[c["name"] for c in BARS["levels"]])
+def test_bar_levels(case: dict[str, Any]) -> None:
+    g = ai.BarGraph(bars=case["bars"], deadband=case["deadband"])
+    for values, expected in case["steps"]:
+        g.value = [_num(v) for v in values]
+        assert g.alarm_levels == expected, (case["name"], values)
