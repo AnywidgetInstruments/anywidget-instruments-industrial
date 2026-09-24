@@ -84,6 +84,7 @@ const NONFINITE = ["nan", "inf", "-inf"];
 function traitSpec(name, p, where, nested = false) {
   const spec = {};
   let types = Array.isArray(p.type) ? [...p.type] : p.type ? [p.type] : [];
+  if (Array.isArray(p.anyOf) && p.anyOf.some((alt) => alt.type === "null")) spec.nullable = true;
   if (types.includes("null")) {
     spec.nullable = true;
     types = types.filter((t) => t !== "null");

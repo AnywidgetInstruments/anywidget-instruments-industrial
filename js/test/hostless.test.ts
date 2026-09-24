@@ -136,6 +136,9 @@ const NUMERIC = [
   ["SevenSegment", 1e9],
   ["AnalogIndicator", 100],
   ["Transmitter", 100],
+  ["Gauge", 100],
+  ["Meter", 100],
+  ["VUMeter", 100],
 ] as const;
 
 describe.each(NUMERIC)("%s without a kernel", (title, max) => {
@@ -183,6 +186,18 @@ describe("Transmitter without a kernel", () => {
     const { root } = mount({ ...defaults("Transmitter"), value: 2, tag: "LT-101", status: "broken" });
     await frame();
     expect(root.classList.contains("awi-ne107-ok")).toBe(true);
+  });
+});
+
+describe("Gauge without a kernel", () => {
+  test("holds its peak and draws the marker", async () => {
+    const { model, el } = mount({ ...defaults("Gauge"), value: 10, peak_hold: true, label: "Pressure" });
+    await frame();
+    model.push("value", 90);
+    model.push("value", 40);
+    await frame();
+    expect(model.get("peak")).toBe(90);
+    expect((el.querySelector(".awi-peak") as SVGElement).style.display).toBe("");
   });
 });
 

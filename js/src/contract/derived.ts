@@ -10,6 +10,7 @@ import type { AnyModel, Traits } from "../core/model.js";
 import { BY_KIND } from "../generated/contract.js";
 import { type AlarmLevel, computeAlarmLevel } from "./alarm.js";
 import { coerceValue } from "./numeric.js";
+import { nextPeak, type PeakState } from "./peak.js";
 import type { WidgetContract } from "./spec.js";
 import { readTrait } from "./traits.js";
 
@@ -67,13 +68,49 @@ function attachAlarmLevel(model: AnyModel<Traits>, contract: WidgetContract): ()
   };
 }
 
+/** Monotonic clock in seconds (the kernel uses time.monotonic). */
+const monotonic = (): number => (typeof performance !== "undefined" ? performance.now() : Date.now()) / 1000;
+
+/** peak of a numeric widget with peak hold (NUM-110). */
+function attachPeak(model: AnyModel<Traits>, contract: WidgetContract, clock: () => number): () => void {
+  const read = reader(model, contract);
+  const num = (name: string): number => read(name) as number;
+  const state: PeakState = { peak: read("peak") as number | null, time: 0 };
+  let writing = false;
+  const onValue = (): void => {
+    if (hostOwnsState(model)) return;
+    const value = coerceValue(num("value"), num("min"), num("max"), !!read("coerce"));
+    const next = nextPeak(value, state, { hold: !!read("peak_hold"), decay: num("peak_decay") || 0, now: clock() });
+    if (!next) return;
+    Object.assign(state, next);
+    writing = true;
+    try {
+      model.set("peak", next.peak);
+      model.save_changes();
+    } finally {
+      writing = false;
+    }
+  };
+  // a peak set by the host (e.g. a reset to null) becomes the held peak
+  const onPeak = (): void => {
+    if (!writing) state.peak = read("peak") as number | null;
+  };
+  model.on("change:value", onValue);
+  model.on("change:peak", onPeak);
+  return () => {
+    model.off("change:value", onValue);
+    model.off("change:peak", onPeak);
+  };
+}
+
 /**
  * Model-level hook (AFM `initialize`): keep the derived traits of a widget
  * with a schema up to date when no host owns the state. Returns a cleanup.
  */
-export function attachDerived(model: AnyModel): () => void {
+export function attachDerived(model: AnyModel, { clock = monotonic }: { clock?: () => number } = {}): () => void {
   const contract = contractOf(model);
   const cleanups: Array<() => void> = [];
   if (contract?.traits.alarm_level?.writer === "derived") cleanups.push(attachAlarmLevel(model, contract));
+  if (contract?.traits.peak?.writer === "derived") cleanups.push(attachPeak(model, contract, clock));
   return () => cleanups.forEach((c) => c());
 }

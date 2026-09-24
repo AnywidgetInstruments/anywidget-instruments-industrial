@@ -100,3 +100,20 @@ def test_modulo(case: dict[str, Any]) -> None:
     """Values wrapped by the kernel (x-awi-modulo in the schema), e.g. a heading."""
     w = getattr(ai, case["widget"])(_num(case["value"]))
     assert _same(w.value, _num(case["expected"]))
+
+
+PEAK = _load("peak.json")["cases"]
+
+
+@pytest.mark.parametrize("case", PEAK, ids=[c["name"] for c in PEAK])
+def test_peak_hold(case: dict[str, Any], monkeypatch: pytest.MonkeyPatch) -> None:
+    from anywidget_instruments import _numeric
+
+    clock = {"now": 0.0}
+    monkeypatch.setattr(_numeric.time, "monotonic", lambda: clock["now"])
+    g = ai.Gauge(0, min=-1e12, max=1e12, peak_hold=case["hold"], peak_decay=case["decay"])
+    g.reset_peak()
+    for now, value, expected in case["steps"]:
+        clock["now"] = now
+        g.value = _num(value)
+        assert g.peak == expected, (case["name"], now, value)

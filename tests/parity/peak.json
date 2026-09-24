@@ -1,0 +1,174 @@
+{
+  "description": "Peak hold (NUM-110). Each step is [time in seconds, value, expected peak]; the peak starts at null. A step that repeats the previous value is not a change: it neither refreshes nor releases the peak (traitlets and the front-end models only report changes).",
+  "cases": [
+    {
+      "name": "off: no peak",
+      "hold": false,
+      "decay": 0,
+      "steps": [
+        [
+          100,
+          50,
+          null
+        ],
+        [
+          101,
+          80,
+          null
+        ]
+      ]
+    },
+    {
+      "name": "held until reset",
+      "hold": true,
+      "decay": 0,
+      "steps": [
+        [
+          100,
+          50,
+          50
+        ],
+        [
+          101,
+          80,
+          80
+        ],
+        [
+          102,
+          60,
+          80
+        ],
+        [
+          5000,
+          10,
+          80
+        ]
+      ]
+    },
+    {
+      "name": "a repeated value does not refresh the peak time",
+      "hold": true,
+      "decay": 2,
+      "steps": [
+        [
+          100,
+          80,
+          80
+        ],
+        [
+          101.5,
+          80,
+          80
+        ],
+        [
+          103,
+          70,
+          70
+        ],
+        [
+          103.6,
+          70,
+          70
+        ]
+      ]
+    },
+    {
+      "name": "decay releases at the next value",
+      "hold": true,
+      "decay": 2,
+      "steps": [
+        [
+          100,
+          80,
+          80
+        ],
+        [
+          101,
+          60,
+          80
+        ],
+        [
+          102.5,
+          50,
+          50
+        ],
+        [
+          103,
+          55,
+          55
+        ]
+      ]
+    },
+    {
+      "name": "exactly at the decay time the peak is kept",
+      "hold": true,
+      "decay": 2,
+      "steps": [
+        [
+          100,
+          80,
+          80
+        ],
+        [
+          102,
+          60,
+          80
+        ],
+        [
+          102.25,
+          61,
+          61
+        ]
+      ]
+    },
+    {
+      "name": "non-finite values are ignored",
+      "hold": true,
+      "decay": 0,
+      "steps": [
+        [
+          100,
+          50,
+          50
+        ],
+        [
+          101,
+          "nan",
+          50
+        ],
+        [
+          102,
+          "inf",
+          50
+        ],
+        [
+          103,
+          70,
+          70
+        ]
+      ]
+    },
+    {
+      "name": "negative values",
+      "hold": true,
+      "decay": 0,
+      "steps": [
+        [
+          100,
+          -5,
+          -5
+        ],
+        [
+          101,
+          -10,
+          -5
+        ],
+        [
+          102,
+          -1,
+          -1
+        ]
+      ]
+    }
+  ]
+}

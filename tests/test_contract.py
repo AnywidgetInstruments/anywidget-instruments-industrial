@@ -36,6 +36,7 @@ CLASSES: dict[str, type] = {
     **{n: c for n, c in vars(ai).items() if isinstance(c, type)},
     "InstrumentWidget": _base.InstrumentWidget,
     "NumericWidget": _numeric.NumericWidget,
+    "_PeakMixin": _numeric._PeakMixin,
 }
 WIDGETS = sorted(CONTRACT["widgets"].items())
 IDS = [title for title, _ in WIDGETS]
@@ -66,6 +67,9 @@ MIGRATED = {
     "AnalogIndicator",
     "Transmitter",
     "NumericEntry",
+    "Gauge",
+    "Meter",
+    "VUMeter",
 }
 
 

@@ -173,8 +173,40 @@ describe("derived alarm_level (HOST-004)", () => {
   });
 
   test("widgets without a schema are left alone", () => {
-    const m = eventModel({ _kind: "gauge", value: 95, hi: 80 });
+    const m = eventModel({ _kind: "pidfaceplate", pv: 95, hi: 80 });
     attachDerived(m);
     expect(m.get("alarm_level")).toBeUndefined();
+  });
+});
+
+describe("derived peak (HOST-004, NUM-110)", () => {
+  test("without a host, the front end holds the peak with the kernel rules", () => {
+    let now = 100;
+    const m = eventModel({ _kind: "gauge", value: 10, peak_hold: true, peak_decay: 2, peak: null });
+    attachDerived(m, { clock: () => now });
+    m.set("value", 80);
+    expect(m.get("peak")).toBe(80);
+    now = 101;
+    m.set("value", 60);
+    expect(m.get("peak")).toBe(80);
+    now = 102.5; // older than peak_decay: released at this value
+    m.set("value", 50);
+    expect(m.get("peak")).toBe(50);
+    m.set("peak", null); // reset by the host
+    now = 103;
+    m.set("value", 40);
+    expect(m.get("peak")).toBe(40);
+    expect(m.sent.at(-1)).toMatchObject({ peak: 40 });
+  });
+
+  test("off unless peak_hold; kept when a host owns the state", () => {
+    const off = eventModel({ _kind: "meter", value: 10, peak: null });
+    attachDerived(off);
+    off.set("value", 90);
+    expect(off.get("peak")).toBe(null);
+    const host = eventModel({ _kind: "vumeter", _session: "k", value: 10, peak_hold: true, peak: 20 });
+    attachDerived(host);
+    host.set("value", 90);
+    expect(host.get("peak")).toBe(20);
   });
 });

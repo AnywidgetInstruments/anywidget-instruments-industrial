@@ -3,9 +3,11 @@
 import { describe, expect, test } from "vitest";
 import alarmCases from "../../tests/parity/alarm_level.json";
 import numericCases from "../../tests/parity/numeric.json";
+import peakCases from "../../tests/parity/peak.json";
 import stateCases from "../../tests/parity/states.json";
 import { type AlarmLevel, type AlarmLimits, computeAlarmLevel } from "../src/contract/alarm.js";
 import { coerceValue, validScale } from "../src/contract/numeric.js";
+import { nextPeak, type PeakState } from "../src/contract/peak.js";
 import { readTrait } from "../src/contract/traits.js";
 import { parseNumber } from "../src/core/scale.js";
 import { CONTRACTS } from "../src/generated/contract.js";
@@ -61,4 +63,20 @@ describe("states accepted by the kernel are read unchanged", () => {
       }
     });
   });
+});
+
+describe("peak hold", () => {
+  for (const c of peakCases.cases) {
+    test(c.name, () => {
+      let state: PeakState = { peak: null, time: 0 };
+      let previous: number | undefined;
+      for (const [now, value, expected] of c.steps as Array<[number, number | string, number | null]>) {
+        const v = parseNumber(value);
+        // like the models, a repeated value is not a change event
+        if (!Object.is(v, previous)) state = nextPeak(v, state, { hold: c.hold, decay: c.decay, now }) ?? state;
+        previous = v;
+        expect(state.peak, `${c.name} at ${now}`).toBe(expected);
+      }
+    });
+  }
 });

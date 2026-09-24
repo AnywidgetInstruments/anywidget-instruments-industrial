@@ -232,6 +232,7 @@ class Gauge(_PeakMixin):
 
     _kind = t.Unicode("gauge").tag(sync=True)
     _default_mode = "indicator"
+    mode = mode_trait(_default_mode)
     variant = t.Enum(["circular", "semicircular"], default_value="circular").tag(sync=True)
     ranges = t.List(t.Dict()).tag(sync=True)
 
@@ -242,6 +243,8 @@ class Meter(_PeakMixin):
     _kind = t.Unicode("meter").tag(sync=True)
     _default_mode = "indicator"
     _default_size = (200, 140)
+    mode = mode_trait(_default_mode)
+    size = size_trait(*_default_size)
     angle_range = t.Float(90.0, min=20.0, max=150.0).tag(sync=True)
 
 
@@ -251,6 +254,8 @@ class VUMeter(_PeakMixin):
     _kind = t.Unicode("vumeter").tag(sync=True)
     _default_mode = "indicator"
     _default_size = (60, 200)
+    mode = mode_trait(_default_mode)
+    size = size_trait(*_default_size)
     segments = t.Int(20, min=2).tag(sync=True)
     orientation = t.Enum(["vertical", "horizontal"], default_value="vertical").tag(sync=True)
 

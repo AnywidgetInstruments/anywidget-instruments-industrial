@@ -6,7 +6,21 @@
   "type": "object",
   "x-awi-abstract": true,
   "x-awi-class": "InstrumentWidget",
-  "x-awi-framework-traits": ["_anywidget_id", "_css", "_dom_classes", "_esm", "_model_module", "_model_module_version", "_model_name", "_view_count", "_view_module", "_view_module_version", "_view_name", "layout", "tabbable"],
+  "x-awi-framework-traits": [
+    "_anywidget_id",
+    "_css",
+    "_dom_classes",
+    "_esm",
+    "_model_module",
+    "_model_module_version",
+    "_model_name",
+    "_view_count",
+    "_view_module",
+    "_view_module_version",
+    "_view_name",
+    "layout",
+    "tabbable"
+  ],
   "properties": {
     "_kind": {
       "type": "string",
@@ -15,7 +29,10 @@
       "x-awi-writer": "host"
     },
     "mode": {
-      "enum": ["control", "indicator"],
+      "enum": [
+        "control",
+        "indicator"
+      ],
       "description": "\"control\": the user sets the value; \"indicator\": display only.",
       "default": "control",
       "x-awi-writer": "host"
@@ -47,21 +64,39 @@
       "type": "array",
       "description": "[width, height] in CSS pixels.",
       "prefixItems": [
-        { "type": "integer", "exclusiveMinimum": 0 },
-        { "type": "integer", "exclusiveMinimum": 0 }
+        {
+          "type": "integer",
+          "exclusiveMinimum": 0
+        },
+        {
+          "type": "integer",
+          "exclusiveMinimum": 0
+        }
       ],
       "items": false,
       "minItems": 2,
-      "default": [160, 160],
+      "default": [
+        160,
+        160
+      ],
       "x-awi-writer": "host"
     },
     "style": {
-      "enum": ["modern", "classic", "system"],
+      "enum": [
+        "modern",
+        "classic",
+        "system"
+      ],
       "default": "modern",
       "x-awi-writer": "host"
     },
     "theme": {
-      "enum": ["auto", "light", "dark", "system"],
+      "enum": [
+        "auto",
+        "light",
+        "dark",
+        "system"
+      ],
       "description": "\"auto\": the style decides; \"system\": the host page or the operating system (STYLE-007).",
       "default": "auto",
       "x-awi-writer": "host"
@@ -69,8 +104,17 @@
     "skin": {
       "type": "object",
       "description": "Replaceable drawing parts: part name -> SVG source, sanitized (STYLE-005, STYLE-006).",
-      "propertyNames": { "enum": ["background", "housing", "knob", "needle"] },
-      "additionalProperties": { "type": "string" },
+      "propertyNames": {
+        "enum": [
+          "background",
+          "housing",
+          "knob",
+          "needle"
+        ]
+      },
+      "additionalProperties": {
+        "type": "string"
+      },
       "default": {},
       "x-awi-writer": "host"
     },
@@ -93,19 +137,59 @@
       "type": "hb",
       "direction": "host-to-front",
       "description": "Heartbeat, sent every _heartbeat seconds when the host announces liveness.",
-      "fields": { "session": { "type": "string" }, "interval": { "type": "number" } },
+      "fields": {
+        "session": {
+          "type": "string"
+        },
+        "interval": {
+          "type": "number"
+        }
+      },
       "buffers": []
     }
   ],
   "$defs": {
     "float": {
       "description": "A float; NaN and infinities travel as the strings \"nan\", \"inf\" and \"-inf\" (JSON has no non-finite numbers, NUM-007).",
-      "anyOf": [{ "type": "number" }, { "enum": ["nan", "inf", "-inf"] }],
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "enum": [
+            "nan",
+            "inf",
+            "-inf"
+          ]
+        }
+      ],
       "x-awi-nonfinite": true
     },
     "optionalNumber": {
-      "type": ["number", "null"],
+      "type": [
+        "number",
+        "null"
+      ],
       "description": "A number, or null when not set."
+    },
+    "optionalFloat": {
+      "description": "A float or null; NaN and infinities travel as the strings \"nan\", \"inf\" and \"-inf\".",
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "enum": [
+            "nan",
+            "inf",
+            "-inf"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "x-awi-nonfinite": true
     }
   }
 }

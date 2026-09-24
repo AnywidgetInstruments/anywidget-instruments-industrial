@@ -3,19 +3,11 @@ import { clear, safeColor, svg, svgText } from "../core/dom.js";
 import { formatValue, tickFormat } from "../core/format.js";
 import type { AnyModel } from "../core/model.js";
 import { arcPath, parseNumber, polar, sectorPath, ticks } from "../core/scale.js";
-import type { DialTraits, KnobTraits } from "../generated/contract.js";
+import type { DialTraits, GaugeTraits, KnobTraits } from "../generated/contract.js";
 import { NumericView } from "./numeric.js";
 
-/**
- * Traits of the rotary widgets. Knob and Dial come from their schemas; the
- * traits of Gauge, Meter and Compass are typed here until they get theirs.
- */
-export type RotaryTraits = KnobTraits & Partial<Pick<DialTraits, "turns">> & {
-  variant?: "circular" | "semicircular";
-  ranges?: Array<{ from: number | string; to: number | string; color?: string }>;
-  peak?: number | string | null;
-  peak_hold?: boolean;
-};
+/** Traits of the rotary widgets (Knob, Dial, Gauge, Meter, Compass), from their schemas. */
+export type RotaryTraits = KnobTraits & Partial<Pick<DialTraits, "turns"> & Pick<GaugeTraits, "variant" | "ranges" | "peak" | "peak_hold">>;
 
 interface Geometry {
   vb: [number, number];
