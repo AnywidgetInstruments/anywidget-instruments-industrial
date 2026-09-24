@@ -59,6 +59,7 @@ JupyterLab / Notebook 7 / marimo (`e2e/`).
 | CHART-101, CHART-102 | S | ✅ | IntensityChart (6 colormaps, colorbar), DigitalWaveformGraph (buses, hex) |
 | CHART-104, CHART-106 | S | ✅ | Draggable cursors with kernel-computed values; box zoom, wheel, pan, double-click reset (e2e) |
 | CHART-103, CHART-105, CHART-107 | C | ✅ | MixedSignalGraph, annotations, CSV / PNG / SVG export (e2e CSV) |
+| CHART-108 | S | ✅ | Axes panel (X / Y limits, Apply, Auto) on every graph; Y limits of `WaveformChart` and the radial range of `PolarPlot` (typed or mouse wheel) update the kernel settings (js, e2e) |
 
 ## SPEC – Specialized displays
 | ID | Pri | Status | Notes |

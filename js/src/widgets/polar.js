@@ -1,5 +1,6 @@
 // PolarPlot, SmithChart, RadarChart (SPEC-002..004). SVG rendering.
 import { clear, html, safeColor, svg, svgText } from "../core/dom.js";
+import { checkEntry } from "../core/entry.js";
 import { formatValue } from "../core/format.js";
 import { niceTicks, parseNumber } from "../core/scale.js";
 import { BaseView } from "../core/view.js";
@@ -31,6 +32,42 @@ export class PolarView extends BaseView {
     this.body.setAttribute("role", "img");
     this.legend = html("div", { cls: "awi-legend" });
     this.root.appendChild(this.legend);
+    if (this.kind === "polar") this.buildRadialRange();
+    this.schedule();
+  }
+
+  // -- radial range (CHART-108): mouse wheel on the plot, or typed ---------------------------
+  buildRadialRange() {
+    this.rField = html("input", { cls: "awi-entry", attrs: { type: "text", inputmode: "decimal", "aria-label": "Radial range maximum", "data-lm-suppress-shortcuts": "true" } });
+    this.rMsg = html("span", { cls: "awi-entry-msg", attrs: { role: "alert" } });
+    const auto = html("button", { text: "Auto", attrs: { type: "button", title: "Automatic radial range" } });
+    auto.addEventListener("click", () => this.setRMax(null));
+    this.rField.addEventListener("keydown", (e) => {
+      e.stopPropagation();
+      if (e.key !== "Enter") return;
+      e.preventDefault();
+      const r = checkEntry(this.rField.value, { min: Number.MIN_VALUE, max: Number.MAX_VALUE, unit: this.get("unit") || "", format: "%.4g" });
+      this.rMsg.textContent = r.ok ? "" : "Enter a positive number";
+      this.rField.toggleAttribute("aria-invalid", !r.ok);
+      if (r.ok) this.setRMax(r.value);
+    });
+    this.rRow = html("div", { cls: "awi-axes-panel" }, [html("span", { cls: "awi-axis-row" }, [html("b", { text: "r max" }), this.rField]), auto, this.rMsg]);
+    this.root.appendChild(this.rRow);
+    this.svgEl.addEventListener("wheel", (e) => {
+      if (!this.canZoom) return;
+      e.preventDefault();
+      this.setRMax(this.shownRMax * (e.deltaY < 0 ? 1 / 1.25 : 1.25));
+    }, { passive: false });
+  }
+
+  get canZoom() {
+    return !this.get("disabled") && this.stale === "live";
+  }
+
+  setRMax(v) {
+    if (!this.canZoom) return;
+    this.model.set("r_max", v);
+    this.model.save_changes();
     this.schedule();
   }
 
@@ -93,6 +130,8 @@ export class PolarView extends BaseView {
       if (t[t.length - 1] < rmax) rmax = t[t.length - 1] + (t[1] - t[0]);
       else rmax = t[t.length - 1];
     }
+    this.shownRMax = rmax;
+    if (this.rField && document.activeElement !== this.rField) this.rField.value = formatValue(rmax, "%.4g");
     const grid = svg("g", { class: "awi-polar-grid" });
     for (const v of niceTicks(0, rmax, this.get("rings")).filter((v) => v > 0)) {
       grid.appendChild(svg("circle", { cx: C, cy: C, r: (v / rmax) * R }));

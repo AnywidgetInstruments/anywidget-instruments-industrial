@@ -2,7 +2,7 @@
 // annotations and export (CHART-104..107).
 import { clear, html, safeColor } from "./dom.js";
 import { checkEntry } from "./entry.js";
-import { formatValue } from "./format.js";
+import { formatValue, parseEntry } from "./format.js";
 import { niceTicks, parseNumber } from "./scale.js";
 import { BaseView } from "./view.js";
 
@@ -52,6 +52,8 @@ export class PlotView extends BaseView {
     this.root.insertBefore(this.toolbar, this.body);
     // form entry for cursor positions (API-014): one field per cursor
     this.cursorBar = html("div", { cls: "awi-cursor-bar", attrs: { role: "group", "aria-label": "Cursor positions" } });
+    this.axesPanel = this.buildAxesPanel();
+    this.root.insertBefore(this.axesPanel, this.body);
     this.legend = html("div", { cls: "awi-legend" });
     this.root.append(this.cursorBar, this.legend);
     this.zoom = null;
@@ -84,11 +86,107 @@ export class PlotView extends BaseView {
     });
     btn("⤢ Reset", "Restore the full view", () => this.resetZoom());
     btn("⌖ Cursor", "Add a cursor", () => this.addCursor());
+    this.axesBtn = btn("↕ Axes", "Set the axis ranges", () => this.toggleAxesPanel());
     this.exportBtns = [
       btn("CSV", "Download data as CSV", () => this.exportCsv()),
       btn("PNG", "Download image as PNG", () => this.exportPng()),
       btn("SVG", "Download image as SVG", () => this.exportSvg()),
     ];
+  }
+
+  // -- axis ranges by form entry (CHART-108) --------------------------------------------
+  buildAxesPanel() {
+    const panel = html("div", { cls: "awi-axes-panel", attrs: { role: "group", "aria-label": "Axis ranges" } });
+    panel.hidden = true;
+    const field = (name) => {
+      const f = html("input", { cls: "awi-entry", attrs: { type: "text", inputmode: "decimal", "aria-label": name, "data-lm-suppress-shortcuts": "true" } });
+      f.addEventListener("keydown", (e) => {
+        e.stopPropagation();
+        if (e.key === "Enter") {
+          e.preventDefault();
+          this.applyAxes();
+        } else if (e.key === "Escape") this.toggleAxesPanel(false);
+      });
+      return f;
+    };
+    this.axisFields = { x0: field("X minimum"), x1: field("X maximum"), y0: field("Y minimum"), y1: field("Y maximum") };
+    this.axisUnits = { x: html("span", { cls: "awi-entry-unit" }), y: html("span", { cls: "awi-entry-unit" }) };
+    const apply = html("button", { text: "Apply", attrs: { type: "button" } });
+    apply.addEventListener("click", () => this.applyAxes());
+    const auto = html("button", { text: "Auto", attrs: { type: "button", title: "Full range and automatic scale" } });
+    auto.addEventListener("click", () => this.autoAxes());
+    this.axesMsg = html("div", { cls: "awi-entry-msg", attrs: { role: "alert" } });
+    const f = this.axisFields;
+    panel.append(
+      html("span", { cls: "awi-axis-row" }, [html("b", { text: "X" }), f.x0, html("span", { text: "…" }), f.x1, this.axisUnits.x]),
+      html("span", { cls: "awi-axis-row" }, [html("b", { text: "Y" }), f.y0, html("span", { text: "…" }), f.y1, this.axisUnits.y]),
+      apply,
+      auto,
+      this.axesMsg,
+    );
+    return panel;
+  }
+
+  toggleAxesPanel(open = this.axesPanel.hidden) {
+    this.axesPanel.hidden = !open;
+    this.axesBtn?.setAttribute("aria-pressed", String(open));
+    if (!open) return;
+    const r = this.ranges();
+    const fmt = (v) => formatValue(v, "%.4g");
+    const f = this.axisFields;
+    [f.x0.value, f.x1.value, f.y0.value, f.y1.value] = [fmt(r.x[0]), fmt(r.x[1]), fmt(r.y[0]), fmt(r.y[1])];
+    this.axisUnits.x.textContent = this.get("x_unit") || "";
+    this.axisUnits.y.textContent = this.get("unit") || "";
+    this.axesMsg.textContent = "";
+    f.x0.focus();
+  }
+
+  /** Charts whose Y scale is a synchronized setting (WaveformChart). */
+  get yIsSetting() {
+    return this.get("autoscale_y") !== undefined;
+  }
+
+  applyAxes() {
+    if (!this.canInteract) return;
+    const f = this.axisFields;
+    const read = (field, unit) => parseEntry(field.value, unit);
+    const [x0, x1] = [read(f.x0, this.get("x_unit") || ""), read(f.x1, this.get("x_unit") || "")];
+    const [y0, y1] = [read(f.y0, this.get("unit") || ""), read(f.y1, this.get("unit") || "")];
+    for (const [a, b, name] of [[x0, x1, "X"], [y0, y1, "Y"]]) {
+      if (!Number.isFinite(a) || !Number.isFinite(b)) return this.axisError(`${name}: enter two numbers`);
+      if (!(a < b)) return this.axisError(`${name}: the minimum must be below the maximum`);
+    }
+    this.axisError("");
+    const full = this.fullRange();
+    const span = full.x[1] - full.x[0] || 1;
+    const zoom = { fx: [(x0 - full.x[0]) / span, (x1 - full.x[0]) / span], y: [y0, y1] };
+    if (this.yIsSetting) {
+      // the Y range is a chart setting: the kernel keeps it (autoscale off)
+      zoom.y = null;
+      this.model.set("autoscale_y", false);
+      this.model.set("y_min", y0);
+      this.model.set("y_max", y1);
+      this.model.save_changes();
+    }
+    this.zoom = zoom;
+    this.schedule();
+  }
+
+  autoAxes() {
+    if (!this.canInteract) return;
+    this.zoom = null;
+    if (this.yIsSetting) {
+      this.model.set("autoscale_y", true);
+      this.model.save_changes();
+    }
+    this.axisError("");
+    this.toggleAxesPanel(false);
+    this.schedule();
+  }
+
+  axisError(reason) {
+    this.axesMsg.textContent = reason;
+    for (const field of Object.values(this.axisFields)) field.toggleAttribute("aria-invalid", !!reason);
   }
 
   /** Cursor position fields (API-014); fields being edited are left alone. */

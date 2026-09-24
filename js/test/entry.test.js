@@ -136,3 +136,39 @@ describe("selector list, valve position, cursor fields (API-014)", () => {
     expect(model.get("cursors")[0].x).toBe(-3.5);
   });
 });
+
+describe("axis ranges (CHART-108)", () => {
+  const CHART = { _kind: "waveformchart", mode: "indicator", history: 100, n_traces: 1, update_mode: "strip", y_min: -1, y_max: 1, autoscale_y: false, paused: false, dt: 0.1, x_unit: "s", unit: "V", traces: [], show_legend: true, cursors: [], cursor_values: [], annotations: [], export: true, size: [300, 150] };
+
+  it("typed Y limits become the chart setting; bad limits are rejected", async () => {
+    const { el, model } = mount(CHART);
+    model.emit("msg:custom", { type: "append", n_points: 2, total: 2 }, [new DataView(new Float32Array([0.1, 0.2]).buffer)]);
+    await tick();
+    el.querySelector('button[aria-label="Set the axis ranges"]').click();
+    const field = (name) => el.querySelector(`input[aria-label="${name}"]`);
+    field("Y minimum").value = "5";
+    field("Y maximum").value = "2";
+    field("Y maximum").dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+    expect(el.querySelector(".awi-axes-panel .awi-entry-msg").textContent).toBe("Y: the minimum must be below the maximum");
+    expect(model.get("y_min")).toBe(-1);
+    field("Y minimum").value = "-250 mV";
+    field("Y maximum").value = "2";
+    field("Y maximum").dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+    expect([model.get("y_min"), model.get("y_max"), model.get("autoscale_y")]).toEqual([-0.25, 2, false]);
+    el.querySelector(".awi-axes-panel button:last-of-type").click(); // Auto
+    expect(model.get("autoscale_y")).toBe(true);
+  });
+
+  it("PolarPlot radial range: typed maximum and Auto", async () => {
+    const { el, model } = mount({ _kind: "polar", mode: "indicator", value: [{ name: "p", color: "", style: "line", r: [1, 2], theta: [0, 90] }], show_legend: true, angle_unit: "deg", zero: "E", direction: "ccw", r_max: null, rings: 4, unit: "", size: [220, 220] });
+    await tick();
+    const field = el.querySelector('input[aria-label="Radial range maximum"]');
+    expect(field.value).toBe("2");
+    field.value = "-1";
+    field.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+    expect(model.get("r_max")).toBe(null);
+    field.value = "5";
+    field.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+    expect(model.get("r_max")).toBe(5);
+  });
+});

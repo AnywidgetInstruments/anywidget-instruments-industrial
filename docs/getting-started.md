@@ -82,6 +82,8 @@ Every control can be operated in two ways (API-014): directly on its drawing
 | `PIDFaceplate` | drag the SP marker (AUTO) or the OP bar (MAN) | SP / OP fields |
 | `Valve` (control valve, faceplate) | position slider | position field |
 | Graph cursors | drag the cursor | cursor position field |
+| Graph axis ranges (CHART-108) | zoom box, pan, wheel; double-click resets | **↕ Axes**: X and Y limits, Apply, Auto |
+| `PolarPlot` radial range | mouse wheel on the plot | **r max** field, Auto |
 
 The value field accepts `12.5`, `12,5`, `1e3`, SI prefixes (`4.7 k`, `250 m`)
 and the widget unit (`250 mV` for a unit of `V`). A confirmed entry (Enter, or

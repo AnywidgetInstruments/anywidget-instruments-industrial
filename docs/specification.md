@@ -201,6 +201,7 @@ Requirements use identifiers `<GROUP>-<NNN>` with priorities:
 | CHART-105 | C | Every graph widget shall support text annotations anchored to data coordinates. |
 | CHART-106 | S | When the user uses the zoom tool on a graph, the graph shall zoom on the selected region, and when the user double-clicks, the graph shall restore the full view. |
 | CHART-107 | C | Where `export` is enabled, a graph widget shall let the user download the displayed data as CSV and the image as PNG or SVG. |
+| CHART-108 | S | The user shall be able to change the displayed range of each axis of a graph both on the plot (zoom, pan, mouse wheel) and by typing its limits; for graphs whose scale is a setting (`y_min`, `y_max`, `autoscale_y`, `r_max`), the typed limits shall update that setting in the kernel. |
 
 ---
 
@@ -474,4 +475,4 @@ state model).
 | 0.2 | Moved into the repository; DOC-003 withdrawn; component traceability table made product-neutral. |
 | 0.3 | Industrial operator objects (IND): analog indicator, selector switch, stack light, PID faceplate, annunciator, alarm list, state machine. |
 | 0.4 | DOC-007: safety notice. |
-| 0.5 | API-014 (graphic and form entry for every control), NUM-010 (numeric entry field with range check). |
+| 0.5 | API-014 (graphic and form entry for every control), NUM-010 (numeric entry field with range check), CHART-108 (axis ranges set by the user). |

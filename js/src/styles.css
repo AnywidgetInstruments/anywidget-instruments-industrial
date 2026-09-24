@@ -184,6 +184,10 @@
 .awi-root .awi-entry:disabled { opacity: 0.6; }
 .awi-root .awi-choice { font: inherit; font-size: 12px; padding: 1px 4px; border: 1px solid var(--awi-face-stroke); border-radius: 3px; background: var(--awi-plot-bg); color: var(--awi-fg); }
 .awi-root .awi-fp-position { align-items: center; }
+.awi-root .awi-axes-panel { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 11px; max-width: var(--awi-w); padding: 2px 0; }
+.awi-root .awi-axes-panel .awi-entry { width: 7ch; font-size: 11px; }
+.awi-root .awi-axis-row { display: inline-flex; align-items: baseline; gap: 4px; }
+.awi-root .awi-axes-panel button { font: inherit; font-size: 10px; padding: 1px 6px; border-radius: 3px; border: 1px solid var(--awi-face-stroke); background: var(--awi-face); color: var(--awi-fg); cursor: pointer; }
 .awi-root .awi-cursor-bar { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 11px; max-width: var(--awi-w); }
 .awi-root .awi-cursor-field { display: inline-flex; align-items: baseline; gap: 4px; }
 .awi-root .awi-cursor-bar .awi-entry { width: 7ch; font-size: 11px; }

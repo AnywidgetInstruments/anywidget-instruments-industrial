@@ -266,4 +266,23 @@ test.describe("every widget", () => {
     await field.press("Enter");
     await expect.poll(() => py('print(W["WaveformChart"].cursors[0]["x"])')).toBe("2.0");
   });
+
+  test("WaveformChart: typed axis ranges reach the kernel (CHART-108)", async () => {
+    const w = widget(page, "WaveformChart");
+    await w.scrollIntoViewIfNeeded();
+    await w.getByRole("button", { name: "Set the axis ranges" }).click();
+    await w.getByRole("textbox", { name: "Y minimum" }).fill("-2");
+    await w.getByRole("textbox", { name: "Y maximum" }).fill("8");
+    await w.getByRole("button", { name: "Apply" }).click();
+    await expect.poll(() => py('print(W["WaveformChart"].y_min, W["WaveformChart"].y_max, W["WaveformChart"].autoscale_y)')).toBe("-2.0 8.0 False");
+  });
+
+  test("PolarPlot: typed radial range (CHART-108)", async () => {
+    const w = widget(page, "PolarPlot");
+    await w.scrollIntoViewIfNeeded();
+    const field = w.getByRole("textbox", { name: "Radial range maximum" });
+    await field.fill("5");
+    await field.press("Enter");
+    await expect.poll(() => py('print(W["PolarPlot"].r_max)')).toBe("5.0");
+  });
 });
