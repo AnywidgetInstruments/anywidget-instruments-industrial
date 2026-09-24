@@ -134,7 +134,7 @@ export class PlotView extends BaseView {
     const r = this.ranges();
     const fmt = (v) => formatValue(v, "%.4g");
     const f = this.axisFields;
-    [f.x0.value, f.x1.value, f.y0.value, f.y1.value] = [fmt(r.x[0]), fmt(r.x[1]), fmt(r.y[0]), fmt(r.y[1])];
+    [f.x0.value, f.x1.value, f.y0.value, f.y1.value] = [this.xText(r.x[0]), this.xText(r.x[1]), fmt(r.y[0]), fmt(r.y[1])];
     this.axisUnits.x.textContent = this.get("x_unit") || "";
     this.axisUnits.y.textContent = this.get("unit") || "";
     this.axesMsg.textContent = "";
@@ -150,7 +150,7 @@ export class PlotView extends BaseView {
     if (!this.canInteract) return;
     const f = this.axisFields;
     const read = (field, unit) => parseEntry(field.value, unit);
-    const [x0, x1] = [read(f.x0, this.get("x_unit") || ""), read(f.x1, this.get("x_unit") || "")];
+    const [x0, x1] = [this.parseX(f.x0.value), this.parseX(f.x1.value)];
     const [y0, y1] = [read(f.y0, this.get("unit") || ""), read(f.y1, this.get("unit") || "")];
     for (const [a, b, name] of [[x0, x1, "X"], [y0, y1, "Y"]]) {
       if (!Number.isFinite(a) || !Number.isFinite(b)) return this.axisError(`${name}: enter two numbers`);
@@ -221,15 +221,14 @@ export class PlotView extends BaseView {
       unitEl.textContent = unit;
       field.setAttribute("aria-label", `Position of cursor ${cur.name || i + 1}`);
       field.disabled = !this.canInteract;
-      if (document.activeElement !== field) field.value = formatValue(parseNumber(cur.x), "%.4g");
+      if (document.activeElement !== field) field.value = this.xText(parseNumber(cur.x));
     });
     this.cursorBar.hidden = cursors.length === 0;
   }
 
   setCursorFromField(i, field, msg) {
     if (!this.canInteract) return;
-    const [a, b] = this.fullRange().x;
-    const r = checkEntry(field.value, { min: Math.min(a, b), max: Math.max(a, b), unit: this.get("x_unit") || "", format: "%.4g" });
+    const r = this.checkX(field.value);
     msg.textContent = r.ok ? "" : r.reason;
     field.toggleAttribute("aria-invalid", !r.ok);
     if (!r.ok) return;
@@ -238,6 +237,28 @@ export class PlotView extends BaseView {
     this.model.save_changes();
     field.blur();
     this.schedule();
+  }
+
+  // -- x-axis values as text (time axes override these) ---------------------------------
+  /** Text of an x value in the entry fields. */
+  xText(v) {
+    return formatValue(v, "%.4g");
+  }
+
+  /** x value typed in an entry field (NaN if not understood). */
+  parseX(text) {
+    return parseEntry(text, this.get("x_unit") || "");
+  }
+
+  /** Check a typed x value against the full x range (API-014). */
+  checkX(text) {
+    const [a, b] = this.fullRange().x;
+    return checkEntry(text, { min: Math.min(a, b), max: Math.max(a, b), unit: this.get("x_unit") || "", format: "%.4g" });
+  }
+
+  /** Tick positions of the x axis. */
+  xTicks(a, b) {
+    return niceTicks(a, b, 5);
   }
 
   resetZoom() {
@@ -453,7 +474,7 @@ export class PlotView extends BaseView {
     }
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
-    for (const v of niceTicks(r.x[0], r.x[1], 5)) {
+    for (const v of this.xTicks(r.x[0], r.x[1])) {
       const x = Math.round(X(v)) + 0.5;
       ctx.beginPath(); ctx.moveTo(x, area.y); ctx.lineTo(x, area.y + area.h); ctx.stroke();
       ctx.fillText(this.xLabel(v), x, area.y + area.h + 4);
@@ -566,7 +587,7 @@ export class PlotView extends BaseView {
       root.appendChild(el("line", { x1: area.x, x2: area.x + area.w, y1: Y(v), y2: Y(v), stroke: colors.grid }));
       root.appendChild(el("text", { x: area.x - 4, y: Y(v), "text-anchor": "end", "dominant-baseline": "middle", fill: colors.fg }, formatValue(v, "%.3g")));
     }
-    for (const v of niceTicks(r.x[0], r.x[1], 5)) {
+    for (const v of this.xTicks(r.x[0], r.x[1])) {
       root.appendChild(el("line", { x1: X(v), x2: X(v), y1: area.y, y2: area.y + area.h, stroke: colors.grid }));
       root.appendChild(el("text", { x: X(v), y: area.y + area.h + 14, "text-anchor": "middle", fill: colors.fg }, this.xLabel(v)));
     }

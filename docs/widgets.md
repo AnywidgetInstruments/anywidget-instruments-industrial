@@ -14,6 +14,7 @@ by default; every widget switches with `mode`.
 | Indicators, analog | `Gauge`, `Meter`, `VUMeter`, `Tank`, `Thermometer`, `SevenSegment`, `Compass`, `AnalogIndicator` (I) | ISA-101 (`AnalogIndicator`) |
 | Indicators, discrete | `LED`, `StackLight` (I) | IEC 60073 |
 | Graphs, time | `WaveformChart`, `IntensityChart`, `DigitalWaveformGraph`, `MixedSignalGraph` (I) | |
+| Graphs, trends | `TrendChart` | ISA-101 |
 | Graphs, specialized | `PolarPlot`, `SmithChart`, `RadarChart`, `PictureControl` | |
 | Alarms and events | `AlarmIndicator`, `AlarmBanner`, `AlarmList`, `Annunciator` | ISA-18.1, ISA-18.2 / IEC 62682 |
 | Process symbols | `Valve`, `Pump`, `Motor`, `Pipe` (faceplates) | ISA-5.1 (symbols) |
@@ -169,3 +170,32 @@ machine.state_complete()  # the kernel ends acting states
 | `StateMachine` | commands valid in the current state |
 
 ![Filling line](img/filling_line.png)
+
+## Trends, instruments and compact indicators
+
+Objects of supervision screens (IND-070 .. IND-104).
+
+### TrendChart
+
+Named pens against wall-clock time, each on its own scale; the vertical axis
+shows the scale of the selected pen (click its legend entry). Alarm limits
+are dashed lines and the setpoint a dotted line. The chart follows the latest
+data (● LIVE); the ◀ ▶ buttons, the zoom and the span list browse the
+history (❚❚ HISTORY) until **● Live** is pressed. Times are Unix seconds and
+travel as binary float64; cursors and axis fields take local times
+(`HH:MM:SS` or `YYYY-MM-DD HH:MM:SS`).
+
+```python
+trend = ai.TrendChart(
+    pens=[
+        {"name": "LT-101", "unit": "m", "min": 0, "max": 4, "hi": 3.0, "setpoint": 2.2},
+        {"name": "FT-101", "unit": "L/s", "min": 0, "max": 60},
+    ],
+    span=600,  # seconds shown in live mode
+)
+trend.add("LT-101", 2.31)  # now
+trend.add_many({"LT-101": 2.32, "FT-101": 24.0})
+trend.add("FT-101", values, time=timestamps)  # arrays
+times, values = trend.data("LT-101")
+```
+

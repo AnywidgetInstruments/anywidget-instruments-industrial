@@ -59,6 +59,7 @@ from ._style import (
     theme_switch,
 )
 from ._themeswitch import THEME_SWITCH_POSITIONS, ThemeSwitch
+from ._trend import TrendChart
 
 __version__ = "0.1.0.dev0"
 
@@ -125,6 +126,7 @@ __all__ = [
     "ThemeSwitch",
     "Thermometer",
     "ToggleSwitch",
+    "TrendChart",
     "VUMeter",
     "Valve",
     "WaveformChart",

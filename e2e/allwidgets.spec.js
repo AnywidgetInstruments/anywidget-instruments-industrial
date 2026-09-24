@@ -115,6 +115,19 @@ test.describe("every widget", () => {
     });
   }
 
+  test("TrendChart: both directions (IND-071, IND-072)", async () => {
+    const w = widget(page, "TrendChart");
+    await w.scrollIntoViewIfNeeded();
+    await py('W["TrendChart"].add("LT", [1.0, 2.5], time=[1767254400.0, 1767254405.0])');
+    await expect(w.locator(":scope > .awi-body")).toHaveAttribute("aria-label", "TrendChart: LT 2.5 m");
+    await w.getByRole("combobox", { name: "Time span" }).selectOption("3600");
+    await expect.poll(() => py('print(W["TrendChart"].span)')).toBe("3600.0");
+    await w.getByRole("button", { name: "Earlier" }).click();
+    await expect(w.locator(":scope > .awi-body")).toHaveAttribute("aria-label", /\(history\)/);
+    await w.getByRole("button", { name: "Follow the latest data" }).click();
+    await expect(w.locator(":scope > .awi-body")).not.toHaveAttribute("aria-label", /history/);
+  });
+
   test("Pipe: kernel -> front", async () => {
     await widget(page, "Pipe").scrollIntoViewIfNeeded();
     await py('W["Pipe"].value = True');

@@ -632,3 +632,10 @@
 .awi-root .awi-theme-opt.awi-on { background: var(--awi-fg); color: var(--awi-face); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
 .awi-root .awi-theme-opt:focus-visible { outline: 2px solid var(--awi-accent); outline-offset: -3px; }
 .awi-root .awi-theme-opt:disabled { cursor: not-allowed; opacity: 0.6; }
+
+/* trend chart (IND-070..075) */
+.awi-root .awi-trend-nav { display: inline-flex; gap: 4px; margin-right: auto; }
+.awi-root .awi-toolbar:has(.awi-trend-nav) { align-self: stretch; }
+.awi-root .awi-trend-nav .awi-choice { font-size: 10px; }
+.awi-root button.awi-pen { font: inherit; font-size: 11px; padding: 1px 6px; border: 1px solid transparent; border-radius: 3px; background: none; color: var(--awi-fg); cursor: pointer; }
+.awi-root button.awi-pen[aria-pressed="true"] { border-color: var(--awi-face-stroke); font-weight: 700; }

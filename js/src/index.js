@@ -19,6 +19,7 @@ import { RotaryView } from "./widgets/rotary.js";
 import { SevenSegmentView } from "./widgets/sevensegment.js";
 import { StateMachineView } from "./widgets/statemachine.js";
 import { ThemeSwitchView } from "./widgets/themeswitch.js";
+import { TrendView } from "./widgets/trend.js";
 
 const VIEWS = {
   knob: RotaryView,
@@ -60,6 +61,7 @@ const VIEWS = {
   alarmlist: AlarmListView,
   statemachine: StateMachineView,
   themeswitch: ThemeSwitchView,
+  trendchart: TrendView,
 };
 
 function render({ model, el }) {

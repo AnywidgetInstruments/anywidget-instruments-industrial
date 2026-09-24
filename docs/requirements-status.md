@@ -117,7 +117,7 @@ JupyterLab / Notebook 7 / marimo (`e2e/`).
 | IND-040 … IND-043 | S | ✅ | Annunciator: ISA-18.1 sequences A, M, R with lock-in, first out, horn, Silence / Ack / Reset / Test |
 | IND-050 … IND-053 | S | ✅ | AlarmList: sort and filter, timed shelving with automatic unshelving, suppressed / out of service |
 | IND-060 … IND-063 | S/C | ✅ | StateMachine: PackML model (17 states), valid commands only, `state_complete()`, custom models |
-| IND-070 … IND-075 | S/C | ⬜ | TrendChart |
+| IND-070 … IND-075 | S/C | ✅ | `TrendChart`: pens with own scales, float64 times over binary buffers, live / history (◀ ▶, zoom, span, Live), limit and setpoint lines, `history` bound, cursors, time entry, CSV / PNG / SVG (py, js, e2e) |
 | IND-080 … IND-083 | S/C | ⬜ | Transmitter |
 | IND-090 … IND-093 | S/C | ⬜ | EventLog |
 | IND-100 … IND-104 | S | ⬜ | DeviationIndicator, Sparkline, BarGraph, KPITile, NumericEntry |

@@ -8,3 +8,4 @@ function bytesOf(b) {
 
 export const toFloat32 = (b) => new Float32Array(bytesOf(b));
 export const toUint8 = (b) => new Uint8Array(bytesOf(b));
+export const toFloat64 = (b) => new Float64Array(bytesOf(b));

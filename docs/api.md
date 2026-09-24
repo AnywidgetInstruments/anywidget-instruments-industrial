@@ -80,6 +80,10 @@ Generated from the docstrings (DOC-001).
 ::: anywidget_instruments.AlarmList
 ::: anywidget_instruments.StateMachine
 
+## Trends, instruments and compact indicators
+
+::: anywidget_instruments.TrendChart
+
 ## Utilities
 
 ::: anywidget_instruments.sanitize_svg
