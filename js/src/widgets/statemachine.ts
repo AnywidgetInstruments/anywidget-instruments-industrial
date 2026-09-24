@@ -1,13 +1,17 @@
 // Machine state model (IND-060..063): state diagram with the current state
 // highlighted and the commands valid in that state.
+import { hostOwnsState, machineOf } from "../contract/derived.js";
+import { type Machine, nextState } from "../contract/statemachine.js";
 import { clear, html, svg, svgText } from "../core/dom.js";
+import type { AnyModel } from "../core/model.js";
 import { BaseView } from "../core/view.js";
+import type { StateMachineTraits } from "../generated/contract.js";
 
 const SC = "SC";
 const FROM_ANY = new Set(["Stop", "Abort"]); // drawn as a note, not as arrows
 
 /** Point where the segment from (x0, y0) to the centre (x1, y1) enters a w×h box. */
-export function boxEdge(x0, y0, x1, y1, w, h) {
+export function boxEdge(x0: number, y0: number, x1: number, y1: number, w: number, h: number): [number, number] {
   const dx = x0 - x1;
   const dy = y0 - y1;
   if (dx === 0 && dy === 0) return [x1, y1];
@@ -15,23 +19,53 @@ export function boxEdge(x0, y0, x1, y1, w, h) {
   return [x1 + dx * k, y1 + dy * k];
 }
 
-export class StateMachineView extends BaseView {
-  constructor(model, el) {
+export class StateMachineView extends BaseView<StateMachineTraits> {
+  readonly svgEl: SVGElement;
+  readonly statusEl: HTMLDivElement;
+  readonly bar: HTMLDivElement;
+  protected _shown: string | undefined;
+
+  constructor(model: AnyModel<StateMachineTraits>, el: HTMLElement) {
     super(model, el, ["value", "machine", "available_commands", "last_command"]);
     this.svgEl = svg("svg", { class: "awi-svg awi-sm-diagram", "aria-hidden": "true" });
     this.statusEl = html("div", { cls: "awi-sm-status", attrs: { role: "status" } });
     this.bar = html("div", { cls: "awi-sm-commands", attrs: { role: "group", "aria-label": "Commands" } });
     this.body.append(this.svgEl, this.statusEl, this.bar);
     this.body.setAttribute("role", "group");
-    this.listen("msg:custom", (msg) => {
-      if (msg && msg.type === "rejected") this.statusEl.textContent = `✖ ${msg.command} not allowed in ${msg.state}`;
+    this.listen("msg:custom", (msg: { type?: string; command?: string; state?: string } | null) => {
+      if (msg && msg.type === "rejected") this.reject(String(msg.command), String(msg.state));
     });
     this.schedule();
   }
 
-  draw() {
-    const m = this.get("machine") || { states: [], transitions: [], commands: [] };
-    const current = this.get("value");
+  get machine(): Machine {
+    return this.contract ? machineOf(this.model as unknown as AnyModel, this.contract) : (this.get("machine") as unknown as Machine);
+  }
+
+  reject(command: string, state: string): void {
+    this.statusEl.textContent = `✖ ${command} not allowed in ${state}`;
+  }
+
+  /**
+   * Operator command (IND-061): always sent to the host; applied by the front
+   * end when no host owns the state (HOST-004).
+   */
+  command(c: string): void {
+    if (!this.interactive) return;
+    this.model.send({ type: "command", command: c });
+    const model = this.model as unknown as AnyModel;
+    if (hostOwnsState(model)) return;
+    const state = String(this.get("value"));
+    const next = nextState(this.machine, state, c);
+    if (next === null) return this.reject(c, state);
+    model.set("last_command", c);
+    model.set("value", next); // available_commands follows (contract/derived.ts)
+    model.save_changes();
+  }
+
+  override draw(): void {
+    const m = this.machine;
+    const current = String(this.get("value"));
     const available = new Set(this.get("available_commands") || []);
     const [w, h] = this.get("size");
     const dh = Math.max(80, h - 62);
@@ -45,7 +79,7 @@ export class StateMachineView extends BaseView {
     const ch = dh / rows;
     const bw = Math.min(cw - 14, 110);
     const bh = Math.min(ch - 12, 30);
-    const centre = {};
+    const centre: Record<string, [number, number]> = {};
     for (const st of m.states) centre[st.name] = [cw * (st.x + 0.5), ch * (st.y + 0.5)];
 
     // transitions (Stop / Abort from any state are summarised in the legend)
@@ -53,7 +87,7 @@ export class StateMachineView extends BaseView {
       svg("marker", { id: `${this.id}-arrow`, viewBox: "0 0 8 8", refX: 7, refY: 4, markerWidth: 7, markerHeight: 7, markerUnits: "userSpaceOnUse", orient: "auto-start-reverse" }, [svg("path", { class: "awi-sm-arrowhead", d: "M0 0L8 4L0 8Z" })]),
     ]);
     s.appendChild(defs);
-    const drawn = new Set();
+    const drawn = new Set<string>();
     for (const [from, cmd, to] of m.transitions || []) {
       if (FROM_ANY.has(cmd) || !centre[from] || !centre[to] || drawn.has(`${from}>${to}`)) continue;
       drawn.add(`${from}>${to}`);
@@ -85,7 +119,7 @@ export class StateMachineView extends BaseView {
       const ok = available.has(c);
       const btn = html("button", { cls: "awi-sm-cmd", text: c, attrs: { type: "button", "aria-disabled": String(!ok) } });
       btn.disabled = !control || !ok || !!this.get("disabled");
-      btn.addEventListener("click", () => this.interactive && ok && this.model.send({ type: "command", command: c }));
+      btn.addEventListener("click", () => ok && this.command(c));
       this.bar.appendChild(btn);
     }
     this.bar.hidden = !control;

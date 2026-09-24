@@ -7,7 +7,7 @@ from typing import Any
 
 import traitlets as t
 
-from ._base import InstrumentWidget
+from ._base import InstrumentWidget, size_trait
 
 #: Pseudo-command for the end of an acting state ("state complete").
 SC = "SC"
@@ -149,8 +149,10 @@ class StateMachine(InstrumentWidget):
 
     _kind = t.Unicode("statemachine").tag(sync=True)
     _default_size = (560, 250)
+    size = size_trait(*_default_size)
     value = t.Unicode("", read_only=True).tag(sync=True)
-    machine = t.Dict().tag(sync=True)
+    #: The class default is the PackML model, so hosts reading class defaults get it.
+    machine = t.Dict(default_value=copy.deepcopy(PACKML_MODEL)).tag(sync=True)
     available_commands = t.List(t.Unicode(), read_only=True).tag(sync=True)
     last_command = t.Unicode("", read_only=True).tag(sync=True)
 

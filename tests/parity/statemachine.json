@@ -1,0 +1,29 @@
+{
+  "description": "Machine state model (IND-060 .. IND-063): models as the kernel stores them, and operator command sequences. Each step is [command, expected state, expected available commands]; a command that is not valid keeps the state. \"SC\" completes an acting state (a host event).",
+  "normalize": [
+    { "model": { "states": [{ "name": "Off" }, { "name": "On", "acting": true }], "transitions": [["Off", "Start", "On"], ["On", "Stop", "Off"]] },
+      "expected": { "states": [{ "name": "Off", "x": 0, "y": 0, "acting": false }, { "name": "On", "x": 1, "y": 0, "acting": true }], "transitions": [["Off", "Start", "On"], ["On", "Stop", "Off"]], "commands": ["Start", "Stop"], "initial": "Off" } },
+    { "model": { "states": [{ "name": "A" }, { "name": "B" }, { "name": "C" }, { "name": "D" }, { "name": "E" }, { "name": "F" }], "transitions": [["A", "SC", "B"]], "commands": ["Go"], "initial": "F" },
+      "expected": { "states": [{ "name": "A", "x": 0, "y": 0, "acting": false }, { "name": "B", "x": 1, "y": 0, "acting": false }, { "name": "C", "x": 2, "y": 0, "acting": false }, { "name": "D", "x": 3, "y": 0, "acting": false }, { "name": "E", "x": 4, "y": 0, "acting": false }, { "name": "F", "x": 0, "y": 1, "acting": false }], "transitions": [["A", "SC", "B"]], "commands": ["Go"], "initial": "F" } }
+  ],
+  "invalid": [
+    { "states": [] },
+    { "states": [{ "name": "A" }, { "name": "A" }] },
+    { "states": [{ "name": "A" }], "transitions": [["A", "Go", "Z"]] },
+    { "states": [{ "name": "A" }], "initial": "Z" }
+  ],
+  "sequences": [
+    { "name": "PackML start-up", "model": null, "steps": [
+      ["Start", "Stopped", ["Reset", "Abort"]],
+      ["Reset", "Resetting", ["Stop", "Abort"]],
+      ["SC", "Idle", ["Start", "Stop", "Abort"]],
+      ["Start", "Starting", ["Stop", "Abort"]],
+      ["SC", "Execute", ["Stop", "Hold", "Suspend", "Abort"]],
+      ["Hold", "Holding", ["Stop", "Abort"]],
+      ["Abort", "Aborting", []] ] },
+    { "name": "custom model", "model": { "states": [{ "name": "Off" }, { "name": "On" }], "transitions": [["Off", "Start", "On"], ["On", "Stop", "Off"]] }, "steps": [
+      ["Stop", "Off", ["Start"]],
+      ["Start", "On", ["Stop"]],
+      ["Stop", "Off", ["Start"]] ] }
+  ]
+}

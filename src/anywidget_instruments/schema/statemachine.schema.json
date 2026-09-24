@@ -1,0 +1,471 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://s-celles.github.io/anywidget-instruments/schema/statemachine.schema.json",
+  "title": "StateMachine",
+  "description": "Machine state model with operator commands, PackML (ISA-TR88.00.02) by default (IND-060 .. IND-063).",
+  "type": "object",
+  "x-awi-class": "StateMachine",
+  "allOf": [
+    {
+      "$ref": "instrument.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "statemachine",
+      "default": "statemachine",
+      "x-awi-writer": "host"
+    },
+    "size": {
+      "default": [
+        560,
+        250
+      ]
+    },
+    "machine": {
+      "type": "object",
+      "properties": {
+        "states": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "x": {
+                "type": "number"
+              },
+              "y": {
+                "type": "number"
+              },
+              "acting": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "transitions": {
+          "type": "array",
+          "items": {
+            "type": "array"
+          }
+        },
+        "commands": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "initial": {
+          "type": "string"
+        }
+      },
+      "description": "State model: {states: [{name, x, y, acting}], transitions: [[from, command, to]], commands, initial}; the command SC completes an acting state (a host event). Missing positions, acting flags, commands and initial state are completed as the kernel does; an invalid model reads as this default (PackML).",
+      "default": {
+        "states": [
+          {
+            "name": "Idle",
+            "x": 0,
+            "y": 0,
+            "acting": false
+          },
+          {
+            "name": "Starting",
+            "x": 1,
+            "y": 0,
+            "acting": true
+          },
+          {
+            "name": "Execute",
+            "x": 2,
+            "y": 0,
+            "acting": false
+          },
+          {
+            "name": "Completing",
+            "x": 3,
+            "y": 0,
+            "acting": true
+          },
+          {
+            "name": "Complete",
+            "x": 4,
+            "y": 0,
+            "acting": false
+          },
+          {
+            "name": "Resetting",
+            "x": 0,
+            "y": 1,
+            "acting": true
+          },
+          {
+            "name": "Unholding",
+            "x": 1,
+            "y": 1,
+            "acting": true
+          },
+          {
+            "name": "Held",
+            "x": 2,
+            "y": 1,
+            "acting": false
+          },
+          {
+            "name": "Holding",
+            "x": 3,
+            "y": 1,
+            "acting": true
+          },
+          {
+            "name": "Unsuspending",
+            "x": 1,
+            "y": 2,
+            "acting": true
+          },
+          {
+            "name": "Suspended",
+            "x": 2,
+            "y": 2,
+            "acting": false
+          },
+          {
+            "name": "Suspending",
+            "x": 3,
+            "y": 2,
+            "acting": true
+          },
+          {
+            "name": "Stopped",
+            "x": 0,
+            "y": 3,
+            "acting": false
+          },
+          {
+            "name": "Stopping",
+            "x": 1,
+            "y": 3,
+            "acting": true
+          },
+          {
+            "name": "Clearing",
+            "x": 2,
+            "y": 3,
+            "acting": true
+          },
+          {
+            "name": "Aborted",
+            "x": 3,
+            "y": 3,
+            "acting": false
+          },
+          {
+            "name": "Aborting",
+            "x": 4,
+            "y": 3,
+            "acting": true
+          }
+        ],
+        "transitions": [
+          [
+            "Stopped",
+            "Reset",
+            "Resetting"
+          ],
+          [
+            "Resetting",
+            "SC",
+            "Idle"
+          ],
+          [
+            "Idle",
+            "Start",
+            "Starting"
+          ],
+          [
+            "Starting",
+            "SC",
+            "Execute"
+          ],
+          [
+            "Execute",
+            "SC",
+            "Completing"
+          ],
+          [
+            "Completing",
+            "SC",
+            "Complete"
+          ],
+          [
+            "Complete",
+            "Reset",
+            "Resetting"
+          ],
+          [
+            "Execute",
+            "Hold",
+            "Holding"
+          ],
+          [
+            "Holding",
+            "SC",
+            "Held"
+          ],
+          [
+            "Held",
+            "Unhold",
+            "Unholding"
+          ],
+          [
+            "Unholding",
+            "SC",
+            "Execute"
+          ],
+          [
+            "Execute",
+            "Suspend",
+            "Suspending"
+          ],
+          [
+            "Suspending",
+            "SC",
+            "Suspended"
+          ],
+          [
+            "Suspended",
+            "Unsuspend",
+            "Unsuspending"
+          ],
+          [
+            "Unsuspending",
+            "SC",
+            "Execute"
+          ],
+          [
+            "Stopping",
+            "SC",
+            "Stopped"
+          ],
+          [
+            "Aborting",
+            "SC",
+            "Aborted"
+          ],
+          [
+            "Aborted",
+            "Clear",
+            "Clearing"
+          ],
+          [
+            "Clearing",
+            "SC",
+            "Stopped"
+          ],
+          [
+            "Idle",
+            "Stop",
+            "Stopping"
+          ],
+          [
+            "Idle",
+            "Abort",
+            "Aborting"
+          ],
+          [
+            "Starting",
+            "Stop",
+            "Stopping"
+          ],
+          [
+            "Starting",
+            "Abort",
+            "Aborting"
+          ],
+          [
+            "Execute",
+            "Stop",
+            "Stopping"
+          ],
+          [
+            "Execute",
+            "Abort",
+            "Aborting"
+          ],
+          [
+            "Completing",
+            "Stop",
+            "Stopping"
+          ],
+          [
+            "Completing",
+            "Abort",
+            "Aborting"
+          ],
+          [
+            "Complete",
+            "Stop",
+            "Stopping"
+          ],
+          [
+            "Complete",
+            "Abort",
+            "Aborting"
+          ],
+          [
+            "Resetting",
+            "Stop",
+            "Stopping"
+          ],
+          [
+            "Resetting",
+            "Abort",
+            "Aborting"
+          ],
+          [
+            "Unholding",
+            "Stop",
+            "Stopping"
+          ],
+          [
+            "Unholding",
+            "Abort",
+            "Aborting"
+          ],
+          [
+            "Held",
+            "Stop",
+            "Stopping"
+          ],
+          [
+            "Held",
+            "Abort",
+            "Aborting"
+          ],
+          [
+            "Holding",
+            "Stop",
+            "Stopping"
+          ],
+          [
+            "Holding",
+            "Abort",
+            "Aborting"
+          ],
+          [
+            "Unsuspending",
+            "Stop",
+            "Stopping"
+          ],
+          [
+            "Unsuspending",
+            "Abort",
+            "Aborting"
+          ],
+          [
+            "Suspended",
+            "Stop",
+            "Stopping"
+          ],
+          [
+            "Suspended",
+            "Abort",
+            "Aborting"
+          ],
+          [
+            "Suspending",
+            "Stop",
+            "Stopping"
+          ],
+          [
+            "Suspending",
+            "Abort",
+            "Aborting"
+          ],
+          [
+            "Stopped",
+            "Abort",
+            "Aborting"
+          ],
+          [
+            "Stopping",
+            "Abort",
+            "Aborting"
+          ],
+          [
+            "Clearing",
+            "Abort",
+            "Aborting"
+          ]
+        ],
+        "commands": [
+          "Start",
+          "Stop",
+          "Hold",
+          "Unhold",
+          "Suspend",
+          "Unsuspend",
+          "Reset",
+          "Abort",
+          "Clear"
+        ],
+        "initial": "Stopped"
+      },
+      "x-awi-writer": "host"
+    },
+    "value": {
+      "type": "string",
+      "description": "Current state. Empty or unknown: the initial state of the model. Written by the host, or by the front end when it applies an operator command without a host (HOST-004).",
+      "default": "",
+      "readOnly": true,
+      "x-awi-resolved": true,
+      "x-awi-writer": "derived"
+    },
+    "available_commands": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Commands valid in the current state (IND-061). Derived from machine and value.",
+      "default": [],
+      "readOnly": true,
+      "x-awi-resolved": true,
+      "x-awi-writer": "derived"
+    },
+    "last_command": {
+      "type": "string",
+      "description": "Last command applied.",
+      "default": "",
+      "readOnly": true,
+      "x-awi-writer": "derived"
+    }
+  },
+  "x-awi-messages": [
+    {
+      "type": "command",
+      "direction": "front-to-host",
+      "description": "Operator command (only those in available_commands are offered). Also sent when the front end applies it itself.",
+      "fields": {
+        "command": {
+          "type": "string"
+        }
+      },
+      "buffers": []
+    },
+    {
+      "type": "rejected",
+      "direction": "host-to-front",
+      "description": "A command that is not valid in the current state.",
+      "fields": {
+        "command": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        }
+      },
+      "buffers": []
+    }
+  ]
+}

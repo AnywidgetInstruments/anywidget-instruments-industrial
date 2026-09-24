@@ -216,7 +216,7 @@ describe("StateMachine (IND-060..063)", () => {
   });
 
   it("highlights the current state and enables only valid commands (IND-061)", async () => {
-    const { el, model } = mount({ _kind: "statemachine", value: "Off", machine, available_commands: ["On"], last_command: "", size: [400, 200] });
+    const { el, model } = mount({ _kind: "statemachine", _session: "kernel", value: "Off", machine, available_commands: ["On"], last_command: "", size: [400, 200] });
     await tick();
     expect(el.querySelector(".awi-sm-label-current").textContent).toBe("▶ Off");
     const [on, off] = el.querySelectorAll(".awi-sm-cmd");

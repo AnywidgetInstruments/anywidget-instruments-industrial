@@ -171,3 +171,30 @@ def test_process_commands(case: dict[str, Any]) -> None:
             w.command(command)
         for name, v in expected.items():
             assert getattr(w, name) == v, (case["name"], command, name)
+
+
+MACHINE = _load("statemachine.json")
+
+
+@pytest.mark.parametrize("case", MACHINE["normalize"])
+def test_machine_normalized(case: dict[str, Any]) -> None:
+    assert ai.StateMachine(case["model"]).machine == case["expected"]
+
+
+@pytest.mark.parametrize("model", MACHINE["invalid"])
+def test_machine_invalid(model: dict[str, Any]) -> None:
+    with pytest.raises(t.TraitError):
+        ai.StateMachine(model)
+
+
+@pytest.mark.parametrize(
+    "case", MACHINE["sequences"], ids=[c["name"] for c in MACHINE["sequences"]]
+)
+def test_machine_commands(case: dict[str, Any]) -> None:
+    sm = ai.StateMachine(case["model"])
+    for command, state, available in case["steps"]:
+        if command == "SC":
+            sm.state_complete()
+        else:
+            sm.command(command)
+        assert (sm.value, sm.available_commands) == (state, available), (case["name"], command)

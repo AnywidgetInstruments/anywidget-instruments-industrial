@@ -415,6 +415,47 @@ describe("Event log without a kernel", () => {
   });
 });
 
+describe("State machine without a kernel", () => {
+  const cmd = (el: HTMLElement, name: string) => [...el.querySelectorAll(".awi-sm-cmd")].find((b) => b.textContent === name) as HTMLButtonElement;
+
+  test("the PackML model, the resolved state and its commands", async () => {
+    const sent: unknown[] = [];
+    const { model, el } = mount({ ...defaults("StateMachine"), label: "Line" });
+    model.send = (msg: unknown) => {
+      sent.push(msg);
+    };
+    await frame();
+    expect(model.get("value")).toBe("Stopped");
+    expect(model.get("available_commands")).toEqual(["Reset", "Abort"]);
+    cmd(el, "Reset").click();
+    expect(sent).toEqual([{ type: "command", command: "Reset" }]);
+    expect(model.get("value")).toBe("Resetting");
+    expect(model.get("last_command")).toBe("Reset");
+    expect(model.get("available_commands")).toEqual(["Stop", "Abort"]);
+    expect(model.saved.at(-1)).toMatchObject({ value: "Resetting", available_commands: ["Stop", "Abort"] });
+    model.push("value", "Idle"); // state completion (SC) is a host event
+    await frame();
+    expect(model.get("available_commands")).toEqual(["Start", "Stop", "Abort"]);
+  });
+
+  test("an invalid model reads as the default; a custom one works", async () => {
+    const { model } = mount({ ...defaults("StateMachine"), machine: { states: [] } });
+    await frame();
+    expect(model.get("value")).toBe("Stopped");
+    model.push("machine", { states: [{ name: "Off" }, { name: "On" }], transitions: [["Off", "Start", "On"], ["On", "Stop", "Off"]] });
+    expect(model.get("value")).toBe("Off");
+    expect(model.get("available_commands")).toEqual(["Start"]);
+  });
+
+  test("with a kernel, commands are only sent", async () => {
+    const { model, el } = mount({ ...defaults("StateMachine"), _session: "kernel", value: "Stopped", available_commands: ["Reset", "Abort"] });
+    await frame();
+    cmd(el, "Reset").click();
+    expect(model.get("value")).toBe("Stopped");
+    expect(model.saved).toHaveLength(0);
+  });
+});
+
 describe("Tank without a kernel", () => {
   test("indicator by default, markers read through the schema", async () => {
     const { root, body, el } = mount({ ...defaults("Tank"), value: 3.2, max: 4, unit: "m", markers: [0.5, "x", 3.5], hi: 3, hihi: 3.5 });

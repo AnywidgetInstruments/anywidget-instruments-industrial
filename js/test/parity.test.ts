@@ -7,6 +7,7 @@ import numericCases from "../../tests/parity/numeric.json";
 import peakCases from "../../tests/parity/peak.json";
 import processCases from "../../tests/parity/process.json";
 import resolvedCases from "../../tests/parity/resolved.json";
+import machineCases from "../../tests/parity/statemachine.json";
 import stateCases from "../../tests/parity/states.json";
 import { type AlarmLevel, type AlarmLimits, computeAlarmLevel } from "../src/contract/alarm.js";
 import { barLevels, normalizeBars } from "../src/contract/bars.js";
@@ -14,6 +15,7 @@ import { selectorValue, stackStates } from "../src/contract/industrial.js";
 import { coerceValue, validScale } from "../src/contract/numeric.js";
 import { nextPeak, type PeakState } from "../src/contract/peak.js";
 import { positionDemand, processCommand, type ProcessState } from "../src/contract/process.js";
+import { availableCommands, type Machine, nextState, normalizeMachine, SC } from "../src/contract/statemachine.js";
 import { readTrait } from "../src/contract/traits.js";
 import { parseNumber } from "../src/core/scale.js";
 import { CONTRACTS } from "../src/generated/contract.js";
@@ -128,6 +130,27 @@ describe("process object commands", () => {
         };
         Object.assign(state, Array.isArray(command) ? positionDemand(command[1], s) : processCommand(command, s));
         for (const [name, v] of Object.entries(expected)) expect(state[name], `${c.name}: ${String(command)} ${name}`).toEqual(v);
+      }
+    });
+  }
+});
+
+describe("state machine", () => {
+  test.each(machineCases.normalize)("model %#", (c) => {
+    expect(normalizeMachine(c.model)).toEqual(c.expected);
+  });
+  test.each(machineCases.invalid)("invalid model %#", (m) => {
+    expect(normalizeMachine(m)).toBeNull();
+  });
+  for (const c of machineCases.sequences) {
+    test(c.name, () => {
+      const m = (c.model ? normalizeMachine(c.model) : normalizeMachine(CONTRACTS.StateMachine.traits.machine.default)) as Machine;
+      let state = m.initial;
+      for (const [command, expected, available] of c.steps as Array<[string, string, string[]]>) {
+        // SC is a host event; operator commands never apply it
+        const next = command === SC ? nextState(m, state, SC) : nextState(m, state, command);
+        if (next !== null) state = next;
+        expect([state, availableCommands(m, state)], `${c.name}: ${command}`).toEqual([expected, available]);
       }
     });
   }

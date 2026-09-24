@@ -12,6 +12,7 @@ import { type AlarmLevel, computeAlarmLevel } from "./alarm.js";
 import { barLevels, normalizeBars } from "./bars.js";
 import { coerceValue } from "./numeric.js";
 import { nextPeak, type PeakState } from "./peak.js";
+import { availableCommands, type Machine, normalizeMachine, resolveState } from "./statemachine.js";
 import type { WidgetContract } from "./spec.js";
 import { readTrait } from "./traits.js";
 
@@ -136,6 +137,39 @@ function attachBarLevels(model: AnyModel<Traits>, contract: WidgetContract): () 
   };
 }
 
+/** Model of a state machine as the kernel stores it (the schema default when invalid). */
+export function machineOf(model: AnyModel, contract: WidgetContract): Machine {
+  return normalizeMachine(model.get("machine")) ?? (normalizeMachine(contract.traits.machine.default) as Machine);
+}
+
+/** value and available_commands of a state machine (IND-060, IND-061). */
+function attachStateMachine(model: AnyModel<Traits>, contract: WidgetContract): () => void {
+  const inputs = ["machine", "value", "_session"];
+  let writing = false;
+  const update = (): void => {
+    if (writing || hostOwnsState(model)) return;
+    const m = machineOf(model, contract);
+    const state = resolveState(m, model.get("value"));
+    const available = availableCommands(m, state);
+    const changes: Traits = {};
+    if (model.get("value") !== state) changes.value = state;
+    if (JSON.stringify(model.get("available_commands")) !== JSON.stringify(available)) changes.available_commands = available;
+    if (Object.keys(changes).length === 0) return;
+    writing = true;
+    try {
+      for (const [k, v] of Object.entries(changes)) model.set(k, v);
+      model.save_changes();
+    } finally {
+      writing = false;
+    }
+  };
+  for (const name of inputs) model.on(`change:${name}`, update);
+  update();
+  return () => {
+    for (const name of inputs) model.off(`change:${name}`, update);
+  };
+}
+
 /**
  * Model-level hook (AFM `initialize`): keep the derived traits of a widget
  * with a schema up to date when no host owns the state. Returns a cleanup.
@@ -146,5 +180,6 @@ export function attachDerived(model: AnyModel, { clock = monotonic }: { clock?: 
   if (contract?.traits.alarm_level?.writer === "derived") cleanups.push(attachAlarmLevel(model, contract));
   if (contract?.traits.peak?.writer === "derived") cleanups.push(attachPeak(model, contract, clock));
   if (contract?.traits.alarm_levels?.writer === "derived") cleanups.push(attachBarLevels(model, contract));
+  if (contract?.traits.available_commands?.writer === "derived") cleanups.push(attachStateMachine(model, contract));
   return () => cleanups.forEach((c) => c());
 }

@@ -435,6 +435,43 @@
       "traits": {
         "max_events": 1
       }
+    },
+    {
+      "widget": "StateMachine",
+      "traits": {
+        "machine": {
+          "states": [
+            {
+              "name": "Off",
+              "x": 0,
+              "y": 0,
+              "acting": false
+            },
+            {
+              "name": "On",
+              "x": 1,
+              "y": 0,
+              "acting": true
+            }
+          ],
+          "transitions": [
+            [
+              "Off",
+              "Start",
+              "On"
+            ],
+            [
+              "On",
+              "SC",
+              "Off"
+            ]
+          ],
+          "commands": [
+            "Start"
+          ],
+          "initial": "Off"
+        }
+      }
     }
   ]
 }
