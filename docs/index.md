@@ -17,7 +17,9 @@ notebook (see [Hosts](hosts.md)).
     The library is for visualization, teaching, simulation and supervision.
     It is **not a safety-related system**, and the `EmergencyStop` widget is
     not an emergency stop device. Read the [safety notice](safety.md) before
-    connecting widgets to real equipment.
+    connecting widgets to real equipment. The industrial standards that
+    inspired the widgets are listed in [Standards and references](standards.md);
+    the library does not claim conformity with them.
 
 ```python
 import anywidget_instruments as ai

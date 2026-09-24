@@ -65,7 +65,9 @@ Contributing: see [development](docs/development.md) and `AGENTS.md`.
 The library is for visualization, teaching, simulation and supervision in
 notebooks. It is **not a safety-related system**, and the `EmergencyStop`
 widget is not an emergency stop device: see the
-[safety notice](docs/safety.md).
+[safety notice](docs/safety.md). The industrial standards that inspired the
+widgets are listed in [Standards and references](docs/standards.md); the
+library does not claim conformity with them.
 
 ## License
 

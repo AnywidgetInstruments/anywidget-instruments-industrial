@@ -21,6 +21,8 @@ by default; every widget switches with `mode`.
 | Layout and session | `Panel`, `SynopticCanvas`, `ThemeSwitch` | |
 
 The sections below follow the families of the [specification](specification.md).
+The standards named in this page inspired the widgets; the library does not
+claim conformity with them (see [Standards and references](standards.md)).
 
 ## Numeric controls and indicators
 
