@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://s-celles.github.io/anywidget-instruments/schema/eventlog.schema.json",
+  "title": "EventLog",
+  "description": "Chronological journal of events, shown newest first (IND-090 .. IND-093).",
+  "type": "object",
+  "x-awi-class": "EventLog",
+  "allOf": [
+    {
+      "$ref": "instrument.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "eventlog",
+      "default": "eventlog",
+      "x-awi-writer": "host"
+    },
+    "mode": {
+      "default": "indicator"
+    },
+    "size": {
+      "default": [
+        600,
+        200
+      ]
+    },
+    "value": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "time": {
+            "type": "number",
+            "description": "Unix seconds."
+          },
+          "source": {
+            "type": "string"
+          },
+          "category": {
+            "enum": [
+              "operator",
+              "state",
+              "alarm",
+              "system"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Events in chronological order, {id, time, source, category, message}. Written by the host (Python: log(), connect()); the view shows at most the newest max_events.",
+      "default": [],
+      "readOnly": true,
+      "x-awi-writer": "host"
+    },
+    "max_events": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Number of events kept (the oldest are dropped).",
+      "default": 500,
+      "x-awi-writer": "host"
+    }
+  }
+}

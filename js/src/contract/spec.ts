@@ -38,6 +38,8 @@ export interface ValueSpec {
   prefixItems?: ValueSpec[];
   /** Allowed keys of an object. */
   keys?: string[];
+  /** Known fields of an object (for typing; values are not checked). */
+  properties?: Record<string, ValueSpec>;
 }
 
 export interface TraitSpec extends ValueSpec {

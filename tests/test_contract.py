@@ -90,6 +90,7 @@ MIGRATED = {
     "Valve",
     "Pump",
     "Motor",
+    "EventLog",
 }
 
 

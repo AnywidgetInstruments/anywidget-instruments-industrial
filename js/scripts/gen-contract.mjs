@@ -114,6 +114,9 @@ function traitSpec(name, p, where, nested = false) {
     else if (p.items && typeof p.items === "object") spec.items = traitSpec(`${name}[]`, p.items, where, true);
   }
   if (spec.type === "object" && p.propertyNames?.enum) spec.keys = p.propertyNames.enum;
+  if (spec.type === "object" && p.properties) {
+    spec.properties = Object.fromEntries(Object.entries(p.properties).map(([k, v]) => [k, traitSpec(`${name}.${k}`, v, where, true)]));
+  }
   if (nested) return spec;
   if (!("default" in p)) throw new Error(`${where}.${name}: missing default`);
   spec.default = p.default;
@@ -176,7 +179,9 @@ function tsType(spec) {
       else t = "unknown[]";
       break;
     case "object":
-      t = spec.keys ? `Partial<Record<${spec.keys.map((k) => JSON.stringify(k)).join(" | ")}, string>>` : "Record<string, unknown>";
+      if (spec.keys) t = `Partial<Record<${spec.keys.map((k) => JSON.stringify(k)).join(" | ")}, string>>`;
+      else if (spec.properties) t = `{ ${Object.entries(spec.properties).map(([k, v]) => `${k}?: ${tsType(v)}`).join("; ")} }`;
+      else t = "Record<string, unknown>";
       break;
     default:
       t = "unknown";

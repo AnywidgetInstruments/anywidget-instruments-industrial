@@ -8,7 +8,7 @@ from typing import Any
 
 import traitlets as t
 
-from ._base import InstrumentWidget
+from ._base import InstrumentWidget, mode_trait, size_trait
 
 #: Event categories, shown as text chips in the log.
 EVENT_CATEGORIES: tuple[str, ...] = ("operator", "state", "alarm", "system")
@@ -42,6 +42,8 @@ class EventLog(InstrumentWidget):
     _kind = t.Unicode("eventlog").tag(sync=True)
     _default_mode = "indicator"
     _default_size = (600, 200)
+    mode = mode_trait(_default_mode)
+    size = size_trait(*_default_size)
     #: Events in chronological order (the view shows the newest first).
     value = t.List(t.Dict(), read_only=True).tag(sync=True)
     max_events = t.Int(500, min=1).tag(sync=True)

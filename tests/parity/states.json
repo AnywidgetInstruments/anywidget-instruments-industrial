@@ -429,6 +429,12 @@
         "value": "reverse",
         "tag": "M-3"
       }
+    },
+    {
+      "widget": "EventLog",
+      "traits": {
+        "max_events": 1
+      }
     }
   ]
 }

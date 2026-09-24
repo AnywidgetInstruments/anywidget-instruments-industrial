@@ -405,6 +405,16 @@ describe("Process objects without a kernel", () => {
   });
 });
 
+describe("Event log without a kernel", () => {
+  test("shows at most the newest max_events", async () => {
+    const events = [1, 2, 3].map((id) => ({ id, time: 1767254400 + id, source: "P-101", category: "state", message: `event ${id}` }));
+    const { body } = mount({ ...defaults("EventLog"), value: events, max_events: 2, label: "Journal" });
+    await frame();
+    expect(body.getAttribute("aria-label")).toBe("Journal: 2 events, latest event 3");
+    expect(body.querySelectorAll("tbody tr")).toHaveLength(2);
+  });
+});
+
 describe("Tank without a kernel", () => {
   test("indicator by default, markers read through the schema", async () => {
     const { root, body, el } = mount({ ...defaults("Tank"), value: 3.2, max: 4, unit: "m", markers: [0.5, "x", 3.5], hi: 3, hihi: 3.5 });
