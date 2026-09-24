@@ -529,6 +529,34 @@ describe("Annunciator without a kernel", () => {
   });
 });
 
+describe("Alarm banner and alarm list without a kernel", () => {
+  const rows = [
+    { id: "TAH-101", timestamp: "2026-09-24T10:00:00", source: "R-1", priority: "critical", message: "High", state: "active_unacknowledged" },
+    { id: "LAL-7", timestamp: "2026-09-24T10:01:00", source: "T-7", priority: "low", message: "Low", state: "cleared_unacknowledged" },
+  ];
+
+  test("the banner applies acknowledgements", async () => {
+    const { model, el } = mount({ ...defaults("AlarmBanner"), value: rows });
+    await frame();
+    (el.querySelector('button[aria-label="Acknowledge LAL-7"]') as HTMLButtonElement).click();
+    expect((model.get("value") as unknown[]).length).toBe(1); // cleared + acknowledged: back to normal, removed
+    (el.querySelector(".awi-banner-head .awi-ack") as HTMLButtonElement).click(); // ACK ALL
+    expect(model.get("value")).toMatchObject([{ id: "TAH-101", state: "active_acknowledged" }]);
+  });
+
+  test("the list shelves an alarm and lifts the shelving when it expires", async () => {
+    vi.setSystemTime(new Date(2026, 8, 24, 10, 0, 0));
+    const { model, el } = mount({ ...defaults("AlarmList"), value: rows.map((r) => ({ ...r, shelved_until: null, suppressed: false, out_of_service: false })) });
+    await frame();
+    const shelve = el.querySelector('select[aria-label="Shelve TAH-101"]') as HTMLSelectElement;
+    shelve.value = "300";
+    shelve.dispatchEvent(new Event("change"));
+    expect((model.get("value") as Array<{ id: string; shelved_until: string | null }>).find((r) => r.id === "TAH-101")?.shelved_until).toBe("2026-09-24T10:05:00");
+    await vi.advanceTimersByTimeAsync(301_000);
+    expect((model.get("value") as Array<{ id: string; shelved_until: string | null }>).find((r) => r.id === "TAH-101")?.shelved_until).toBe(null);
+  });
+});
+
 describe("Tank without a kernel", () => {
   test("indicator by default, markers read through the schema", async () => {
     const { root, body, el } = mount({ ...defaults("Tank"), value: 3.2, max: 4, unit: "m", markers: [0.5, "x", 3.5], hi: 3, hihi: 3.5 });

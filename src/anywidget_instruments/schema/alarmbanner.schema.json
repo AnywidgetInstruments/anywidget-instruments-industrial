@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://s-celles.github.io/anywidget-instruments/schema/alarmbanner.schema.json",
+  "title": "AlarmBanner",
+  "description": "List of active alarms with time, source, priority and message (SCADA-006, SCADA-007).",
+  "type": "object",
+  "x-awi-class": "AlarmBanner",
+  "allOf": [
+    {
+      "$ref": "instrument.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "alarmbanner",
+      "default": "alarmbanner",
+      "x-awi-writer": "host"
+    },
+    "size": {
+      "default": [
+        520,
+        180
+      ]
+    },
+    "value": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "Local ISO time of activation."
+          },
+          "source": {
+            "type": "string"
+          },
+          "priority": {
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "critical"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "normal",
+              "active_unacknowledged",
+              "active_acknowledged",
+              "cleared_unacknowledged"
+            ]
+          }
+        }
+      },
+      "description": "Alarms that are not back to normal, {id, timestamp, source, priority, message, state}; the view sorts them (unacknowledged first, then priority and time). Written by the host (Python: raise_alarm(), clear_alarm()); without a host owning the state, the front end applies the acknowledgements (an alarm back to normal leaves the list) and writes the list back (HOST-004).",
+      "default": [],
+      "readOnly": true,
+      "x-awi-writer": "derived"
+    }
+  },
+  "x-awi-messages": [
+    {
+      "type": "ack",
+      "direction": "front-to-host",
+      "description": "ACK of one alarm.",
+      "fields": {
+        "alarm_id": {
+          "type": "string"
+        }
+      },
+      "buffers": []
+    },
+    {
+      "type": "ack_all",
+      "direction": "front-to-host",
+      "description": "ACK ALL.",
+      "fields": {},
+      "buffers": []
+    }
+  ]
+}

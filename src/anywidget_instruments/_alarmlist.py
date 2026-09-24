@@ -14,7 +14,7 @@ from typing import Any
 
 import traitlets as t
 
-from ._base import Callback, InstrumentWidget, _report_callback_error
+from ._base import Callback, InstrumentWidget, _report_callback_error, size_trait
 from ._scada import ALARM_PRIORITIES, alarm_transition
 
 
@@ -40,6 +40,7 @@ class AlarmList(InstrumentWidget):
 
     _kind = t.Unicode("alarmlist").tag(sync=True)
     _default_size = (640, 240)
+    size = size_trait(*_default_size)
     value = t.List(t.Dict(), read_only=True).tag(sync=True)
     shelve_durations = t.List(t.Float(), default_value=[300.0, 900.0, 3600.0]).tag(sync=True)
     max_shelve = t.Float(8 * 3600.0, min=1.0).tag(sync=True)

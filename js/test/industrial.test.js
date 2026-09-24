@@ -188,7 +188,7 @@ describe("AlarmList (IND-050..053)", async () => {
   });
 
   it("acknowledges and shelves from the table (IND-053)", async () => {
-    const { el, model } = mount({ _kind: "alarmlist", value: alarms, shelve_durations: [300, 3600], max_shelve: 28800, size: [640, 240] });
+    const { el, model } = mount({ _kind: "alarmlist", _session: "kernel", value: alarms, shelve_durations: [300, 3600], max_shelve: 28800, size: [640, 240] });
     await tick();
     expect(el.querySelector(".awi-al-counts").textContent).toBe("2 active · 1 unacknowledged · 1 shelved · 1 suppressed / OOS");
     el.querySelector('button[aria-label="Acknowledge A"]').click();

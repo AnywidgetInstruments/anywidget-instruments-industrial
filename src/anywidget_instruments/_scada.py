@@ -121,6 +121,7 @@ class AlarmBanner(InstrumentWidget):
 
     _kind = t.Unicode("alarmbanner").tag(sync=True)
     _default_size = (520, 180)
+    size = size_trait(*_default_size)
     value = t.List(t.Dict(), read_only=True).tag(sync=True)
 
     def __init__(self, **kwargs: Any) -> None:

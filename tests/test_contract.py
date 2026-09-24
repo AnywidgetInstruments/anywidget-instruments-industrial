@@ -94,6 +94,8 @@ MIGRATED = {
     "StateMachine",
     "PIDFaceplate",
     "Annunciator",
+    "AlarmBanner",
+    "AlarmList",
 }
 
 

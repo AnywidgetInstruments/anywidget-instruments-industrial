@@ -1,22 +1,28 @@
 // Alarm summary (IND-050..053): sort and filter, acknowledge, shelve and
 // unshelve; shelved, suppressed and out-of-service alarms shown apart.
+import type { AlarmRow } from "../contract/alarms.js";
+import { alarmAction } from "../contract/derived.js";
 import { clear, html } from "../core/dom.js";
+import type { AnyModel } from "../core/model.js";
 import { BaseView } from "../core/view.js";
+import type { AlarmListTraits } from "../generated/contract.js";
 
-const RANK = { critical: 0, high: 1, medium: 2, low: 3 };
-const PRIORITY_TEXT = { critical: "P1", high: "P2", medium: "P3", low: "P4" };
-const STATE_TEXT = { active_unacknowledged: "ACTIVE · UNACK", active_acknowledged: "ACTIVE · ACK", cleared_unacknowledged: "CLEARED · UNACK", normal: "NORMAL" };
-export const VIEWS = { active: "Active", unack: "Unacknowledged", shelved: "Shelved", suppressed: "Suppressed / out of service", all: "All" };
+type Filters = { view: string; priority: string; text: string; sort: string };
+
+const RANK: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 };
+const PRIORITY_TEXT: Record<string, string> = { critical: "P1", high: "P2", medium: "P3", low: "P4" };
+const STATE_TEXT: Record<string, string> = { active_unacknowledged: "ACTIVE · UNACK", active_acknowledged: "ACTIVE · ACK", cleared_unacknowledged: "CLEARED · UNACK", normal: "NORMAL" };
+export const VIEWS: Record<string, string> = { active: "Active", unack: "Unacknowledged", shelved: "Shelved", suppressed: "Suppressed / out of service", all: "All" };
 
 /** Category of an alarm for the operator views (IND-051, IND-052). */
-export function category(a) {
+export function category(a: AlarmRow): string {
   if (a.out_of_service || a.suppressed) return "suppressed";
   if (a.shelved_until) return "shelved";
   return "active";
 }
 
 /** Filter and sort alarms for display (IND-050). */
-export function filterAlarms(alarms, { view = "active", priority = "all", text = "", sort = "priority" } = {}) {
+export function filterAlarms(alarms: readonly AlarmRow[], { view = "active", priority = "all", text = "", sort = "priority" }: Partial<Filters> = {}): AlarmRow[] {
   const needle = text.trim().toLowerCase();
   const out = alarms.filter((a) => {
     const cat = category(a);
@@ -28,22 +34,31 @@ export function filterAlarms(alarms, { view = "active", priority = "all", text =
     if (needle && !`${a.id} ${a.source} ${a.message}`.toLowerCase().includes(needle)) return false;
     return true;
   });
-  const byTime = (a, b) => String(b.timestamp).localeCompare(String(a.timestamp));
-  const unack = (a) => (String(a.state).includes("unacknowledged") ? 0 : 1);
-  return out.sort(sort === "time" ? byTime : (a, b) => unack(a) - unack(b) || (RANK[a.priority] ?? 9) - (RANK[b.priority] ?? 9) || byTime(a, b));
+  const byTime = (a: AlarmRow, b: AlarmRow): number => String(b.timestamp).localeCompare(String(a.timestamp));
+  const unack = (a: AlarmRow): number => (String(a.state).includes("unacknowledged") ? 0 : 1);
+  return out.sort(sort === "time" ? byTime : (a, b) => unack(a) - unack(b) || (RANK[String(a.priority)] ?? 9) - (RANK[String(b.priority)] ?? 9) || byTime(a, b));
 }
 
-function formatDuration(s) {
+function formatDuration(s: number): string {
   return s >= 3600 ? `${+(s / 3600).toFixed(1)} h` : `${Math.round(s / 60)} min`;
 }
 
-export class AlarmListView extends BaseView {
-  constructor(model, el) {
+export class AlarmListView extends BaseView<AlarmListTraits> {
+  filters: Filters;
+  readonly viewSel: HTMLSelectElement;
+  readonly prioSel: HTMLSelectElement;
+  readonly search: HTMLInputElement;
+  readonly sortBtn: HTMLButtonElement;
+  readonly counts: HTMLDivElement;
+  readonly table: HTMLTableElement;
+  readonly tbody: HTMLTableSectionElement;
+
+  constructor(model: AnyModel<AlarmListTraits>, el: HTMLElement) {
     super(model, el, ["value", "shelve_durations"]);
     this.filters = { view: "active", priority: "all", text: "", sort: "priority" };
     const b = this.body;
     b.setAttribute("role", "region");
-    const select = (label, options, key) => {
+    const select = (label: string, options: Record<string, string>, key: keyof Filters): HTMLSelectElement => {
       const s = html("select", { attrs: { "aria-label": label, "data-lm-suppress-shortcuts": "true" } }, Object.entries(options).map(([v, t]) => html("option", { text: t, attrs: { value: v } })));
       s.value = this.filters[key];
       s.addEventListener("change", () => {
@@ -74,11 +89,14 @@ export class AlarmListView extends BaseView {
     this.schedule();
   }
 
-  send(msg) {
-    if (this.interactive) this.model.send(msg);
+  /** Operator action: always sent to the host; applied by the front end when no host owns the state (HOST-004). */
+  send(msg: { type: string; alarm_id?: string; seconds?: number }): void {
+    if (!this.interactive) return;
+    this.model.send(msg);
+    alarmAction(this.model as unknown as AnyModel, msg);
   }
 
-  actions(a) {
+  actions(a: AlarmRow): HTMLTableCellElement {
     const cell = html("td", { cls: "awi-al-actions" });
     if (this.get("mode") !== "control") return cell;
     const cat = category(a);
@@ -105,9 +123,9 @@ export class AlarmListView extends BaseView {
     return cell;
   }
 
-  draw() {
-    const alarms = this.get("value") || [];
-    const count = (pred) => alarms.filter(pred).length;
+  override draw(): void {
+    const alarms = (this.get("value") || []) as AlarmRow[];
+    const count = (pred: (a: AlarmRow) => boolean): number => alarms.filter(pred).length;
     const active = count((a) => category(a) === "active" && a.state !== "normal");
     const unack = count((a) => category(a) === "active" && String(a.state).includes("unacknowledged"));
     const shelved = count((a) => category(a) === "shelved");
@@ -125,9 +143,9 @@ export class AlarmListView extends BaseView {
       else if (cat === "shelved") state = `SHELVED until ${String(a.shelved_until).slice(11, 16)}`;
       const row = html("tr", { cls: `awi-prio-${a.priority} awi-state-${a.state} awi-al-${cat}` }, [
         html("td", { text: String(a.timestamp || "").replace("T", " ") }),
-        html("td", {}, [html("span", { cls: "awi-prio-chip", text: PRIORITY_TEXT[a.priority] || a.priority })]),
-        html("td", { text: a.source || a.id }),
-        html("td", { text: a.message || a.id }),
+        html("td", {}, [html("span", { cls: "awi-prio-chip", text: PRIORITY_TEXT[String(a.priority)] || String(a.priority) })]),
+        html("td", { text: String(a.source || a.id) }),
+        html("td", { text: String(a.message || a.id) }),
         html("td", { cls: "awi-al-state", text: state }),
         this.actions(a),
       ]);

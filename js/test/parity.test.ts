@@ -2,6 +2,7 @@
 // tests/parity/*.json, also run by tests/test_parity.py.
 import { describe, expect, test } from "vitest";
 import alarmCases from "../../tests/parity/alarm_level.json";
+import alarmTables from "../../tests/parity/alarms.json";
 import annCases from "../../tests/parity/annunciator.json";
 import barCases from "../../tests/parity/bars.json";
 import numericCases from "../../tests/parity/numeric.json";
@@ -12,6 +13,7 @@ import resolvedCases from "../../tests/parity/resolved.json";
 import machineCases from "../../tests/parity/statemachine.json";
 import stateCases from "../../tests/parity/states.json";
 import { type AlarmLevel, type AlarmLimits, computeAlarmLevel } from "../src/contract/alarm.js";
+import { acknowledgeRows, type AlarmRow, expireShelving, localIso, shelveRow, unshelveRow } from "../src/contract/alarms.js";
 import { type AnnEvent, annunciatorTransition, hornOn, type Panel, panelAction, type Sequence, setProcess } from "../src/contract/annunciator.js";
 import { barLevels, normalizeBars } from "../src/contract/bars.js";
 import { selectorValue, stackStates } from "../src/contract/industrial.js";
@@ -195,6 +197,40 @@ describe("annunciator", () => {
         p = action === "set" ? setProcess(p, ...(arg as [string, boolean])) : panelAction(p, action as "acknowledge" | "reset" | "silence");
         const got = Object.fromEntries(p.windows.map((w) => [w.tag, [w.state, w.first]]));
         expect([got, hornOn(p)], `${c.name}: ${action}`).toEqual([windows, horn]);
+      }
+    });
+  }
+});
+
+describe("alarm banner and alarm list", () => {
+  const table = CONTRACTS.AlarmIndicator.traits.value.transitions;
+  const now0 = alarmTables.now * 1000;
+  const rowsOf = (rows: Array<Record<string, unknown>>, list: boolean, now: number): AlarmRow[] =>
+    rows.map((r) => ({ id: String(r.id), state: String(r.state), ...(list ? { shelved_until: r.shelved_for == null ? null : localIso(now + Number(r.shelved_for) * 1000), suppressed: !!r.suppressed, out_of_service: false } : {}) }));
+  const stateOf = (rows: AlarmRow[]) => Object.fromEntries(rows.map((r) => [r.id, [r.state, r.shelved_until != null]]));
+
+  for (const c of alarmTables.banner) {
+    test(`banner: ${c.name}`, () => {
+      let rows = rowsOf(c.rows, false, now0);
+      for (const [step, expected] of c.steps as Array<[unknown[], Record<string, unknown>]>) {
+        rows = acknowledgeRows(rows, step[0] === "ack" ? String(step[1]) : null, table, false);
+        expect(stateOf(rows), JSON.stringify(step)).toEqual(expected);
+      }
+    });
+  }
+  for (const c of alarmTables.list) {
+    test(`list: ${c.name}`, () => {
+      let now = now0;
+      let rows = rowsOf(c.rows, true, now);
+      for (const [step, expected] of c.steps as Array<[unknown[], Record<string, unknown>]>) {
+        if (step[0] === "ack") rows = acknowledgeRows(rows, String(step[1]), table, true);
+        else if (step[0] === "shelve") rows = shelveRow(rows, String(step[1]), Number(step[2]), c.max_shelve, now) ?? rows;
+        else if (step[0] === "unshelve") rows = unshelveRow(rows, String(step[1]));
+        else {
+          now += Number(step[1]) * 1000;
+          rows = expireShelving(rows, now).rows;
+        }
+        expect(stateOf(rows), JSON.stringify(step)).toEqual(expected);
       }
     });
   }

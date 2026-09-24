@@ -1,0 +1,25 @@
+{
+  "description": "Alarm banner and alarm list operator actions (SCADA-006, SCADA-007, IND-050 .. IND-053). The clock starts at 'now' (Unix seconds); rows give shelved_for (seconds from now) instead of a time. Steps: [\"ack\", id], [\"ack_all\"], [\"shelve\", id, seconds], [\"unshelve\", id], [\"tick\", seconds] (the clock advances, expired shelving is lifted); each step is followed by the expected rows {id: [state, shelved]}.",
+  "now": 1800000000,
+  "banner": [
+    { "name": "acknowledged alarms stay while active, cleared ones leave", "rows": [
+      { "id": "A1", "state": "active_unacknowledged" }, { "id": "A2", "state": "cleared_unacknowledged" }, { "id": "A3", "state": "active_acknowledged" } ],
+      "steps": [
+        [["ack", "A1"], { "A1": ["active_acknowledged", false], "A2": ["cleared_unacknowledged", false], "A3": ["active_acknowledged", false] }],
+        [["ack_all"], { "A1": ["active_acknowledged", false], "A3": ["active_acknowledged", false] }] ] }
+  ],
+  "list": [
+    { "name": "acknowledge, shelve, expiry", "max_shelve": 3600, "rows": [
+      { "id": "L1", "state": "active_unacknowledged" }, { "id": "L2", "state": "cleared_unacknowledged" }, { "id": "L3", "state": "normal", "suppressed": true } ],
+      "steps": [
+        [["ack", "L2"], { "L1": ["active_unacknowledged", false], "L3": ["normal", false] }],
+        [["shelve", "L1", 300], { "L1": ["active_unacknowledged", true], "L3": ["normal", false] }],
+        [["shelve", "L1", 7200], { "L1": ["active_unacknowledged", true], "L3": ["normal", false] }],
+        [["tick", 299], { "L1": ["active_unacknowledged", true], "L3": ["normal", false] }],
+        [["tick", 2], { "L1": ["active_unacknowledged", false], "L3": ["normal", false] }] ] },
+    { "name": "a normal alarm leaves the list when unshelved", "max_shelve": 3600, "rows": [
+      { "id": "L1", "state": "normal", "shelved_for": 600 } ],
+      "steps": [
+        [["unshelve", "L1"], {}] ] }
+  ]
+}

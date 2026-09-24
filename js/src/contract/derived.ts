@@ -9,6 +9,7 @@
 import type { AnyModel, Traits } from "../core/model.js";
 import { BY_KIND } from "../generated/contract.js";
 import { type AlarmLevel, computeAlarmLevel } from "./alarm.js";
+import { acknowledgeRows, type AlarmRow, expireShelving, nextExpiry, shelveRow, unshelveRow } from "./alarms.js";
 import { hornOn, normalizeWindows, type Panel, panelAction, type Sequence, setProcess } from "./annunciator.js";
 import { barLevels, normalizeBars } from "./bars.js";
 import { coerceValue } from "./numeric.js";
@@ -295,6 +296,54 @@ function attachAnnunciator(model: AnyModel<Traits>, contract: WidgetContract): (
   };
 }
 
+function writeRows(model: AnyModel<Traits>, rows: AlarmRow[]): void {
+  if (JSON.stringify(model.get("value")) === JSON.stringify(rows)) return;
+  model.set("value", rows);
+  model.save_changes();
+}
+
+/**
+ * Operator action on an alarm banner or alarm list without a host
+ * (SCADA-007, IND-053): acknowledge (one or all), shelve, unshelve, applied to
+ * the rows and written back. Does nothing when a host owns the state.
+ */
+export function alarmAction(model: AnyModel, msg: { type: string; alarm_id?: string; seconds?: number }, now = Date.now()): void {
+  const contract = contractOf(model);
+  if (!contract || hostOwnsState(model)) return;
+  const list = contract.className === "AlarmList";
+  const table = BY_KIND.alarmindicator?.traits.value.transitions;
+  const rows = ((model.get("value") as AlarmRow[]) || []).map((r) => ({ ...r }));
+  let next: AlarmRow[] | null = rows;
+  if (msg.type === "ack") next = acknowledgeRows(rows, String(msg.alarm_id), table, list);
+  else if (msg.type === "ack_all") next = acknowledgeRows(rows, null, table, list);
+  else if (msg.type === "shelve") next = shelveRow(rows, String(msg.alarm_id), Number(msg.seconds), Number(reader(model, contract)("max_shelve")), now);
+  else if (msg.type === "unshelve") next = unshelveRow(rows, String(msg.alarm_id));
+  if (next) writeRows(model as AnyModel<Traits>, next);
+}
+
+/** Shelving expiry of an alarm list without a host (IND-051): a timer on the next expiry. */
+function attachShelvingExpiry(model: AnyModel<Traits>): () => void {
+  let timer: ReturnType<typeof setTimeout> | null = null;
+  const arm = (): void => {
+    if (timer) clearTimeout(timer);
+    timer = null;
+    if (hostOwnsState(model)) return;
+    const t = nextExpiry((model.get("value") as AlarmRow[]) || []);
+    if (t === null) return;
+    timer = setTimeout(() => {
+      timer = null;
+      writeRows(model, expireShelving((model.get("value") as AlarmRow[]) || [], Date.now()).rows);
+      arm();
+    }, Math.max(0, t - Date.now()) + 50);
+  };
+  model.on("change:value", arm);
+  arm();
+  return () => {
+    if (timer) clearTimeout(timer);
+    model.off("change:value", arm);
+  };
+}
+
 /**
  * Model-level hook (AFM `initialize`): keep the derived traits of a widget
  * with a schema up to date when no host owns the state. Returns a cleanup.
@@ -308,5 +357,6 @@ export function attachDerived(model: AnyModel, { clock = monotonic }: { clock?: 
   if (contract?.traits.available_commands?.writer === "derived") cleanups.push(attachStateMachine(model, contract));
   if (contract?.traits.loop_mode && contract.traits.value?.writer === "derived") cleanups.push(attachPidSummary(model, contract));
   if (contract?.traits.horn?.writer === "derived") cleanups.push(attachAnnunciator(model, contract));
+  if (contract?.traits.max_shelve) cleanups.push(attachShelvingExpiry(model));
   return () => cleanups.forEach((c) => c());
 }

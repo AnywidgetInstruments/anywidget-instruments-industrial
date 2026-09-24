@@ -505,6 +505,22 @@
         "first_out": true,
         "test": true
       }
+    },
+    {
+      "widget": "AlarmList",
+      "traits": {
+        "shelve_durations": [
+          60,
+          120.5
+        ],
+        "max_shelve": 1
+      }
+    },
+    {
+      "widget": "AlarmBanner",
+      "traits": {
+        "label": "Alarms"
+      }
     }
   ]
 }

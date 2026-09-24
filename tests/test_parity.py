@@ -7,6 +7,7 @@ same results.
 
 from __future__ import annotations
 
+import contextlib
 import json
 import math
 import pathlib
@@ -236,3 +237,57 @@ def test_annunciator_scenarios(case: dict[str, Any]) -> None:
             getattr(ann, action)()
         got = {w["tag"]: [w["state"], w["first"]] for w in ann.value}
         assert (got, ann.horn) == (windows, horn), (case["name"], action, arg)
+
+
+ALARMS = _load("alarms.json")
+
+
+def _alarm_rows(widget: Any, rows: list[dict[str, Any]], now: float) -> None:
+    base = {"timestamp": "", "source": "", "priority": "high", "message": ""}
+    for r in rows:
+        a = {**base, "id": r["id"], "state": r["state"]}
+        if isinstance(widget, ai.AlarmList):
+            shelved = r.get("shelved_for")
+            a.update(
+                shelved_until=None if shelved is None else now + shelved,
+                suppressed=r.get("suppressed", False),
+                out_of_service=False,
+            )
+        widget._alarms[r["id"]] = a
+    widget._publish()
+
+
+def _alarm_state(widget: Any) -> dict[str, list[Any]]:
+    return {a["id"]: [a["state"], a.get("shelved_until") is not None] for a in widget.value}
+
+
+@pytest.mark.parametrize("case", ALARMS["banner"], ids=[c["name"] for c in ALARMS["banner"]])
+def test_alarm_banner_actions(case: dict[str, Any]) -> None:
+    banner = ai.AlarmBanner()
+    _alarm_rows(banner, case["rows"], ALARMS["now"])
+    for step, expected in case["steps"]:
+        if step[0] == "ack":
+            banner.acknowledge(step[1])
+        else:
+            banner.acknowledge_all()
+        assert _alarm_state(banner) == expected, (case["name"], step)
+
+
+@pytest.mark.parametrize("case", ALARMS["list"], ids=[c["name"] for c in ALARMS["list"]])
+def test_alarm_list_actions(case: dict[str, Any]) -> None:
+    clock = {"now": float(ALARMS["now"])}
+    lst = ai.AlarmList(max_shelve=case["max_shelve"])
+    lst._clock = lambda: clock["now"]
+    _alarm_rows(lst, case["rows"], clock["now"])
+    for step, expected in case["steps"]:
+        if step[0] == "ack":
+            lst.acknowledge(step[1])
+        elif step[0] == "shelve":
+            with contextlib.suppress(ValueError):  # refused duration
+                lst.shelve(step[1], step[2])
+        elif step[0] == "unshelve":
+            lst.unshelve(step[1])
+        else:
+            clock["now"] += step[1]
+            lst.refresh()
+        assert _alarm_state(lst) == expected, (case["name"], step)
