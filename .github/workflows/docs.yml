@@ -40,7 +40,7 @@ jobs:
           mkdir -p lite/marimo/public
           cp dist/*.whl lite/marimo/public/
           (cd dist && ls *.whl) > lite/marimo/public/wheel.txt
-          marimo export html-wasm lite/marimo/instruments.py -o site/marimo --mode edit
+          marimo export html-wasm lite/marimo/instruments.py -o site/marimo --mode run --show-code
           rm -f site/marimo/CLAUDE.md
       - name: In-browser deployments work (DOC-006)
         run: |
