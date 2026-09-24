@@ -273,6 +273,8 @@ class Thermometer(NumericWidget):
     _kind = t.Unicode("thermometer").tag(sync=True)
     _default_mode = "indicator"
     _default_size = (100, 220)
+    mode = mode_trait(_default_mode)
+    size = size_trait(*_default_size)
     unit = t.Unicode("°C").tag(sync=True)
     min = t.Float(-20.0).tag(sync=True)
     max = t.Float(120.0).tag(sync=True)
@@ -285,6 +287,7 @@ class FillSlide(NumericWidget):
 
     _kind = t.Unicode("fillslide").tag(sync=True)
     _default_size = (260, 70)
+    size = size_trait(*_default_size)
     orientation = t.Enum(["horizontal", "vertical"], default_value="horizontal").tag(sync=True)
     fill_color = t.Unicode("").tag(sync=True)
 
@@ -300,6 +303,8 @@ class SevenSegment(NumericWidget):
     _kind = t.Unicode("sevensegment").tag(sync=True)
     _default_mode = "indicator"
     _default_size = (200, 80)
+    mode = mode_trait(_default_mode)
+    size = size_trait(*_default_size)
     digits = t.Int(4, min=1, max=16).tag(sync=True)
     decimals = t.Int(1, min=0).tag(sync=True)
     color = t.Unicode("").tag(sync=True)

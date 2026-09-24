@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://s-celles.github.io/anywidget-instruments/schema/fillslide.schema.json",
+  "title": "FillSlide",
+  "description": "Horizontal or vertical slider control and bar indicator (NUM-108).",
+  "type": "object",
+  "x-awi-class": "FillSlide",
+  "allOf": [
+    {
+      "$ref": "numeric.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "fillslide",
+      "default": "fillslide",
+      "x-awi-writer": "host"
+    },
+    "fill_color": {
+      "type": "string",
+      "description": "CSS color of the filled part; empty: the theme color. Unsafe colors are ignored (SEC-002).",
+      "default": "",
+      "x-awi-writer": "host"
+    },
+    "orientation": {
+      "enum": [
+        "horizontal",
+        "vertical"
+      ],
+      "description": "Track direction.",
+      "default": "horizontal",
+      "x-awi-writer": "host"
+    },
+    "size": {
+      "description": "[width, height] in CSS pixels. The Python class uses (80, 240) when created vertical; other hosts give the size with the orientation.",
+      "default": [
+        260,
+        70
+      ]
+    }
+  }
+}

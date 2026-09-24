@@ -1,6 +1,8 @@
 // Seven-segment numeric display (NUM-109).
 import { clear, safeColor, svg } from "../core/dom.js";
+import type { AnyModel } from "../core/model.js";
 import { keyStep } from "../core/scale.js";
+import type { SevenSegmentTraits } from "../generated/contract.js";
 import { NumericView } from "./numeric.js";
 
 //   aaa
@@ -8,7 +10,7 @@ import { NumericView } from "./numeric.js";
 //   ggg
 //  e   c
 //   ddd   (dp)
-const GLYPHS = {
+const GLYPHS: Record<string, string> = {
   0: "abcdef", 1: "bc", 2: "abdeg", 3: "abcdg", 4: "bcfg", 5: "acdfg", 6: "acdefg",
   7: "abc", 8: "abcdefg", 9: "abcdfg", "-": "g", " ": "", E: "adefg", r: "eg", o: "cdeg",
   N: "abcef", a: "abcdeg", n: "ceg", I: "bc", F: "aefg",
@@ -18,10 +20,10 @@ const W = 30;
 const H = 54;
 const T = 5; // segment thickness
 
-function segmentPath(s, ox) {
+function segmentPath(s: string, ox: number): string {
   const h = T / 2;
-  const hor = (x, y) => `M${ox + x + h} ${y}l${h} ${-h}h${W - 4 * h - T}l${h} ${h}l${-h} ${h}h${-(W - 4 * h - T)}Z`;
-  const ver = (x, y) => `M${ox + x} ${y + h}l${h} ${h}v${H / 2 - 2 * T}l${-h} ${h}l${-h} ${-h}v${-(H / 2 - 2 * T)}Z`;
+  const hor = (x: number, y: number): string => `M${ox + x + h} ${y}l${h} ${-h}h${W - 4 * h - T}l${h} ${h}l${-h} ${h}h${-(W - 4 * h - T)}Z`;
+  const ver = (x: number, y: number): string => `M${ox + x} ${y + h}l${h} ${h}v${H / 2 - 2 * T}l${-h} ${h}l${-h} ${-h}v${-(H / 2 - 2 * T)}Z`;
   switch (s) {
     case "a": return hor(h, h);
     case "g": return hor(h, H / 2);
@@ -35,7 +37,7 @@ function segmentPath(s, ox) {
 }
 
 /** Text shown for a value: fixed decimals, right aligned; "Err" on overflow, "NaN" if invalid. */
-export function sevenSegmentText(v, digits, decimals) {
+export function sevenSegmentText(v: number, digits: number, decimals: number): { chars: string; dp: number } {
   if (!Number.isFinite(v)) return { chars: Number.isNaN(v) ? " NaN".slice(-digits) : "  Err".slice(-digits), dp: -1 };
   const text = Math.abs(v).toFixed(Math.max(0, decimals));
   const [int, frac = ""] = text.split(".");
@@ -44,8 +46,10 @@ export function sevenSegmentText(v, digits, decimals) {
   return { chars: body.padStart(digits, " "), dp: frac ? digits - frac.length - 1 : -1 };
 }
 
-export class SevenSegmentView extends NumericView {
-  constructor(model, el) {
+export class SevenSegmentView extends NumericView<SevenSegmentTraits> {
+  readonly svgEl: SVGElement;
+
+  constructor(model: AnyModel<SevenSegmentTraits>, el: HTMLElement) {
     super(model, el, ["digits", "decimals", "color"], { role: "img" });
     this.svgEl = svg("svg", { class: "awi-svg", "aria-hidden": "true", preserveAspectRatio: "xMidYMid meet" });
     this.body.appendChild(this.svgEl);
@@ -65,7 +69,7 @@ export class SevenSegmentView extends NumericView {
     this.schedule();
   }
 
-  draw() {
+  override draw(): void {
     const digits = Math.max(1, this.get("digits"));
     const gap = 10;
     const width = digits * (W + gap) + gap;

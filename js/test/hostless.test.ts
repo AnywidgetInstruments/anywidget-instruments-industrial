@@ -36,7 +36,7 @@ function hostModel(state: State) {
 }
 
 /** Class defaults as a host reads them (schema defaults), plus the user's traits. */
-function defaults(title: "Knob" | "Tank"): State {
+function defaults(title: keyof typeof CONTRACTS): State {
   return Object.fromEntries(Object.entries(CONTRACTS[title].traits).map(([k, s]) => [k, s.default]));
 }
 
@@ -121,6 +121,28 @@ describe("Knob without a kernel", () => {
     await frame();
     expect(body.getAttribute("aria-valuenow")).toBe("30");
     expect(body.getAttribute("aria-valuemax")).toBe("100");
+    await vi.advanceTimersByTimeAsync(60_000);
+    expect(root.classList.contains("awi-stale")).toBe(false);
+  });
+});
+
+// Every migrated numeric widget: bounded value, derived alarm, no NO KERNEL.
+const NUMERIC = [
+  ["Knob", 100],
+  ["Dial", 100],
+  ["Tank", 100],
+  ["Thermometer", 120],
+  ["FillSlide", 100],
+  ["SevenSegment", 1e9],
+] as const;
+
+describe.each(NUMERIC)("%s without a kernel", (title, max) => {
+  test("bounds its value and shows its alarm, without NO KERNEL", async () => {
+    const { model, root, body } = mount({ ...defaults(title), value: max * 2, coerce: true, hi: max / 2, label: title });
+    await frame();
+    expect(body.getAttribute("aria-valuenow")).toBe(String(max));
+    expect(model.get("alarm_level")).toBe("hi");
+    expect(root.classList.contains("awi-alarm-hi")).toBe(true);
     await vi.advanceTimersByTimeAsync(60_000);
     expect(root.classList.contains("awi-stale")).toBe(false);
   });

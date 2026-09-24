@@ -3,15 +3,14 @@ import { clear, safeColor, svg, svgText } from "../core/dom.js";
 import { formatValue, tickFormat } from "../core/format.js";
 import type { AnyModel } from "../core/model.js";
 import { linearHit, parseNumber, ticks } from "../core/scale.js";
-import type { TankTraits } from "../generated/contract.js";
+import type { FillSlideTraits, TankTraits } from "../generated/contract.js";
 import { NumericView, svgPoint } from "./numeric.js";
 
 /**
- * Traits of the linear widgets. Tank comes from its schema; the traits of
- * Thermometer, FillSlide and VUMeter are typed here until they get theirs.
+ * Traits of the linear widgets. Tank, Thermometer and FillSlide come from
+ * their schemas; the traits of VUMeter are typed here until it gets its own.
  */
-export type LinearTraits = TankTraits & {
-  orientation?: "vertical" | "horizontal";
+export type LinearTraits = TankTraits & Partial<Pick<FillSlideTraits, "orientation">> & {
   segments?: number;
   peak?: number | string | null;
   peak_hold?: boolean;

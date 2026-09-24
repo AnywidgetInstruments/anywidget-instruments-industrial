@@ -54,8 +54,8 @@ def _synced(cls: type) -> dict[str, t.TraitType]:
     return {k: v for k, v in cls.class_traits(sync=True).items() if k not in FRAMEWORK}
 
 
-#: Widgets migrated to the host-independent front end (phase 2 pilot).
-MIGRATED = {"Knob", "Tank"}
+#: Widgets migrated to the host-independent front end.
+MIGRATED = {"Knob", "Tank", "Dial", "Thermometer", "FillSlide", "SevenSegment"}
 
 
 def test_migrated_widgets_have_a_schema() -> None:
