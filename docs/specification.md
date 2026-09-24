@@ -7,7 +7,7 @@
 | Project | anywidget-instruments (working name) |
 | Document type | Software requirements specification |
 | Notation | EARS (Easy Approach to Requirements Syntax) |
-| Version | 0.6 |
+| Version | 0.7 |
 | Date | 2026-09-24 |
 | Status | Baseline for version 1.0 |
 
@@ -351,10 +351,11 @@ Requirements use identifiers `<GROUP>-<NNN>` with priorities:
 
 ## 18. Industrial Operator Objects (IND)
 
-Operator objects for control rooms and machine panels. They follow ISA-101
-(high-performance HMI), ISA-18.1 (annunciator sequences), ISA-18.2 / IEC 62682
-(alarm management), IEC 60073 (indicator colors) and ISA-TR88.00.02 (machine
-state model).
+Operator objects for control rooms and machine panels. They take inspiration
+from ISA-101 (high-performance HMI), ISA-18.1 (annunciator sequences), ISA-18.2 /
+IEC 62682 (alarm management), IEC 60073 (indicator colors), ISA-TR88.00.02
+(machine state model), ISA-5.1 (instrument identification) and NAMUR NE 107
+(device status); see Standards and references, which disclaims any conformity.
 
 ### 18.1 Analog Indicator
 
@@ -418,6 +419,45 @@ state model).
 | IND-062 | S | When an acting state completes (for example Starting → Execute), the kernel code shall advance the model with `state_complete()`; the widget shall not advance on its own. |
 | IND-063 | C | The StateMachine shall accept a custom model given as states and transitions. |
 
+### 18.8 Trend Chart
+
+| ID | Pri. | Requirement |
+|---|---|---|
+| IND-070 | S | The library shall provide a **TrendChart** widget plotting one or more named pens against wall-clock time, each pen with its own unit and scale. |
+| IND-071 | S | When the kernel calls `add(pen, value, time=None)` or `add_many(...)`, the TrendChart shall store the timestamped samples, transfer them as binary buffers, and, in live mode, display the most recent `span` seconds. |
+| IND-072 | S | While the user browses the history (pan, zoom or a span selection), the TrendChart shall stop following new data, and shall offer a Live action that returns to the most recent data. |
+| IND-073 | S | Where a pen has alarm limits or a setpoint, the TrendChart shall draw them as reference lines on that pen's scale. |
+| IND-074 | S | If a pen holds more than `history` samples, then the TrendChart shall discard the oldest ones. |
+| IND-075 | C | The TrendChart shall provide the graph cursors, axis ranges and CSV / PNG / SVG export of the other graphs (CHART-104, CHART-107, CHART-108). |
+
+### 18.9 Transmitter
+
+| ID | Pri. | Requirement |
+|---|---|---|
+| IND-080 | S | The library shall provide a **Transmitter** widget: an instrument bubble showing a tag (for example `LT-101`), the measured value and its unit. |
+| IND-081 | S | The Transmitter shall show a device status among `ok`, `failure`, `check`, `out_of_spec` and `maintenance` (the NAMUR NE 107 categories) by a symbol and a text as well as by color. |
+| IND-082 | S | While the status is `failure`, the Transmitter shall mark the value as invalid instead of showing it as a normal reading. |
+| IND-083 | C | Where alarm limits are set, the Transmitter shall compute and show the alarm level like the other numeric indicators (ALARM-001). |
+
+### 18.10 Event Log
+
+| ID | Pri. | Requirement |
+|---|---|---|
+| IND-090 | S | The library shall provide an **EventLog** widget: a chronological list of events with time, source, category (`operator`, `state`, `alarm`, `system`) and message, newest first. |
+| IND-091 | S | When the kernel calls `log(message, source, category)`, the EventLog shall append the event with a timestamp and keep at most `max_events` events. |
+| IND-092 | S | The EventLog shall let the user filter the events by category and text, and export them as CSV. |
+| IND-093 | C | Where a widget is connected with `connect(widget, names)`, the EventLog shall record each change of the named traits (an audit trail of operator actions). |
+
+### 18.11 Compact Indicators and Keypad
+
+| ID | Pri. | Requirement |
+|---|---|---|
+| IND-100 | S | The library shall provide a **DeviationIndicator** widget: a centre-zero bar showing the deviation between a value and its setpoint, with a tolerance band, drawn in color only while the deviation is outside the tolerance. |
+| IND-101 | S | The library shall provide a **Sparkline** widget: a compact trend of the last `history` values without axes, showing the last value and marking the minimum and maximum. |
+| IND-102 | S | The library shall provide a **BarGraph** widget: a group of aligned bars on a shared scale, each with its label, normal band and alarm limits, drawn in grey scale except while in alarm (ISA-101). |
+| IND-103 | S | The library shall provide a **KPITile** widget showing a value, its unit, a target and the difference to the target with its direction, and an optional sparkline; an `oee(availability, performance, quality)` helper shall compute the overall equipment effectiveness. |
+| IND-104 | S | The library shall provide a **NumericEntry** widget: a touch-friendly numeric keypad with a display, which checks the entered value against the range (NUM-010), commits it with Enter and discards it with Escape, and, where `confirm_delta` is set, asks for confirmation of large changes. |
+
 ---
 
 ## 19. Traceability of Front Panel Components
@@ -460,6 +500,10 @@ state model).
 | Annunciator panel | Annunciator | IND-040 to IND-043 |
 | Alarm summary | AlarmList | IND-050 to IND-053 |
 | Machine state model | StateMachine | IND-060 to IND-063 |
+| Time-based trend | TrendChart | IND-070 to IND-075 |
+| Instrument bubble with device status | Transmitter | IND-080 to IND-083 |
+| Event journal | EventLog | IND-090 to IND-093 |
+| Deviation bar, sparkline, bar group, KPI tile, keypad | DeviationIndicator, Sparkline, BarGraph, KPITile, NumericEntry | IND-100 to IND-104 |
 
 ---
 
@@ -481,3 +525,4 @@ state model).
 | 0.4 | DOC-007: safety notice. |
 | 0.5 | API-014 (graphic and form entry for every control), NUM-010 (numeric entry field with range check), CHART-108 (axis ranges set by the user), STYLE-007 (light / dark theme). |
 | 0.6 | BOOL-015 (push button with a built-in lamp); STYLE-007 `system` theme; STYLE-008 (three-position theme switch applied to the page). |
+| 0.7 | IND-070 .. IND-104: trend chart, transmitter with device status, event log, deviation indicator, sparkline, bar graph, KPI tile, numeric keypad. |

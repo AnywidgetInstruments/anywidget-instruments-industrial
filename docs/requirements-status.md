@@ -1,7 +1,7 @@
 # Requirements status
 
 Status of each requirement of the
-[specification](specification.md) (version 0.2).
+[specification](specification.md) (version 0.7).
 
 Legend: ✅ implemented and tested · 🟡 partial / not verifiable here · ⬜ not started
 
@@ -117,6 +117,10 @@ JupyterLab / Notebook 7 / marimo (`e2e/`).
 | IND-040 … IND-043 | S | ✅ | Annunciator: ISA-18.1 sequences A, M, R with lock-in, first out, horn, Silence / Ack / Reset / Test |
 | IND-050 … IND-053 | S | ✅ | AlarmList: sort and filter, timed shelving with automatic unshelving, suppressed / out of service |
 | IND-060 … IND-063 | S/C | ✅ | StateMachine: PackML model (17 states), valid commands only, `state_complete()`, custom models |
+| IND-070 … IND-075 | S/C | ⬜ | TrendChart |
+| IND-080 … IND-083 | S/C | ⬜ | Transmitter |
+| IND-090 … IND-093 | S/C | ⬜ | EventLog |
+| IND-100 … IND-104 | S | ⬜ | DeviationIndicator, Sparkline, BarGraph, KPITile, NumericEntry |
 
 Tests: py (`tests/test_industrial.py`), js (`js/test/industrial.test.js`), e2e
 (`allwidgets.spec.js`, both directions for each object), visual baselines;
