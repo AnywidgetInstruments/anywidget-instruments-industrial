@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://s-celles.github.io/anywidget-instruments/schema/knob.schema.json",
+  "title": "Knob",
+  "description": "Rotary control with a pointer (NUM-101).",
+  "type": "object",
+  "x-awi-class": "Knob",
+  "allOf": [{ "$ref": "numeric.schema.json" }],
+  "properties": {
+    "_kind": { "const": "knob", "default": "knob", "x-awi-writer": "host" },
+    "angle_range": {
+      "type": "number",
+      "minimum": 10,
+      "maximum": 360,
+      "description": "Angle swept by the scale, in degrees.",
+      "default": 270,
+      "x-awi-writer": "host"
+    }
+  }
+}

@@ -10,7 +10,7 @@ import numpy as np
 import traitlets as t
 
 from ._alarm_logic import ALARM_LEVELS, compute_alarm_level, eng_scale
-from ._base import InstrumentWidget, float_serializers
+from ._base import InstrumentWidget, float_serializers, mode_trait, size_trait
 
 
 class NumericValue(t.Float):
@@ -261,6 +261,8 @@ class Tank(NumericWidget):
     _kind = t.Unicode("tank").tag(sync=True)
     _default_mode = "indicator"
     _default_size = (120, 200)
+    mode = mode_trait(_default_mode)
+    size = size_trait(*_default_size)
     fill_color = t.Unicode("").tag(sync=True)
     markers = t.List(t.Float()).tag(sync=True)
 

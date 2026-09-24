@@ -59,6 +59,21 @@ float_serializers: dict[str, Any] = {
 _report_callback_error = _dispatch.report_callback_error
 
 
+def mode_trait(default: str = "control") -> Any:
+    """``mode`` trait with a class-specific default.
+
+    Hosts without a Python kernel read the class defaults of the synced
+    traits (HOST-007): a widget that is an indicator by default declares it
+    here rather than only in ``_default_mode``.
+    """
+    return t.Enum(["control", "indicator"], default_value=default).tag(sync=True)
+
+
+def size_trait(width: int = 160, height: int = 160) -> Any:
+    """``size`` trait with a class-specific default (see :func:`mode_trait`)."""
+    return t.Tuple(t.CInt(), t.CInt(), default_value=(width, height)).tag(sync=True)
+
+
 class InstrumentWidget(anywidget.AnyWidget):
     """Base class of every instrumentation widget.
 
@@ -86,12 +101,12 @@ class InstrumentWidget(anywidget.AnyWidget):
     #: Front-end renderer identifier (one bundle serves every widget).
     _kind = t.Unicode("").tag(sync=True)
 
-    mode = t.Enum(["control", "indicator"], default_value="control").tag(sync=True)
+    mode = mode_trait("control")
     label = t.Unicode("").tag(sync=True)
     disabled = t.Bool(False).tag(sync=True)
     visible = t.Bool(True).tag(sync=True)
     tooltip = t.Unicode("").tag(sync=True)
-    size = t.Tuple(t.CInt(), t.CInt(), default_value=(160, 160)).tag(sync=True)
+    size = size_trait(160, 160)
     style = t.Enum(list(STYLES), default_value="modern").tag(sync=True)
     #: ``"auto"`` (the style decides), ``"light"`` or ``"dark"`` (STYLE-007).
     theme = t.Enum(list(THEMES), default_value="auto").tag(sync=True)

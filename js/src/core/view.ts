@@ -1,5 +1,8 @@
 // Base view shared by every widget: common traits, render scheduling,
 // throttled value sending and visibility handling.
+import type { WidgetContract } from "../contract/spec.js";
+import { readTrait } from "../contract/traits.js";
+import { BY_KIND } from "../generated/contract.js";
 import { html, safeColor } from "./dom.js";
 import { type Liveness, liveness, recordBeat } from "./liveness.js";
 import type { AnyModel, Handler, Traits } from "./model.js";
@@ -19,6 +22,9 @@ export class BaseView<T extends object = Traits> {
   readonly el: HTMLElement;
   readonly id: string;
   readonly kind: string;
+  /** Trait contract of the widget, when its `_kind` has a schema (HOST-001). */
+  readonly contract: WidgetContract | undefined;
+  private _invalid = new Set<string>();
   readonly root: HTMLDivElement;
   readonly labelEl: HTMLDivElement;
   readonly body: HTMLDivElement;
@@ -42,7 +48,8 @@ export class BaseView<T extends object = Traits> {
     this.model = model;
     this.el = el;
     this.id = `${prefix}-${++uid}`;
-    this.kind = String(this.get("_kind") ?? "");
+    this.kind = String((model as unknown as AnyModel<Traits>).get("_kind") ?? "");
+    this.contract = BY_KIND[this.kind];
     this._frame = 0;
     this._dirty = true;
     this._inViewport = true;
@@ -99,11 +106,22 @@ export class BaseView<T extends object = Traits> {
     this._disposers.push(() => this.model.off(event, cb));
   }
 
-  /** Raw trait value (a trait that is not part of `T` reads as `unknown`). */
+  /**
+   * Trait value. For a widget with a schema, values are read through the
+   * contract (HOST-002): wrong types fall back to the default, numbers are
+   * clamped to the schema bounds, "nan" / "inf" strings are decoded.
+   */
   get<K extends keyof T & string>(name: K): T[K];
   get(name: string): unknown;
   get(name: string): unknown {
-    return (this.model as unknown as AnyModel<Traits>).get(name);
+    const raw = (this.model as unknown as AnyModel<Traits>).get(name);
+    const spec = this.contract?.traits[name];
+    if (!spec) return raw;
+    return readTrait(spec, raw, () => {
+      if (this._invalid.has(name)) return;
+      this._invalid.add(name);
+      console.warn(`anywidget-instruments: ${this.kind}.${name}: invalid value ${JSON.stringify(raw)}, using the default`);
+    });
   }
 
   /** True when user input may modify the value (API-004, API-011). */

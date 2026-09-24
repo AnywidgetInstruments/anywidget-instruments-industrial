@@ -1,11 +1,40 @@
 // Linear numeric widgets: Tank, Thermometer, FillSlide, VUMeter (NUM-105..108).
 import { clear, safeColor, svg, svgText } from "../core/dom.js";
 import { formatValue, tickFormat } from "../core/format.js";
+import type { AnyModel } from "../core/model.js";
 import { linearHit, parseNumber, ticks } from "../core/scale.js";
+import type { TankTraits } from "../generated/contract.js";
 import { NumericView, svgPoint } from "./numeric.js";
 
-export class LinearView extends NumericView {
-  constructor(model, el) {
+/**
+ * Traits of the linear widgets. Tank comes from its schema; the traits of
+ * Thermometer, FillSlide and VUMeter are typed here until they get theirs.
+ */
+export type LinearTraits = TankTraits & {
+  orientation?: "vertical" | "horizontal";
+  segments?: number;
+  peak?: number | string | null;
+  peak_hold?: boolean;
+};
+
+interface Track {
+  w: number;
+  h: number;
+  x0: number;
+  x1: number;
+  y0: number;
+  y1: number;
+  bulb: number;
+}
+
+export class LinearView extends NumericView<LinearTraits> {
+  readonly svgEl: SVGElement;
+  readonly staticLayer: SVGElement;
+  readonly dynamicLayer: SVGElement;
+  protected _staticKey: string;
+  track: Track | undefined;
+
+  constructor(model: AnyModel<LinearTraits>, el: HTMLElement) {
     super(model, el, ["orientation", "markers", "fill_color", "segments", "peak", "peak_hold"]);
     this.svgEl = svg("svg", { class: "awi-svg", "aria-hidden": "true" });
     this.body.appendChild(this.svgEl);
@@ -13,9 +42,9 @@ export class LinearView extends NumericView {
     this.dynamicLayer = svg("g", { class: "awi-dynamic" });
     this.svgEl.append(this.staticLayer, this.dynamicLayer);
     this._staticKey = "";
-    const hit = (e, final) => {
+    const hit = (e: PointerEvent, final: boolean): void => {
       const p = svgPoint(this.svgEl, e);
-      const t = this.track;
+      const t = this.track as Track;
       const f = this.vertical ? linearHit(p.y, t.y1, t.y0) : linearHit(p.x, t.x0, t.x1);
       this.commitFraction(f, final);
     };
@@ -23,11 +52,11 @@ export class LinearView extends NumericView {
     this.schedule();
   }
 
-  get vertical() {
+  get vertical(): boolean {
     return this.kind === "tank" || this.kind === "thermometer" || this.get("orientation") !== "horizontal";
   }
 
-  layout() {
+  layout(): Track {
     const [w, h] = this.get("size");
     const labelSpace = 40;
     if (this.vertical) {
@@ -40,12 +69,12 @@ export class LinearView extends NumericView {
     return { w, h, x0: 14, x1: w - 14, y0: 8, y1: 8 + trackH, bulb: 0 };
   }
 
-  pointAt(f) {
-    const t = this.track;
+  pointAt(f: number): number {
+    const t = this.track as Track;
     return this.vertical ? t.y1 - f * (t.y1 - t.y0) : t.x0 + f * (t.x1 - t.x0);
   }
 
-  buildStatic() {
+  buildStatic(): void {
     const t = (this.track = this.layout());
     this.svgEl.setAttribute("viewBox", `0 0 ${t.w} ${t.h}`);
     const layer = this.staticLayer;
@@ -82,9 +111,9 @@ export class LinearView extends NumericView {
     }
 
     // scale
-    const tk = ticks(this.min, this.max, this.get("ticks"), this.get("minor_ticks"), this.scaleType);
+    const tk = ticks(this.min, this.max, Number(this.get("ticks")), Number(this.get("minor_ticks")), this.scaleType);
     const fmt = tickFormat(this.get("format"));
-    const tickPath = (vals, len) =>
+    const tickPath = (vals: number[], len: number): string =>
       vals
         .map((v) => {
           const p = this.pointAt(this.frac(v));
@@ -111,13 +140,13 @@ export class LinearView extends NumericView {
     }
   }
 
-  draw() {
+  override draw(): void {
     const key = JSON.stringify(["min", "max", "scale", "ticks", "minor_ticks", "format", "orientation", "markers", "fill_color", "show_limits", "lolo", "lo", "hi", "hihi", "size", "segments", "skin"].map((k) => this.get(k)));
     if (key !== this._staticKey || !this.track) {
       this._staticKey = key;
       this.buildStatic();
     }
-    const t = this.track;
+    const t = this.track as Track;
     const p = this.pos();
     const layer = this.dynamicLayer;
     clear(layer);
@@ -126,7 +155,7 @@ export class LinearView extends NumericView {
       return;
     }
     const end = this.pointAt(p.fraction);
-    let bar;
+    let bar: SVGElement;
     if (this.vertical) {
       const x0 = this.kind === "thermometer" ? t.x0 + 3 : t.x0;
       const x1 = this.kind === "thermometer" ? t.x1 - 3 : t.x1;
@@ -144,11 +173,11 @@ export class LinearView extends NumericView {
     }
   }
 
-  drawSegments(fraction) {
-    const t = this.track;
-    const n = Math.max(2, this.get("segments"));
+  drawSegments(fraction: number): void {
+    const t = this.track as Track;
+    const n = Math.max(2, Number(this.get("segments")));
     const lit = Math.round(fraction * n);
-    const g = (k) => (this.get(k) === null || this.get(k) === undefined ? null : this.frac(parseNumber(this.get(k))));
+    const g = (k: string): number | null => (this.get(k) === null || this.get(k) === undefined ? null : this.frac(parseNumber(this.get(k))));
     const warn = g("hi") ?? 0.7;
     const danger = g("hihi") ?? 0.9;
     const peak = this.get("peak");

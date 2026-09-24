@@ -1,0 +1,10 @@
+{
+  "description": "Trait values a Python widget accepts and sends: the front end must read them unchanged (HOST-002).",
+  "states": [
+    { "widget": "Knob", "traits": { "value": 42.5, "min": -10, "max": 50, "step": 0.5, "unit": "V", "format": "%.2f", "angle_range": 300, "ticks": 7, "minor_ticks": 0, "lolo": -5, "lo": null, "hi": 40, "hihi": null, "deadband": 1.5, "coerce": true, "update_rate": 10, "animation_ms": 300, "mode": "indicator", "size": [200, 180], "skin": {} } },
+    { "widget": "Knob", "traits": { "value": "nan", "angle_range": 10, "scale": "log", "min": 0.001, "max": 1000, "format": "%.3s" } },
+    { "widget": "Knob", "traits": { "value": "-inf", "theme": "system", "style": "classic", "label": "Gain", "tooltip": "<b>not html</b>", "disabled": true, "visible": false } },
+    { "widget": "Tank", "traits": { "value": 2.41, "max": 4, "unit": "m", "markers": [0.5, 3.5], "fill_color": "#1f77b4", "show_limits": true, "hi": 3, "hihi": 3.5 } },
+    { "widget": "Tank", "traits": { "value": 7, "min": 0, "max": 4, "markers": [], "fill_color": "", "mode": "control", "size": [80, 300] } }
+  ]
+}

@@ -1,5 +1,6 @@
 // anywidget-instruments front-end entry point (AFM module).
 // A single bundle serves every widget; the `_kind` trait selects the view.
+import { attachDerived } from "./contract/derived.js";
 import { watchModel } from "./core/liveness.js";
 import { AlarmView } from "./widgets/alarm.js";
 import { AlarmListView } from "./widgets/alarmlist.js";
@@ -85,8 +86,12 @@ function render({ model, el }) {
   return () => view.destroy();
 }
 
+// Model-level setup, once per model even when no view is displayed:
+// heartbeats (ROB-001) and derived traits computed by the front end when no
+// host owns the state (HOST-004).
 function initialize({ model }) {
   watchModel(model);
+  return attachDerived(model);
 }
 
 export default { initialize, render };

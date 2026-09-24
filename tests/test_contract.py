@@ -54,14 +54,18 @@ def _synced(cls: type) -> dict[str, t.TraitType]:
     return {k: v for k, v in cls.class_traits(sync=True).items() if k not in FRAMEWORK}
 
 
-def test_base_schemas() -> None:
+#: Widgets migrated to the host-independent front end (phase 2 pilot).
+MIGRATED = {"Knob", "Tank"}
+
+
+def test_migrated_widgets_have_a_schema() -> None:
     classes = {w["class"] for w in CONTRACT["widgets"].values()}
-    assert {"InstrumentWidget", "NumericWidget"} <= classes
+    assert {"InstrumentWidget", "NumericWidget", *MIGRATED} <= classes
 
 
 def test_class_defaults_announce_no_liveness() -> None:
     """HOST-003: a host using class defaults never sees NO KERNEL."""
-    for cls in (_base.InstrumentWidget, ai.Knob, ai.Gauge, ai.WaveformChart):
+    for cls in (_base.InstrumentWidget, *(CLASSES[c] for c in MIGRATED)):
         traits = cls.class_traits()
         assert traits["_session"].default() == ""
         assert traits["_heartbeat"].default() == 0

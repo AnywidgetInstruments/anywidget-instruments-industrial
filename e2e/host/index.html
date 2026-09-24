@@ -1,0 +1,57 @@
+<!doctype html>
+<!--
+  A minimal AFM host without a Python kernel (HOST-001): like the SlateAFM
+  extension of KaimonSlate.jl, it binds each widget to a plain dictionary of
+  traits built from the class defaults (static/contract.json) and the traits
+  given by the user, then runs the module's initialize and render.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Hostless widgets</title>
+    <link rel="stylesheet" href="/src/anywidget_instruments/static/index.css" />
+    <style>body { font-family: sans-serif; display: flex; gap: 24px; padding: 16px; }</style>
+  </head>
+  <body>
+    <div id="knob"></div>
+    <div id="tank"></div>
+    <script type="module">
+      const contract = await (await fetch("/src/anywidget_instruments/static/contract.json")).json();
+      const { default: afm } = await import("/src/anywidget_instruments/static/index.js");
+
+      function hostModel(traits) {
+        const handlers = {};
+        const fire = (ev, ...a) => (handlers[ev] || []).slice().forEach((h) => h(...a));
+        const saved = [];
+        return {
+          saved,
+          get: (k) => traits[k],
+          set(k, v) {
+            if (JSON.stringify(traits[k]) === JSON.stringify(v)) return;
+            traits[k] = v;
+            fire(`change:${k}`);
+          },
+          save_changes: () => saved.push(structuredClone(traits)),
+          on: (ev, cb) => (handlers[ev] ||= []).push(cb),
+          off: (ev, cb) => (handlers[ev] = (handlers[ev] || []).filter((h) => h !== cb)),
+          send: () => {},
+          push(k, v) { traits[k] = v; fire(`change:${k}`); },
+        };
+      }
+
+      const classDefaults = (name) => Object.fromEntries(Object.entries(contract.widgets[name].traits).map(([k, s]) => [k, s.default]));
+      const widgets = {
+        knob: ["Knob", { value: 150, coerce: true, hi: 90, deadband: 5, label: "Hostless knob" }],
+        tank: ["Tank", { value: 3.2, max: 4, unit: "m", hi: 3, hihi: 3.5, markers: [0.5, 3.5], label: "Hostless tank" }],
+      };
+      window.models = {};
+      for (const [id, [cls, traits]] of Object.entries(widgets)) {
+        const model = hostModel({ ...classDefaults(cls), ...traits });
+        window.models[id] = model;
+        afm.initialize({ model });
+        afm.render({ model, el: document.getElementById(id) });
+      }
+      document.body.dataset.ready = "true";
+    </script>
+  </body>
+</html>

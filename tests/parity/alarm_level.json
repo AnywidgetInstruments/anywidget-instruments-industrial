@@ -1,0 +1,30 @@
+{
+  "description": "Alarm level with hysteresis (ALARM-002, ALARM-003). Each case runs its steps in order; the level of a step is the previous level of the next one. A step may change the limits.",
+  "cases": [
+    { "name": "no limits", "limits": {}, "steps": [[0, "normal"], [1e9, "normal"], [-1e9, "normal"]] },
+    { "name": "limits are inclusive", "limits": { "lolo": 10, "lo": 20, "hi": 80, "hihi": 90 },
+      "steps": [[80, "hi"], [90, "hihi"], [50, "normal"], [20, "lo"], [10, "lolo"], [10.0001, "lo"], [79.9999, "normal"]] },
+    { "name": "hihi wins over hi, lolo over lo", "limits": { "lolo": 10, "lo": 20, "hi": 80, "hihi": 90 },
+      "steps": [[95, "hihi"], [5, "lolo"]] },
+    { "name": "only one side", "limits": { "hi": 80 }, "steps": [[85, "hi"], [-1000, "normal"]] },
+    { "name": "deadband on leaving hi", "limits": { "hi": 80, "deadband": 2 },
+      "steps": [[81, "hi"], [79, "hi"], [78.5, "hi"], [78, "normal"], [79, "normal"], [80, "hi"]] },
+    { "name": "deadband on leaving hihi steps down to hi", "limits": { "hi": 80, "hihi": 90, "deadband": 2 },
+      "steps": [[95, "hihi"], [89, "hihi"], [87, "hi"], [79, "hi"], [77.5, "normal"]] },
+    { "name": "deadband skips levels when far enough", "limits": { "hi": 80, "hihi": 90, "deadband": 2 },
+      "steps": [[95, "hihi"], [50, "normal"]] },
+    { "name": "deadband on the low side", "limits": { "lolo": 10, "lo": 20, "deadband": 1 },
+      "steps": [[5, "lolo"], [10.5, "lolo"], [11, "lo"], [20.5, "lo"], [21.5, "normal"]] },
+    { "name": "entering a more severe level is immediate", "limits": { "hi": 80, "hihi": 90, "deadband": 5 },
+      "steps": [[82, "hi"], [90, "hihi"]] },
+    { "name": "crossing sides", "limits": { "lo": 20, "hi": 80, "deadband": 5 },
+      "steps": [[85, "hi"], [10, "lo"], [85, "hi"]] },
+    { "name": "non-finite values keep the previous level", "limits": { "hi": 80 },
+      "steps": [[85, "hi"], ["nan", "hi"], ["inf", "hi"], ["-inf", "hi"], [0, "normal"], ["nan", "normal"]] },
+    { "name": "a removed limit releases its level", "limits": { "hi": 80, "deadband": 10 },
+      "steps": [[85, "hi"], [{ "hi": null }, 85, "normal"]] },
+    { "name": "a moved limit is applied with the deadband", "limits": { "hi": 80, "deadband": 1 },
+      "steps": [[85, "hi"], [{ "hi": 90 }, 85, "normal"], [{ "hi": 84.5 }, 85, "hi"]] },
+    { "name": "zero deadband", "limits": { "lo": 20 }, "steps": [[20, "lo"], [20.000001, "normal"]] }
+  ]
+}
