@@ -1,0 +1,360 @@
+/* anywidget-instruments styles.
+ * Every rule is scoped under .awi-root (GEN-010) and every color is a CSS
+ * custom property (STYLE-003) that can be overridden per widget or per page:
+ *   .awi-root { --awi-accent: hotpink; }
+ */
+
+.awi-root {
+  /* palette: modern (default) */
+  --awi-fg: #1f2937;
+  --awi-muted: #6b7280;
+  --awi-bg: transparent;
+  --awi-face: #f9fafb;
+  --awi-face-stroke: #9ca3af;
+  --awi-plot-bg: #ffffff;
+  --awi-grid: #e5e7eb;
+  --awi-accent: #2563eb;
+  --awi-fill: #2563eb;
+  --awi-track: #e5e7eb;
+  --awi-needle: #dc2626;
+  --awi-knob: #d1d5db;
+  --awi-knob-stroke: #6b7280;
+  --awi-pointer: #111827;
+  --awi-led-on: #22c55e;
+  --awi-led-off: #1f3a2a;
+  --awi-switch-on: #16a34a;
+  --awi-seg-on: #ef4444;
+  --awi-seg-off: rgba(239, 68, 68, 0.12);
+  --awi-seg-bg: #111827;
+  --awi-ok: #16a34a;
+  --awi-warn: #d97706;
+  --awi-danger: #dc2626;
+  /* alarm levels (ALARM-002) */
+  --awi-alarm-lo: #b45309;
+  --awi-alarm-hi: #b45309;
+  --awi-alarm-lolo: #b91c1c;
+  --awi-alarm-hihi: #b91c1c;
+  /* alarm priorities (SCADA-008, see docs/alarm-conventions.md) */
+  --awi-prio-critical: #d10000;
+  --awi-prio-high: #f27b00;
+  --awi-prio-medium: #e6c700;
+  --awi-prio-low: #00a4c7;
+  /* chart traces */
+  --awi-trace-0: #2563eb;
+  --awi-trace-1: #dc2626;
+  --awi-trace-2: #16a34a;
+  --awi-trace-3: #9333ea;
+  --awi-trace-4: #ea580c;
+  --awi-trace-5: #0891b2;
+  --awi-trace-6: #be185d;
+  --awi-trace-7: #4d7c0f;
+  --awi-font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --awi-anim: 0ms;
+  --awi-blink-period: 0.5s;
+
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  font-family: var(--awi-font);
+  color: var(--awi-fg);
+  background: var(--awi-bg);
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* classic: flat, low detail */
+.awi-root.awi-style-classic {
+  --awi-face: #ececec;
+  --awi-face-stroke: #7a7a7a;
+  --awi-knob: #c8c8c8;
+  --awi-knob-stroke: #7a7a7a;
+  --awi-fill: #4a6fa5;
+  --awi-track: #d4d4d4;
+  --awi-needle: #202020;
+  --awi-accent: #4a6fa5;
+  --awi-font: Tahoma, Verdana, sans-serif;
+}
+
+/* system: follow host theme variables (JupyterLab, VS Code) with fallbacks */
+.awi-root.awi-style-system {
+  --awi-fg: var(--jp-ui-font-color1, var(--vscode-editor-foreground, #1f2937));
+  --awi-muted: var(--jp-ui-font-color2, var(--vscode-descriptionForeground, #6b7280));
+  --awi-face: var(--jp-layout-color1, var(--vscode-editor-background, #ffffff));
+  --awi-face-stroke: var(--jp-border-color1, #9ca3af);
+  --awi-plot-bg: var(--jp-layout-color0, var(--vscode-editor-background, #ffffff));
+  --awi-grid: var(--jp-border-color2, #e5e7eb);
+  --awi-accent: var(--jp-brand-color1, var(--vscode-focusBorder, #2563eb));
+  --awi-fill: var(--jp-brand-color1, #2563eb);
+  --awi-track: var(--jp-layout-color3, #e5e7eb);
+  --awi-knob: var(--jp-layout-color2, #d1d5db);
+  --awi-pointer: var(--jp-ui-font-color0, #111827);
+  --awi-font: var(--jp-ui-font-family, system-ui, sans-serif);
+}
+
+/* STYLE-002: dark hosts */
+@media (prefers-color-scheme: dark) {
+  .awi-root.awi-style-system {
+    --awi-fg: var(--jp-ui-font-color1, var(--vscode-editor-foreground, #e5e7eb));
+    --awi-muted: var(--jp-ui-font-color2, #9ca3af);
+    --awi-face: var(--jp-layout-color1, var(--vscode-editor-background, #1f2937));
+    --awi-face-stroke: var(--jp-border-color1, #6b7280);
+    --awi-plot-bg: var(--jp-layout-color0, var(--vscode-editor-background, #111827));
+    --awi-grid: var(--jp-border-color2, #374151);
+    --awi-track: var(--jp-layout-color3, #374151);
+    --awi-knob: var(--jp-layout-color2, #4b5563);
+    --awi-pointer: var(--jp-ui-font-color0, #f9fafb);
+    --awi-alarm-lo: #fbbf24;
+    --awi-alarm-hi: #fbbf24;
+    --awi-alarm-lolo: #f87171;
+    --awi-alarm-hihi: #f87171;
+    --awi-fill: var(--jp-brand-color1, #60a5fa);
+    --awi-trace-6: #f472b6;
+  }
+}
+:is([data-jp-theme-light="false"], .vscode-dark, .vscode-high-contrast, [data-theme="dark"], .dark-mode) .awi-root.awi-style-system {
+  --awi-fg: var(--jp-ui-font-color1, var(--vscode-editor-foreground, #e5e7eb));
+  --awi-muted: var(--jp-ui-font-color2, #9ca3af);
+  --awi-face: var(--jp-layout-color1, var(--vscode-editor-background, #1f2937));
+  --awi-face-stroke: var(--jp-border-color1, #6b7280);
+  --awi-plot-bg: var(--jp-layout-color0, var(--vscode-editor-background, #111827));
+  --awi-grid: var(--jp-border-color2, #374151);
+  --awi-track: var(--jp-layout-color3, #374151);
+  --awi-knob: var(--jp-layout-color2, #4b5563);
+  --awi-pointer: var(--jp-ui-font-color0, #f9fafb);
+  --awi-alarm-lo: #fbbf24;
+  --awi-alarm-hi: #fbbf24;
+  --awi-alarm-lolo: #f87171;
+  --awi-alarm-hihi: #f87171;
+  --awi-fill: var(--jp-brand-color1, #60a5fa);
+  --awi-trace-6: #f472b6;
+}
+:is([data-jp-theme-light="true"], .vscode-light, [data-theme="light"]) .awi-root.awi-style-system {
+  --awi-fg: var(--jp-ui-font-color1, var(--vscode-editor-foreground, #1f2937));
+  --awi-face: var(--jp-layout-color1, var(--vscode-editor-background, #ffffff));
+  --awi-plot-bg: var(--jp-layout-color0, var(--vscode-editor-background, #ffffff));
+  --awi-grid: var(--jp-border-color2, #e5e7eb);
+  --awi-track: var(--jp-layout-color3, #e5e7eb);
+  --awi-knob: var(--jp-layout-color2, #d1d5db);
+  --awi-pointer: var(--jp-ui-font-color0, #111827);
+}
+
+/* ---- layout ------------------------------------------------------------ */
+.awi-root .awi-label { font-size: 12px; font-weight: 600; text-align: center; max-width: max(var(--awi-w), 120px); overflow-wrap: break-word; }
+.awi-root .awi-body { position: relative; outline: none; border-radius: 6px; touch-action: none; }
+.awi-root .awi-body:focus-visible { box-shadow: 0 0 0 2px var(--awi-accent); }
+.awi-root .awi-svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.awi-root.awi-meter .awi-svg { overflow: hidden; border-radius: 6px; }
+.awi-root .awi-value-row { display: flex; gap: 6px; align-items: baseline; font-size: 13px; font-variant-numeric: tabular-nums; }
+.awi-root .awi-badge { font-size: 10px; font-weight: 700; padding: 0 4px; border-radius: 3px; border: 1px solid currentColor; }
+.awi-root.awi-control .awi-body { cursor: grab; }
+.awi-root.awi-control.awi-dragging .awi-body { cursor: grabbing; }
+.awi-root.awi-indicator .awi-body { cursor: default; }
+.awi-root.awi-disabled { opacity: 0.45; filter: grayscale(1); }
+.awi-root.awi-disabled .awi-body { cursor: not-allowed; }
+
+/* alarm colors on the value (ALARM-002) */
+.awi-root.awi-alarm-lo .awi-value-row { color: var(--awi-alarm-lo); }
+.awi-root.awi-alarm-hi .awi-value-row { color: var(--awi-alarm-hi); }
+.awi-root.awi-alarm-lolo .awi-value-row { color: var(--awi-alarm-lolo); font-weight: 700; }
+.awi-root.awi-alarm-hihi .awi-value-row { color: var(--awi-alarm-hihi); font-weight: 700; }
+.awi-root.awi-invalid .awi-value { color: var(--awi-muted); font-style: italic; }
+.awi-root.awi-invalid .awi-needle, .awi-root.awi-invalid .awi-fill { opacity: 0.3; }
+.awi-root .awi-zone-lo, .awi-root .awi-zone-hi { fill: var(--awi-alarm-hi); opacity: 0.55; }
+.awi-root .awi-zone-lolo, .awi-root .awi-zone-hihi { fill: var(--awi-alarm-hihi); opacity: 0.7; }
+
+/* ---- stale data (ROB-001): hatched body + text badge, input rejected ---- */
+.awi-root { position: relative; }
+.awi-root.awi-stale .awi-body { opacity: 0.55; cursor: not-allowed !important; background-image: repeating-linear-gradient(45deg, transparent 0 6px, rgba(128, 128, 128, 0.25) 6px 8px); }
+.awi-root .awi-stale-badge { position: absolute; top: 2px; left: 50%; transform: translateX(-50%); z-index: 2; white-space: nowrap; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 3px; color: #1f2937; background: #fde68a; border: 1px solid #b45309; pointer-events: none; }
+
+/* ---- scales -------------------------------------------------------------- */
+.awi-root .awi-face { fill: var(--awi-face); stroke: var(--awi-face-stroke); stroke-width: 1.5; }
+.awi-root .awi-scale-line { fill: none; stroke: var(--awi-fg); stroke-width: 1; }
+.awi-root .awi-tick-major { stroke: var(--awi-fg); stroke-width: 1.6; }
+.awi-root .awi-tick-minor { stroke: var(--awi-muted); stroke-width: 0.8; }
+.awi-root .awi-tick-label { fill: var(--awi-fg); font-size: 10px; font-family: var(--awi-font); }
+.awi-root .awi-range { opacity: 0.8; }
+.awi-root .awi-marker { stroke: var(--awi-fg); stroke-dasharray: 3 2; }
+.awi-root .awi-peak { fill: var(--awi-accent); }
+.awi-root .awi-turns { fill: var(--awi-muted); font-size: 11px; }
+
+/* rotary */
+.awi-root .awi-knob-body { fill: var(--awi-knob); stroke: var(--awi-knob-stroke); stroke-width: 2; }
+.awi-root.awi-style-modern .awi-knob-body { filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.25)); }
+.awi-root .awi-knurl { stroke-dasharray: 2 3; stroke-width: 4; }
+.awi-root .awi-pointer { stroke: var(--awi-pointer); stroke-width: 5; }
+.awi-root .awi-needle-shape { fill: var(--awi-needle); }
+.awi-root .awi-hub { fill: var(--awi-fg); }
+.awi-root .awi-needle { transform-box: view-box; }
+.awi-root.awi-animate .awi-needle { transition: transform var(--awi-anim) ease-out; }
+.awi-root.awi-animate .awi-fill { transition: y var(--awi-anim) ease-out, height var(--awi-anim) ease-out, width var(--awi-anim) ease-out; }
+
+/* linear */
+.awi-root .awi-track { fill: var(--awi-track); stroke: var(--awi-face-stroke); stroke-width: 1; }
+.awi-root .awi-fill { fill: var(--awi-fill); }
+.awi-root.awi-thermometer { --awi-fill: #dc2626; }
+.awi-root .awi-thumb { fill: var(--awi-face); stroke: var(--awi-fg); stroke-width: 1.5; }
+.awi-root .awi-seg { opacity: 0.15; }
+.awi-root .awi-seg.awi-on { opacity: 1; }
+.awi-root .awi-seg-ok { fill: var(--awi-ok); }
+.awi-root .awi-seg-warn { fill: var(--awi-warn); }
+.awi-root .awi-seg-danger { fill: var(--awi-danger); }
+.awi-root .awi-peak-seg { stroke: var(--awi-fg); stroke-width: 1; }
+
+/* seven segment */
+.awi-root .awi-seg-bg { fill: var(--awi-seg-bg); }
+.awi-root .awi-segment { fill: var(--awi-seg-off); }
+.awi-root .awi-segment.awi-on { fill: var(--awi-seg-on); }
+.awi-root.awi-sevensegment .awi-value { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+/* ---- boolean --------------------------------------------------------------- */
+.awi-root .awi-led { fill: var(--awi-led-off); stroke: var(--awi-face-stroke); stroke-width: 2; }
+.awi-root.awi-on .awi-led { fill: var(--awi-led-on); }
+.awi-root.awi-style-modern.awi-on .awi-led { filter: drop-shadow(0 0 4px var(--awi-led-on)); }
+.awi-root .awi-led-glint { fill: rgba(255, 255, 255, 0.75); }
+.awi-root.awi-blink .awi-led, .awi-root.awi-blink .awi-led-glint { animation: awi-blink var(--awi-blink-period) steps(1, end) infinite; }
+@keyframes awi-blink { 50% { opacity: 0.2; } }
+
+.awi-root .awi-plate { fill: var(--awi-face); stroke: var(--awi-face-stroke); }
+.awi-root .awi-bezel { fill: var(--awi-knob); stroke: var(--awi-knob-stroke); stroke-width: 2; }
+.awi-root .awi-lever { stroke: var(--awi-knob-stroke); stroke-width: 7; }
+.awi-root .awi-lever-tip { fill: var(--awi-knob); stroke: var(--awi-knob-stroke); stroke-width: 2; }
+.awi-root .awi-state-small { fill: var(--awi-fg); font-size: 9px; font-weight: 700; }
+.awi-root .awi-state-text { fill: var(--awi-fg); font-size: 14px; font-weight: 700; }
+.awi-root .awi-rocker { fill: var(--awi-knob); stroke: var(--awi-knob-stroke); }
+.awi-root .awi-rocker.awi-down { fill: var(--awi-track); }
+.awi-root.awi-on .awi-rocker:not(.awi-down) { fill: var(--awi-switch-on); }
+.awi-root .awi-slide-track { fill: var(--awi-track); stroke: var(--awi-face-stroke); }
+.awi-root.awi-on .awi-slide-track { fill: var(--awi-switch-on); }
+.awi-root .awi-slide-thumb { fill: #ffffff; stroke: var(--awi-face-stroke); }
+.awi-root .awi-button { fill: var(--awi-knob); stroke: var(--awi-knob-stroke); stroke-width: 1.5; }
+.awi-root.awi-pressed .awi-button, .awi-root.awi-on .awi-button { fill: var(--awi-track); }
+.awi-root .awi-button-text { fill: var(--awi-fg); font-size: 14px; font-weight: 600; }
+.awi-root .awi-button-lamp { fill: var(--awi-switch-on); }
+.awi-root.awi-armed .awi-button, .awi-root.awi-armed .awi-plate { stroke: var(--awi-warn); stroke-width: 3; stroke-dasharray: 4 2; }
+.awi-root.awi-expired .awi-body { box-shadow: 0 0 0 2px var(--awi-warn); }
+.awi-root .awi-estop-plate { fill: #facc15; stroke: #a16207; stroke-width: 2; }
+.awi-root .awi-estop-mushroom { fill: #dc2626; stroke: #7f1d1d; stroke-width: 3; }
+.awi-root.awi-style-modern .awi-estop-mushroom { filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.35)); }
+.awi-root.awi-on .awi-estop-mushroom { fill: #991b1b; filter: none; }
+.awi-root .awi-estop-text { fill: #ffffff; font-size: 12px; font-weight: 800; letter-spacing: 0.5px; }
+
+/* ---- chart ------------------------------------------------------------------- */
+.awi-root .awi-canvas { display: block; }
+.awi-root .awi-legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: 11px; max-width: var(--awi-w); }
+.awi-root .awi-legend-item { display: inline-flex; align-items: center; gap: 4px; }
+.awi-root .awi-hidden-trace { opacity: 0.4; text-decoration: line-through; }
+.awi-root .awi-swatch { width: 12px; height: 3px; border-radius: 2px; display: inline-block; }
+
+/* polar / smith / radar (SPEC-002..004) */
+.awi-root .awi-polar-grid circle, .awi-root .awi-polar-grid line, .awi-root .awi-polar-grid path { fill: none; stroke: var(--awi-grid); stroke-width: 0.6; }
+.awi-root .awi-smith-grid .awi-smith-outer { stroke: var(--awi-fg); stroke-width: 1; }
+.awi-root .awi-smith-grid .awi-smith-adm { stroke-dasharray: 2 2; }
+.awi-root .awi-polar .awi-tick-label { font-size: 7px; fill: var(--awi-muted); }
+.awi-root .awi-polar .awi-radar-axis { font-size: 8px; fill: var(--awi-fg); }
+.awi-root .awi-series-line { stroke-width: 1.5; stroke-linejoin: round; }
+.awi-root .awi-series-marker { stroke: var(--awi-plot-bg); stroke-width: 0.6; }
+
+/* graph toolbar and zoom box (CHART-104..107) */
+.awi-root .awi-toolbar { display: flex; gap: 4px; align-self: flex-end; }
+.awi-root .awi-toolbar button { font: inherit; font-size: 10px; padding: 1px 6px; border-radius: 3px; border: 1px solid var(--awi-face-stroke); background: var(--awi-face); color: var(--awi-fg); cursor: pointer; }
+.awi-root .awi-toolbar button[aria-pressed="true"] { background: var(--awi-accent); color: #fff; border-color: var(--awi-accent); }
+.awi-root .awi-zoom-box { position: absolute; border: 1px dashed var(--awi-accent); background: rgba(37, 99, 235, 0.12); pointer-events: none; }
+
+/* ---- alarm indicator ------------------------------------------------------------ */
+.awi-root.awi-alarmindicator .awi-body { display: flex; align-items: center; gap: 8px; padding: 6px 8px; box-sizing: border-box; border: 1px solid var(--awi-face-stroke); background: var(--awi-face); }
+.awi-root .awi-alarm-icon { width: 28px; height: 28px; flex: none; }
+.awi-root .awi-alarm-shape { fill: var(--awi-track); stroke: var(--awi-fg); stroke-width: 1; }
+.awi-root .awi-alarm-text { flex: 1; min-width: 0; font-size: 12px; }
+.awi-root .awi-alarm-state { font-weight: 700; }
+.awi-root .awi-alarm-msg { color: var(--awi-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.awi-root .awi-ack { font: inherit; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--awi-fg); background: var(--awi-face); color: var(--awi-fg); cursor: pointer; }
+.awi-root.awi-prio-critical, .awi-root .awi-prio-critical { --awi-prio: var(--awi-prio-critical); }
+.awi-root.awi-prio-high, .awi-root .awi-prio-high { --awi-prio: var(--awi-prio-high); }
+.awi-root.awi-prio-medium, .awi-root .awi-prio-medium { --awi-prio: var(--awi-prio-medium); }
+.awi-root.awi-prio-low, .awi-root .awi-prio-low { --awi-prio: var(--awi-prio-low); }
+.awi-root:is(.awi-state-active_unacknowledged, .awi-state-active_acknowledged, .awi-state-cleared_unacknowledged) .awi-alarm-shape { fill: var(--awi-prio); }
+.awi-root.awi-state-active_unacknowledged .awi-body { border-color: var(--awi-prio); border-width: 2px; }
+.awi-root.awi-state-cleared_unacknowledged .awi-alarm-shape { fill: none; stroke: var(--awi-prio); stroke-width: 3; }
+/* unacknowledged alarms blink: fast when active, slow when cleared */
+.awi-root.awi-state-active_unacknowledged .awi-alarm-icon { animation: awi-blink 0.8s steps(1, end) infinite; }
+.awi-root.awi-state-cleared_unacknowledged .awi-alarm-icon { animation: awi-blink 2s steps(1, end) infinite; }
+
+/* ---- process objects (SCADA-001..004) ------------------------------------------- */
+.awi-root {
+  --awi-proc-on: #16a34a;
+  --awi-proc-off: var(--awi-face);
+  --awi-proc-transit: #eab308;
+  --awi-proc-fault: #dc2626;
+  --awi-proc-stroke: var(--awi-fg);
+  --awi-pipe: #9ca3af;
+  --awi-fluid: #3b82f6;
+}
+.awi-root .awi-process-state { font-size: 11px; font-weight: 700; letter-spacing: 0.3px; }
+.awi-root .awi-valve-body, .awi-root .awi-pump-body, .awi-root .awi-motor-body, .awi-root .awi-actuator { fill: var(--awi-proc-off); stroke: var(--awi-proc-stroke); stroke-width: 2.5; stroke-linejoin: round; }
+.awi-root .awi-stem { stroke: var(--awi-proc-stroke); stroke-width: 2.5; }
+.awi-root .awi-pump-outlet { fill: var(--awi-proc-off); stroke: var(--awi-proc-stroke); stroke-width: 2.5; }
+.awi-root .awi-base { fill: var(--awi-muted); }
+.awi-root .awi-blade { fill: none; stroke: var(--awi-proc-stroke); stroke-width: 3; stroke-linecap: round; }
+.awi-root .awi-motor-shaft { fill: var(--awi-muted); }
+.awi-root .awi-motor-letter { fill: var(--awi-proc-stroke); font-size: 30px; font-weight: 700; }
+.awi-root .awi-dir-arrow { fill: none; stroke: var(--awi-proc-stroke); stroke-width: 3; }
+.awi-root .awi-dir-tip { fill: var(--awi-proc-stroke); }
+.awi-root .awi-fault-mark { fill: var(--awi-proc-fault); font-size: 22px; font-weight: 900; }
+.awi-root.awi-st-open .awi-valve-body, .awi-root.awi-st-running .awi-pump-body, .awi-root.awi-st-forward .awi-motor-body, .awi-root.awi-st-reverse .awi-motor-body { fill: var(--awi-proc-on); }
+.awi-root.awi-st-transit .awi-vl { fill: var(--awi-proc-transit); }
+.awi-root.awi-st-fault :is(.awi-valve-body, .awi-pump-body, .awi-motor-body, .awi-actuator) { stroke: var(--awi-proc-fault); stroke-dasharray: 5 3; }
+.awi-root.awi-st-fault .awi-process-state { color: var(--awi-proc-fault); }
+.awi-root .awi-rotor { transform-box: view-box; }
+.awi-root.awi-anim.awi-st-running .awi-rotor, .awi-root.awi-anim.awi-st-forward .awi-rotor { animation: awi-spin 1.2s linear infinite; }
+.awi-root.awi-anim.awi-st-reverse .awi-rotor { animation: awi-spin 1.2s linear infinite reverse; transform-origin: 46px 50px; }
+.awi-root.awi-anim.awi-st-forward .awi-rotor { transform-origin: 46px 50px; }
+@keyframes awi-spin { to { transform: rotate(360deg); } }
+.awi-root .awi-pipe { stroke: var(--awi-pipe); stroke-linecap: butt; stroke-linejoin: round; }
+.awi-root .awi-pipe-fluid { stroke: transparent; stroke-linejoin: round; }
+.awi-root .awi-pipe-fluid.awi-flowing { stroke: var(--awi-fluid); stroke-dasharray: 8 6; }
+.awi-root .awi-pipe-fluid.awi-flowing.awi-anim-flow { animation: awi-flow 0.6s linear infinite; }
+.awi-root .awi-pipe-fluid.awi-flowing.awi-reverse.awi-anim-flow { animation-direction: reverse; }
+@keyframes awi-flow { to { stroke-dashoffset: -14; } }
+
+/* faceplate popup (SCADA-009) */
+.awi-root .awi-faceplate { position: absolute; top: 100%; left: 0; z-index: 10; min-width: 170px; padding: 6px 8px; font-size: 12px; background: var(--awi-face); color: var(--awi-fg); border: 1px solid var(--awi-face-stroke); border-radius: 6px; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25); }
+.awi-root .awi-faceplate-head { display: flex; justify-content: space-between; align-items: center; font-weight: 700; margin-bottom: 4px; }
+.awi-root .awi-fp-row { margin: 4px 0; display: flex; gap: 4px; flex-wrap: wrap; }
+.awi-root .awi-faceplate button { font: inherit; padding: 3px 8px; border-radius: 4px; border: 1px solid var(--awi-face-stroke); background: var(--awi-knob); color: var(--awi-fg); cursor: pointer; }
+.awi-root .awi-faceplate button[aria-pressed="true"] { background: var(--awi-accent); color: #fff; }
+.awi-root .awi-faceplate button:disabled { opacity: 0.45; cursor: not-allowed; }
+.awi-root .awi-fp-close { padding: 0 6px !important; }
+
+/* synoptic canvas (SCADA-010) */
+.awi-root .awi-synoptic-body { position: relative; overflow: hidden; border: 1px solid var(--awi-face-stroke); background: var(--awi-plot-bg); }
+.awi-root .awi-synoptic-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+.awi-root .awi-synoptic-pipes { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.awi-root .awi-synoptic-children { position: absolute; inset: 0; }
+.awi-root .awi-synoptic-item { position: absolute; }
+
+/* alarm banner (SCADA-006) */
+.awi-root.awi-alarmbanner .awi-body { display: flex; flex-direction: column; border: 1px solid var(--awi-face-stroke); background: var(--awi-face); font-size: 12px; }
+.awi-root .awi-banner-head { display: flex; justify-content: space-between; align-items: center; padding: 4px 6px; font-weight: 700; border-bottom: 1px solid var(--awi-face-stroke); }
+.awi-root .awi-banner-scroll { overflow: auto; flex: 1; }
+.awi-root .awi-banner-table { width: 100%; border-collapse: collapse; }
+.awi-root .awi-banner-table th { text-align: left; font-weight: 600; color: var(--awi-muted); padding: 2px 6px; position: sticky; top: 0; background: var(--awi-face); }
+.awi-root .awi-banner-table td { padding: 2px 6px; border-top: 1px solid var(--awi-grid); white-space: nowrap; }
+.awi-root .awi-banner-table td:nth-child(4) { white-space: normal; width: 100%; }
+.awi-root .awi-prio-chip { display: inline-block; min-width: 22px; text-align: center; font-weight: 700; border-radius: 3px; color: #111827; background: var(--awi-prio); }
+.awi-root .awi-prio-critical .awi-prio-chip { color: #ffffff; }
+.awi-root tr.awi-state-active_unacknowledged { font-weight: 700; }
+.awi-root tr.awi-state-active_unacknowledged .awi-prio-chip { animation: awi-blink 0.8s steps(1, end) infinite; }
+.awi-root tr.awi-state-cleared_unacknowledged .awi-prio-chip { background: none; border: 2px solid var(--awi-prio); animation: awi-blink 2s steps(1, end) infinite; }
+
+/* ---- A11Y-005: reduced motion → no blinking/animation, steady distinct pattern ---- */
+@media (prefers-reduced-motion: reduce) {
+  .awi-root *, .awi-root { animation: none !important; transition: none !important; }
+  .awi-root.awi-blink .awi-led { stroke: var(--awi-fg); stroke-width: 3; stroke-dasharray: 3 2; }
+  .awi-root tr.awi-state-active_unacknowledged .awi-prio-chip { outline: 2px dashed var(--awi-fg); }
+  .awi-root.awi-state-active_unacknowledged .awi-alarm-shape,
+  .awi-root.awi-state-cleared_unacknowledged .awi-alarm-shape { stroke: var(--awi-fg); stroke-width: 2.5; stroke-dasharray: 3 2; }
+}

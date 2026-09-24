@@ -1,0 +1,76 @@
+[build-system]
+requires = ["hatchling", "hatch-jupyter-builder>=0.8"]
+build-backend = "hatchling.build"
+
+[project]
+name = "anywidget-instruments"
+version = "0.1.0.dev0"
+description = "Instrumentation widgets (knobs, gauges, LEDs, tanks, strip charts, alarms) for computational notebooks, built on anywidget."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+authors = [{ name = "Sébastien Celles" }]
+keywords = ["anywidget", "jupyter", "marimo", "instrumentation", "hmi", "scada", "widgets"]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Framework :: Jupyter",
+  "Framework :: Jupyter :: JupyterLab",
+  "Intended Audience :: Education",
+  "Intended Audience :: Science/Research",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Topic :: Scientific/Engineering :: Visualization",
+]
+dependencies = ["anywidget>=0.9", "traitlets>=5.9", "numpy>=1.23"]
+
+[project.optional-dependencies]
+units = ["pint>=0.22"]
+dev = ["pytest>=8", "pytest-cov", "ruff>=0.6", "mypy>=1.10", "pint>=0.22", "jupyterlab>=4", "notebook>=7", "marimo"]
+
+docs = [
+  "mkdocs>=1.6,<2",
+  "mkdocs-material>=9.5",
+  "mkdocstrings[python]>=0.26",
+  "jupyterlite-core>=0.4",
+  "jupyterlite-pyodide-kernel>=0.4",
+]
+
+[project.urls]
+Homepage = "https://github.com/s-celles/anywidget-instruments"
+Issues = "https://github.com/s-celles/anywidget-instruments/issues"
+Specification = "https://gist.github.com/s-celles/3343599158e4742e543ced320aa12743"
+
+[tool.hatch.build]
+only-packages = true
+artifacts = ["src/anywidget_instruments/static/*"]
+
+[tool.hatch.build.hooks.jupyter-builder]
+build-function = "hatch_jupyter_builder.npm_builder"
+ensured-targets = [
+  "src/anywidget_instruments/static/index.js",
+  "src/anywidget_instruments/static/index.css",
+]
+skip-if-exists = ["src/anywidget_instruments/static/index.js"]
+dependencies = ["hatch-jupyter-builder>=0.8"]
+
+[tool.hatch.build.hooks.jupyter-builder.build-kwargs]
+npm = ["npm"]
+build_cmd = "build"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+extend-exclude = ["e2e/notebooks", "e2e/marimo"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+warn_unused_ignores = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"

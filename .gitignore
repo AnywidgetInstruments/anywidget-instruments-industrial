@@ -1,0 +1,23 @@
+__pycache__/
+*.py[cod]
+.venv/
+dist/
+build/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+node_modules/
+.ipynb_checkpoints/
+# Built front-end bundle (produced by `npm run build`)
+src/anywidget_instruments/static/
+test-results/
+playwright-report/
+__marimo__/
+e2e/notebooks/saved-state.ipynb
+e2e/notebooks/ex-*.ipynb
+site/
+lite/.jupyterlite.doit.db
+lite/_output/
+lite/.cache/

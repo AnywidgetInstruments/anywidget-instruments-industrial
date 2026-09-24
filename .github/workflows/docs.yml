@@ -1,0 +1,50 @@
+# Documentation site (DOC-001, DOC-005) with a JupyterLite deployment
+# (DOC-006), published to GitHub Pages.
+name: Docs
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci && npm run build
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install build -e ".[docs]"
+      - run: python -m build --wheel -o dist
+      - name: MkDocs (offline-capable, strict)
+        run: mkdocs build --strict -d site
+      - name: JupyterLite with the package wheel
+        working-directory: lite
+        run: jupyter lite build --contents content --piplite-wheels ../dist/*.whl --output-dir ../site/lite
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

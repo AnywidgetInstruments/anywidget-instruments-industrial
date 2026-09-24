@@ -1,0 +1,25 @@
+{
+  "name": "anywidget-instruments",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Front-end ES modules of anywidget-instruments (AFM compliant).",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "node js/build.mjs",
+    "dev": "esbuild js/src/index.js --bundle --format=esm --target=es2020 --outfile=src/anywidget_instruments/static/index.js --watch",
+    "test": "vitest run",
+    "lint": "eslint js e2e",
+    "check:reproducible": "node js/scripts/check-reproducible.mjs",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@playwright/test": "^1.56.1",
+    "esbuild": "^0.25.0",
+    "eslint": "^9.0.0",
+    "globals": "^16.0.0",
+    "jsdom": "^26.0.0",
+    "vitest": "^3.0.0"
+  }
+}

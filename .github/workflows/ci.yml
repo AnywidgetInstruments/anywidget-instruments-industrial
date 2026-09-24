@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+      - name: Reproducible build (SEC-004)
+        run: npm run check:reproducible
+      - name: Bundle size budget (PERF-004, 150 kB gzipped)
+        run: |
+          size=$(cat src/anywidget_instruments/static/index.js src/anywidget_instruments/static/index.css | gzip -9 | wc -c)
+          echo "bundle: $size bytes gzipped"
+          test "$size" -le 153600
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bundle
+          path: src/anywidget_instruments/static/
+
+  python:
+    needs: frontend
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: bundle
+          path: src/anywidget_instruments/static/
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install -e ".[dev]"
+      - run: ruff check .
+      - run: ruff format --check .
+      - run: mypy src
+      - run: pytest --cov=anywidget_instruments
+
+  e2e:
+    needs: frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: bundle
+          path: src/anywidget_instruments/static/
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: pip install -e ".[dev]"
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      # JupyterLab, marimo, every widget, performance (QA-005), visual (QA-004)
+      - run: npx playwright test --reporter=list,html
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/

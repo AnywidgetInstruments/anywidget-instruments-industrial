@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>anywidget-instruments preview</title>
+<link rel="stylesheet" href="../../src/anywidget_instruments/static/index.css">
+<style>
+  body { font-family: system-ui, sans-serif; margin: 16px; background: #fff; }
+  body.dark { background: #111827; color: #e5e7eb; }
+  .grid { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+</style>
+</head>
+<body>
+<!-- Development preview: renders every widget with an in-memory model.
+     Run `npm run build`, then `python -m http.server` at the repository root
+     and open http://localhost:8000/js/preview/index.html (?style=classic|system, ?dark). -->
+<div class="grid" id="grid"></div>
+<script type="module">
+import widget from "../../src/anywidget_instruments/static/index.js";
+
+const params = new URLSearchParams(location.search);
+// deterministic data for visual regression tests (QA-004)
+let seed = 12345;
+const rand = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648);
+if (params.has("visual")) {
+  const st = document.createElement("style");
+  st.textContent = '.awi-root { --awi-font: "Liberation Sans", sans-serif; } body { font-family: "Liberation Sans", sans-serif; }';
+  document.head.appendChild(st);
+}
+const style = params.get("style") || "modern";
+if (params.has("dark")) { document.body.classList.add("dark"); document.body.dataset.jpThemeLight = "false"; }
+
+function model(state) {
+  const handlers = {};
+  return {
+    get: (k) => state[k],
+    set: (k, v) => { state[k] = v; (handlers[`change:${k}`] || []).forEach((h) => h()); },
+    save_changes: () => {},
+    on: (e, cb) => (handlers[e] ||= []).push(cb),
+    off: (e, cb) => { handlers[e] = (handlers[e] || []).filter((h) => h !== cb); },
+    send: () => {},
+    emit: (e, ...a) => (handlers[e] || []).forEach((h) => h(...a)),
+  };
+}
+const base = { mode: "control", disabled: false, visible: true, tooltip: "", style, skin: {}, update_rate: 30, animate: false, animation_ms: 200 };
+const num = { ...base, min: 0, max: 100, step: 0, unit: "", scale: "linear", ticks: 5, minor_ticks: 4, format: "%.1f", alarm_level: "normal", lolo: null, lo: null, hi: null, hihi: null, show_limits: false, peak: null, peak_hold: false };
+const bool = { ...base, value: false, default_state: false, mechanical_action: "switch_when_pressed", confirm: false, _pressed: false };
+const specs = [
+  { ...num, _kind: "knob", label: "Knob", value: 35, unit: "%", angle_range: 270, size: [160, 160] },
+  { ...num, _kind: "dial", label: "Dial (3 turns)", value: 55, turns: 3, angle_range: 300, size: [160, 160] },
+  { ...num, _kind: "gauge", mode: "indicator", label: "Gauge", value: 72, unit: "bar", variant: "circular", ranges: [{ from: 0, to: 60, color: "#86efac" }, { from: 60, to: 85, color: "#fde047" }, { from: 85, to: 100, color: "#fca5a5" }], peak_hold: true, peak: 81, size: [180, 180] },
+  { ...num, _kind: "gauge", mode: "indicator", label: "Semicircular + limits", value: 91, variant: "semicircular", ranges: [], show_limits: true, lo: 10, hi: 80, hihi: 90, alarm_level: "hihi", size: [200, 120] },
+  { ...num, _kind: "meter", mode: "indicator", label: "Meter", value: 42, unit: "V", angle_range: 90, size: [200, 140] },
+  { ...num, _kind: "compass", mode: "indicator", label: "Compass", value: 237, min: 0, max: 360, ticks: 8, unit: "°", format: "%.0f", size: [160, 160] },
+  { ...num, _kind: "tank", mode: "indicator", label: "Tank", value: 64, unit: "m³", markers: [20, 80], show_limits: true, lo: 15, hi: 85, size: [120, 200] },
+  { ...num, _kind: "thermometer", mode: "indicator", label: "Thermometer", value: 23.4, min: -20, max: 120, ticks: 7, unit: "°C", size: [100, 220] },
+  { ...num, _kind: "vumeter", mode: "indicator", label: "VU", value: 78, orientation: "vertical", segments: 20, peak_hold: true, peak: 92, size: [60, 200] },
+  { ...num, _kind: "fillslide", label: "FillSlide", value: 40, orientation: "horizontal", size: [260, 70] },
+  { ...num, _kind: "fillslide", label: "Log slide", value: 120, min: 1, max: 1000, scale: "log", format: "%.3s", unit: "Hz", orientation: "horizontal", size: [260, 70] },
+  { ...num, _kind: "sevensegment", mode: "indicator", label: "7-segment", value: -12.7, digits: 5, decimals: 1, color: "", size: [200, 80] },
+  { ...num, _kind: "knob", label: "Skinned knob", value: 70, angle_range: 270, size: [140, 140], skin: {
+    knob: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="#334155"/><circle cx="50" cy="50" r="38" fill="#64748b"/><rect x="46" y="6" width="8" height="30" rx="4" fill="#f97316"/></svg>',
+    housing: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect x="4" y="4" width="192" height="192" rx="24" fill="#fef3c7" stroke="#92400e" stroke-width="3"/></svg>' } },
+  { ...num, _kind: "gauge", mode: "indicator", label: "Skinned needle", value: 40, variant: "circular", ranges: [], size: [140, 140], skin: {
+    needle: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 100"><path d="M10 0 L16 100 L4 100 Z" fill="#7c3aed"/></svg>' } },
+  { ...base, _kind: "polar", mode: "indicator", label: "PolarPlot", value: [{ name: "pattern", color: "", style: "line", r: Array.from({ length: 73 }, (_, k) => Math.abs(Math.cos((k * 5 * Math.PI) / 180) ** 3)), theta: Array.from({ length: 73 }, (_, k) => k * 5) }], show_legend: true, angle_unit: "deg", zero: "E", direction: "ccw", r_max: null, rings: 4, unit: "", size: [220, 220] },
+  { ...base, _kind: "smith", mode: "indicator", label: "SmithChart", value: [{ name: "sweep", color: "", style: "both", re: Array.from({ length: 12 }, (_, k) => 0.6 * Math.cos(k / 3)), im: Array.from({ length: 12 }, (_, k) => 0.6 * Math.sin(k / 3)) }], show_legend: true, z0: 50, show_admittance: false, size: [220, 220] },
+  { ...base, _kind: "radar", mode: "indicator", label: "RadarChart", value: [{ name: "A", color: "", values: [4, 3, 5, 2, 4] }, { name: "B", color: "", values: [2, 5, 3, 4, 3] }], show_legend: true, axes: ["speed", "power", "cost", "mass", "range"], ranges: [], fill: true, size: [220, 220] },
+  { ...num, _kind: "knob", label: "NaN value", value: "nan", size: [120, 120] },
+  { ...num, _kind: "knob", label: "Disabled", value: 20, disabled: true, size: [120, 120] },
+  { ...bool, _kind: "led", mode: "indicator", label: "LED on", value: true, shape: "round", on_color: "#22c55e", off_color: "", blink: false, blink_hz: 2, size: [48, 48] },
+  { ...bool, _kind: "led", mode: "indicator", label: "LED off", value: false, shape: "square", on_color: "#ef4444", off_color: "", blink: false, blink_hz: 2, size: [48, 48] },
+  { ...bool, _kind: "toggleswitch", label: "Toggle", value: true, orientation: "vertical", size: [60, 100] },
+  { ...bool, _kind: "rockerswitch", label: "Rocker", value: false, size: [60, 100] },
+  { ...bool, _kind: "slideswitch", label: "Slide", value: true, size: [90, 44] },
+  { ...bool, _kind: "pushbutton", label: "Push", text: "START", mechanical_action: "latch_when_released", size: [110, 44] },
+  { ...bool, _kind: "emergencystop", label: "E-Stop", size: [110, 110] },
+  { ...base, _kind: "alarmindicator", label: "Alarm", value: "active_unacknowledged", alarm_id: "TK-101.HI", priority: "high", message: "Tank level high", size: [280, 64] },
+  { ...base, _kind: "alarmindicator", label: "Alarm (ack)", value: "active_acknowledged", alarm_id: "P-12", priority: "critical", message: "Pump fault", size: [280, 64] },
+  { ...base, _kind: "valve", mode: "control", label: "Valve (open, 60 %)", value: "open", position: 60, orientation: "horizontal", tag: "XV-101", auto: false, simulate: false, commands: ["open", "close"], size: [90, 90] },
+  { ...base, _kind: "valve", mode: "indicator", label: "Valve closed", value: "closed", position: null, orientation: "horizontal", tag: "", auto: true, commands: [], size: [90, 90] },
+  { ...base, _kind: "valve", mode: "indicator", label: "Valve fault", value: "fault", position: null, orientation: "vertical", tag: "", auto: true, commands: [], size: [90, 90] },
+  { ...base, _kind: "pump", mode: "control", label: "Pump running", value: "running", animate: true, direction: "right", tag: "P-12", auto: true, commands: ["start", "stop"], size: [90, 90] },
+  { ...base, _kind: "motor", mode: "indicator", label: "Motor reverse", value: "reverse", animate: true, tag: "M-3", auto: true, commands: [], size: [90, 90] },
+  { ...base, _kind: "pipe", mode: "indicator", label: "Pipe tee", value: true, shape: "tee", rotation: 0, flow_animation: true, flow_direction: "forward", fluid_color: "", thickness: 14, size: [80, 80] },
+  { ...base, _kind: "pipe", mode: "indicator", label: "Pipe elbow", value: false, shape: "elbow", rotation: 90, flow_animation: true, flow_direction: "forward", fluid_color: "", thickness: 14, size: [80, 80] },
+  { ...base, _kind: "alarmbanner", mode: "control", label: "AlarmBanner", value: [
+    { id: "TK-101.HI", timestamp: "2026-09-24T10:02:11", source: "TK-101", priority: "high", message: "Level high", state: "active_unacknowledged" },
+    { id: "P-12.FLT", timestamp: "2026-09-24T10:03:40", source: "P-12", priority: "critical", message: "Pump fault", state: "active_acknowledged" },
+    { id: "TT-3.LO", timestamp: "2026-09-24T09:58:02", source: "TT-3", priority: "low", message: "Temperature low", state: "cleared_unacknowledged" },
+  ], size: [520, 140] },
+  { ...base, _kind: "synoptic", mode: "indicator", label: "SynopticCanvas (pipes only in preview)", items: [], pipes: [{ points: [[20, 60], [200, 60], [200, 120], [300, 120]], flow: true, direction: "forward", color: "", thickness: 10 }], background: null, background_mime: "", size: [320, 150] },
+  { ...base, _kind: "intensitychart", mode: "indicator", label: "IntensityChart", history: 120, n_bins: 48, dt: 0.05, y_min: 0, y_max: 2400, z_min: 0, z_max: 1, autoscale_z: true, colormap: "viridis", show_colorbar: true, cursors: [], cursor_values: [], annotations: [], export: true, x_unit: "s", unit: "dB", size: [420, 200] },
+  { ...base, _kind: "digitalgraph", mode: "indicator", label: "DigitalWaveformGraph", lines: ["D0", "D1", "D2", "D3", "CLK"], buses: [{ name: "DATA", lines: [3, 2, 1, 0] }], dt: 1, x0: 0, show_lines_in_bus: false, cursors: [{ x: 11.5, name: "C1", color: "" }], cursor_values: [], annotations: [], export: true, x_unit: "µs", unit: "", size: [420, 150] },
+  { ...base, _kind: "mixedgraph", mode: "indicator", label: "MixedSignalGraph", lines: ["TRIG"], buses: [], dt: 0.01, x0: 0, show_lines_in_bus: true, traces: [{ name: "analog" }], y_min: null, y_max: null, analog_fraction: 0.6, cursors: [], cursor_values: [], annotations: [{ x: 0.5, y: 0.9, text: "threshold", color: "" }], export: true, x_unit: "s", unit: "", size: [420, 200] },
+  { ...base, _kind: "waveformchart", mode: "indicator", label: "WaveformChart", history: 400, n_traces: 2, update_mode: "strip", y_min: -1.5, y_max: 1.5, autoscale_y: false, paused: false, dt: 0.01, x_unit: "s", unit: "V", traces: [{ name: "sin" }, { name: "noisy cos" }], show_legend: true, cursors: [{ x: 4.2, name: "C1", color: "" }], cursor_values: [], annotations: [{ x: 3, y: 1.2, text: "note", color: "" }], export: true, size: [480, 220] },
+];
+const grid = document.getElementById("grid");
+window.models = [];
+for (const s of specs) {
+  const el = document.createElement("div");
+  grid.appendChild(el);
+  const m = model(s);
+  window.models.push(m);
+  widget.render({ model: m, el });
+  if (s._kind === "intensitychart") {
+    const n = 120, b = 48, rows = new Float32Array(n * b);
+    for (let i = 0; i < n; i++) for (let k = 0; k < b; k++) rows[i * b + k] = Math.exp(-((k - 24 - 15 * Math.sin(i / 12)) ** 2) / 20) + 0.1 * rand();
+    m.emit("msg:custom", { type: "append", n_rows: n, total: n }, [new DataView(rows.buffer)]);
+  }
+  if (s._kind === "digitalgraph") {
+    const n = 32, bits = new Uint8Array(n * 5);
+    for (let i = 0; i < n; i++) { const v = (i * 7) % 16; for (let k = 0; k < 4; k++) bits[i * 5 + k] = (v >> k) & 1; bits[i * 5 + 4] = i % 2; }
+    m.emit("msg:custom", { type: "data", n_samples: n, n_lines: 5, n_analog: 0, n_traces: 0 }, [new DataView(bits.buffer), new DataView(new ArrayBuffer(0))]);
+  }
+  if (s._kind === "mixedgraph") {
+    const n = 100, bits = new Uint8Array(n), an = new Float32Array(n);
+    for (let i = 0; i < n; i++) { an[i] = Math.sin(i / 8); bits[i] = an[i] > 0.9 ? 1 : 0; }
+    m.emit("msg:custom", { type: "data", n_samples: n, n_lines: 1, n_analog: n, n_traces: 1 }, [new DataView(bits.buffer), new DataView(an.buffer)]);
+  }
+  if (s._kind === "waveformchart") {
+    const n = 600;
+    const rows = new Float32Array(n * 2);
+    for (let i = 0; i < n; i++) { rows[2 * i] = Math.sin(i / 20); rows[2 * i + 1] = Math.cos(i / 35) + (rand() - 0.5) * 0.2; }
+    m.emit("msg:custom", { type: "append", n_points: n, total: n }, [new DataView(rows.buffer)]);
+  }
+}
+</script>
+</body>
+</html>

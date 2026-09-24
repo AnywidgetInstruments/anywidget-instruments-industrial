@@ -1,0 +1,49 @@
+site_name: anywidget-instruments
+site_description: Instrumentation widgets for computational notebooks
+repo_url: https://github.com/s-celles/anywidget-instruments
+edit_uri: ""
+# DOC-005: buildable offline — no Google Fonts, no CDN assets.
+theme:
+  name: material
+  font: false
+  features:
+    - navigation.sections
+    - content.code.copy
+  palette:
+    - scheme: default
+      toggle: { icon: material/weather-night, name: Dark mode }
+    - scheme: slate
+      toggle: { icon: material/weather-sunny, name: Light mode }
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - Widget catalog: widgets.md
+  - Examples: examples.md
+  - Try it in the browser: lite.md
+  - Guides:
+      - Alarm conventions: alarm-conventions.md
+      - Hosts and liveness: hosts.md
+  - API reference: api.md
+  - Requirements status: requirements-status.md
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            show_source: false
+            members_order: source
+            docstring_style: numpy
+            show_root_heading: true
+            show_signature_annotations: true
+            separate_signature: true
+            filters: ["!^_"]
+markdown_extensions:
+  - admonition
+  - tables
+  - attr_list
+  - toc: { permalink: true }
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.arithmatex: { generic: true }
