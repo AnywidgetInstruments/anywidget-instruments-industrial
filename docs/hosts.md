@@ -8,7 +8,7 @@
 | marimo in the browser (WebAssembly) | tested (docs workflow) | no threads: heartbeat disabled; see [Try it in the browser](try.md) |
 | JupyterLite (Pyodide) | tested (docs workflow) | no threads: heartbeat disabled |
 | VS Code, Google Colab | expected (anywidget hosts) | not covered by automated tests |
-| [KaimonSlate.jl](https://github.com/kahliburke/KaimonSlate.jl) (Julia) | expected, front end only | see below; not covered by automated tests |
+| [KaimonSlate.jl](https://github.com/kahliburke/KaimonSlate.jl) (Julia) | expected, front end only | see below; the kernel-less path is tested with a host page modeled on its `SlateAFM` extension (E2E) |
 
 ## KaimonSlate.jl
 
@@ -16,10 +16,20 @@
 Julia notebook, hosts anywidget front-end modules through its `SlateAFM`
 extension (`pypi_afm` loads a published anywidget; see its
 [documentation](https://kahliburke.github.io/KaimonSlate.jl/dev/)). There the widgets are
-front ends bound to a dictionary of traits: the Python side of this package
-(validation, callbacks, alarm logic, binary chart data, heartbeats) does not
-run. Set the `_heartbeat` trait to `0`, or the widgets report **⚠ NO KERNEL**
-after a few seconds.
+front ends bound to a dictionary of traits built from the class defaults:
+the Python side of this package (validation, callbacks, alarm logic, binary
+chart data, heartbeats) does not run.
+
+- No widget reports **⚠ NO KERNEL**: stale-data detection is on only when a
+  host announces heartbeats (HOST-003).
+- `Knob` and `Tank` behave as with a Python kernel: traits are read through
+  their schema (wrong types replaced by defaults, bounds applied), the value
+  is shown clamped when `coerce` is set, and `alarm_level` is computed by the
+  front end and written back to the trait dictionary (HOST-002, HOST-004).
+- The other widgets are being migrated (see the
+  [migration inventory](dev/frontend-migration-inventory.md)): until then,
+  their derived traits (alarm levels, peak hold) and chart data need a host
+  that provides them.
 
 ## Stale-data indication (ROB-001)
 

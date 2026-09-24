@@ -1,7 +1,7 @@
 # Requirements status
 
 Status of each requirement of the
-[specification](specification.md) (version 0.7).
+[specification](specification.md) (version 0.8).
 
 Legend: ✅ implemented and tested · 🟡 partial / not verifiable here · ⬜ not started
 
@@ -126,6 +126,21 @@ Tests: py (`tests/test_industrial.py`), js (`js/test/industrial.test.js`), e2e
 (`allwidgets.spec.js`, both directions for each object), visual baselines;
 example `examples/filling_line.ipynb`.
 
+## HOST – Host independence
+Migration in progress: pilot on `Knob` and `Tank` (see the
+[migration inventory](dev/frontend-migration-inventory.md)).
+
+| ID | Pri | Status | Notes |
+|---|---|---|---|
+| HOST-001 | M | 🟡 | Schemas for the shared traits, the numeric base, `Knob` and `Tank`; generated TypeScript types and `static/contract.json` (py, js) |
+| HOST-002 | M | 🟡 | `Knob`, `Tank`: traits read through the schema, coerced value, last valid scale (js, e2e host page) |
+| HOST-003 | M | ✅ | Every widget: neutral class defaults, Python widgets announce the kernel session; no stale indication without an announcement (py, js, e2e host page) |
+| HOST-004 | M | 🟡 | `alarm_level` of `Knob` and `Tank` computed by the front end without a host, host value kept otherwise (js, e2e host page) |
+| HOST-005 | M | 🟡 | Parity cases in `tests/parity/`: alarm levels, coerce, scale validity, accepted states (py, js) |
+| HOST-006 | S | ✅ | Unminified bundle with a linked source map, still reproducible |
+| HOST-007 | M | 🟡 | Checked for the widgets with a schema (`Knob`, `Tank`) by `tests/test_contract.py` |
+| HOST-008 | S | 🟡 | `ArrayBuffer`, `DataView` and typed arrays accepted by `core/buffers.ts`; layouts in the schemas with the graphs |
+
 ## DOC, QA
 | ID | Pri | Status | Notes |
 |---|---|---|---|
@@ -142,7 +157,7 @@ example `examples/filling_line.ipynb`.
 | QA-005 | S | ✅ | Benchmarks with thresholds in CI |
 | QA-006 | M | ✅ | CI: lint, type check, unit, e2e, reproducible build, bundle budget |
 
-## Open questions (spec §19): decisions for this implementation
+## Open questions (spec §21): decisions for this implementation
 1. Name: `anywidget-instruments` (import `anywidget_instruments`).
 2. Rendering: SVG for instruments, Canvas 2D for graphs and PictureControl.
 3. Julia binding: out of scope for 1.0; the single AFM module is ready for it.

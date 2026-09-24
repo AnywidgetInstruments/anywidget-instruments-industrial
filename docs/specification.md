@@ -5,9 +5,10 @@
 | Field | Value |
 |-------|-------|
 | Project | anywidget-instruments (working name) |
+| Author | Sébastien Celles |
 | Document type | Software requirements specification |
 | Notation | EARS (Easy Approach to Requirements Syntax) |
-| Version | 0.7 |
+| Version | 0.8 |
 | Date | 2026-09-24 |
 | Status | Baseline for version 1.0 |
 
@@ -460,7 +461,43 @@ IEC 62682 (alarm management), IEC 60073 (indicator colors), ISA-TR88.00.02
 
 ---
 
-## 19. Traceability of Front Panel Components
+## 19. Host Independence (HOST)
+
+The widgets are anywidget front-end modules (GEN-008). Some hosts run the
+front end without a Python kernel and bind each widget to a plain dictionary
+of traits: for example KaimonSlate.jl, a Julia notebook, through its
+`SlateAFM` extension. The requirements below let such a host get the same
+visual behavior as a Python kernel. The trait contract is described for host
+authors in the documentation.
+
+| ID | Pri. | Requirement |
+|---|---|---|
+| HOST-001 | M | The library shall describe the synchronized traits of every widget in a JSON Schema shipped in the package (name, type, bounds, default, which side writes the trait, custom messages and their binary buffer layouts), and shall generate from these schemas the front-end trait types and a host description file (`contract.json`). |
+| HOST-002 | M | When the front end reads a trait of a widget that has a schema, the front end shall read it through the schema: a value of the wrong type shall be replaced by the schema default, a number outside the schema bounds shall be clamped to them, and non-finite floats encoded as strings shall be decoded. |
+| HOST-003 | M | The front end shall enable the stale-data indication (ROB-001, ROB-004) only when the host announces heartbeats, with a non-empty `_session` and a `_heartbeat` period greater than 0. The class defaults of these two traits shall announce nothing, and the Python package shall announce them for every widget it creates. |
+| HOST-004 | M | Where a host owns the state of a widget (non-empty `_session`), the front end shall display the derived traits the host sends; where no host owns the state, the front end shall compute the derived traits once per model and write them back to the model. |
+| HOST-005 | M | Where a rule is implemented both in the Python kernel and in the front end, both implementations shall give the same results on a shared set of parity cases, checked in continuous integration. |
+| HOST-006 | S | The library shall ship its front-end module unminified, with its source map. |
+| HOST-007 | M | The class default of every synchronized trait shall equal the default given by the widget schema, so that a host reading class defaults without creating a widget gets the documented defaults. |
+| HOST-008 | S | The front end shall decode binary buffers received as `ArrayBuffer`, `DataView` or typed arrays, in the little-endian layouts documented by the schemas. |
+
+### 19.1 Authority over the State
+
+- When a Python kernel (or another host that sets `_session`) owns the
+  state, the kernel is authoritative: it validates the values, computes the
+  derived traits such as `alarm_level`, and rejects invalid values sent by
+  the front end (NUM-010). The front end applies the same rules to what it
+  displays and to what the user enters, but it never overrides the kernel.
+  A notebook reopened without its kernel keeps this rule: the saved values,
+  computed by the kernel, are shown as they are.
+- When no host owns the state (empty `_session`), the front end is
+  authoritative for the derived traits: it computes them once per model and
+  writes them back, so that the host can read them.
+- In both cases, alarm levels computed in the browser are a visualization.
+  They are not a protection layer and do not replace the safety functions of
+  the process (see the safety notice, DOC-007).
+
+## 20. Traceability of Front Panel Components
 
 | Front panel component | Library widget | Requirement |
 |---|---|---|
@@ -507,7 +544,7 @@ IEC 62682 (alarm management), IEC 60073 (indicator colors), ISA-TR88.00.02
 
 ---
 
-## 20. Open Questions
+## 21. Open Questions
 
 1. Final project name (candidates: `anywidget-instruments`, `ipyinstruments`, `notebook-panel`).
 2. Front-end rendering technology: plain SVG for all widgets, or Canvas/WebGL for charts only (impacts CHART-005 and PERF-004).
@@ -526,3 +563,4 @@ IEC 62682 (alarm management), IEC 60073 (indicator colors), ISA-TR88.00.02
 | 0.5 | API-014 (graphic and form entry for every control), NUM-010 (numeric entry field with range check), CHART-108 (axis ranges set by the user), STYLE-007 (light / dark theme). |
 | 0.6 | BOOL-015 (push button with a built-in lamp); STYLE-007 `system` theme; STYLE-008 (three-position theme switch applied to the page). |
 | 0.7 | IND-070 .. IND-104: trend chart, transmitter with device status, event log, deviation indicator, sparkline, bar graph, KPI tile, numeric keypad. |
+| 0.8 | HOST-001 .. HOST-008: trait contract in JSON Schema, schema-driven reading in the front end, heartbeats only when announced, authority over the state (19.1), parity cases, readable front-end module, class defaults, buffer decoding. Author named in the metadata. |
