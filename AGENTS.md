@@ -16,9 +16,9 @@ revision history).
 | Path | Content |
 |---|---|
 | `src/anywidget_instruments/` | Python package (one module per widget family, private `_*.py`) |
-| `src/anywidget_instruments/static/` | Built front-end bundle — generated, never edited, not committed |
-| `js/src/core/` | Shared front end: `view.js` (base view), `plot.js` (graphs), `scale.js`, `format.js`, `dom.js`, `liveness.js` |
-| `js/src/widgets/` | One view per widget family; registered by `_kind` in `js/src/index.js` |
+| `src/anywidget_instruments/static/` | Built front-end bundle (not minified, with source map): generated, never edited, not committed |
+| `js/src/core/` | Shared front end (TypeScript): `view.ts` (base view), `model.ts` (AFM model), `scale.ts`, `format.ts`, `dom.ts`, `liveness.ts`, `plot.js` (graphs) |
+| `js/src/widgets/` | One view per widget family; registered by `_kind` in `js/src/index.js`; being converted to TypeScript |
 | `js/src/styles.css` | All styles, scoped under `.awi-root`, colors as `--awi-*` custom properties |
 | `js/test/` | vitest unit tests (jsdom) |
 | `tests/` | pytest unit tests, including headless execution of `examples/*.ipynb` |
@@ -32,6 +32,7 @@ revision history).
 
 ```bash
 npm install && npm run build        # build the bundle (required before Python tests/E2E)
+npm run typecheck                   # tsc --noEmit
 npm test                            # vitest
 npm run lint                        # eslint (js/ and e2e/)
 npm run check:reproducible          # byte-identical rebuild
@@ -77,8 +78,9 @@ pushing changes to the front end or to the kernel/front-end protocol.
   `mo.Thread` (see `_liveness.py`).
 
 ### Front end
-- Plain ES modules, bundled by esbuild (`js/build.mjs`); no runtime dependency,
-  no network access, no CDN.
+- TypeScript (new and converted code; JavaScript files are converted when
+  touched), bundled by esbuild (`js/build.mjs`) into one readable ES module
+  with a source map; no runtime dependency, no network access, no CDN.
 - Only the AFM model API (`get`, `set`, `save_changes`, `on`, `off`, `send`);
   `widget_manager` only with a fallback.
 - Security: never `innerHTML`, `eval`, `new Function`; text through

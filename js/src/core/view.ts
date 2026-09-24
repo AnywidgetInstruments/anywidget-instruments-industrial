@@ -1,28 +1,48 @@
 // Base view shared by every widget: common traits, render scheduling,
 // throttled value sending and visibility handling.
 import { html, safeColor } from "./dom.js";
-import { liveness, recordBeat } from "./liveness.js";
+import { type Liveness, liveness, recordBeat } from "./liveness.js";
+import type { AnyModel, Handler, Traits } from "./model.js";
 import { hostIsDark } from "./pagetheme.js";
 
 export const COMMON_TRAITS = ["mode", "label", "disabled", "visible", "tooltip", "size", "style", "theme", "skin", "_heartbeat"];
 
-const STALE_TEXT = { stale: "⚠ STALE — kernel lost", nokernel: "⚠ NO KERNEL — read-only" };
+const STALE_TEXT: Record<Liveness, string> = {
+  live: "", stale: "⚠ STALE — kernel lost", nokernel: "⚠ NO KERNEL — read-only" };
 
 // Each widget may load its own copy of this module: ids need a random part.
 let uid = 0;
 const prefix = `awi${Math.random().toString(36).slice(2, 8)}`;
 
-export class BaseView {
+export class BaseView<T extends object = Traits> {
+  readonly model: AnyModel<T>;
+  readonly el: HTMLElement;
+  readonly id: string;
+  readonly kind: string;
+  readonly root: HTMLDivElement;
+  readonly labelEl: HTMLDivElement;
+  readonly body: HTMLDivElement;
+  readonly staleBadge: HTMLDivElement;
+  stale: Liveness;
+  protected _frame: number;
+  protected _dirty: boolean;
+  protected _inViewport: boolean;
+  protected _disposers: Array<() => void>;
+  protected _lastSend: number;
+  protected _pendingSend: ReturnType<typeof setTimeout> | null;
+  protected _pendingValue: unknown;
+  protected _since: number;
+
   /**
-   * @param {object} model anywidget model (AFM interface)
-   * @param {HTMLElement} el host element
-   * @param {string[]} traits widget-specific traits triggering a redraw
+   * @param model anywidget model (AFM interface)
+   * @param el host element
+   * @param traits widget-specific traits triggering a redraw
    */
-  constructor(model, el, traits = []) {
+  constructor(model: AnyModel<T>, el: HTMLElement, traits: string[] = []) {
     this.model = model;
     this.el = el;
     this.id = `${prefix}-${++uid}`;
-    this.kind = model.get("_kind");
+    this.kind = String(this.get("_kind") ?? "");
     this._frame = 0;
     this._dirty = true;
     this._inViewport = true;
@@ -43,7 +63,7 @@ export class BaseView {
     // ROB-001 / ROB-004: stale-data indication when kernel heartbeats stop
     this.stale = "live";
     this._since = Date.now();
-    this.listen("msg:custom", (msg) => {
+    this.listen("msg:custom", (msg: { type?: string; session?: unknown } | null) => {
       if (msg && msg.type === "hb") {
         recordBeat(msg.session);
         this.checkLiveness();
@@ -74,21 +94,24 @@ export class BaseView {
     }
   }
 
-  listen(event, cb) {
+  listen(event: string, cb: Handler): void {
     this.model.on(event, cb);
     this._disposers.push(() => this.model.off(event, cb));
   }
 
-  get(name) {
-    return this.model.get(name);
+  /** Raw trait value (a trait that is not part of `T` reads as `unknown`). */
+  get<K extends keyof T & string>(name: K): T[K];
+  get(name: string): unknown;
+  get(name: string): unknown {
+    return (this.model as unknown as AnyModel<Traits>).get(name);
   }
 
   /** True when user input may modify the value (API-004, API-011). */
-  get interactive() {
-    return this.get("mode") === "control" && !this.get("disabled") && this.get("visible") && this.stale === "live";
+  get interactive(): boolean {
+    return this.get("mode") === "control" && !this.get("disabled") && !!this.get("visible") && this.stale === "live";
   }
 
-  checkLiveness() {
+  checkLiveness(): void {
     const state = liveness({ session: this.get("_session"), interval: this.get("_heartbeat"), since: this._since });
     if (state !== this.stale) {
       this.stale = state;
@@ -97,14 +120,14 @@ export class BaseView {
   }
 
   /** PERF-003: coalesce updates, render at most once per animation frame. */
-  schedule() {
+  schedule(): void {
     this._dirty = true;
     if (!this._inViewport) {
       this.renderCommon(); // cheap DOM state (label, classes) stays current off-screen
       return;
     }
     if (this._frame) return;
-    const raf = typeof requestAnimationFrame !== "undefined" ? requestAnimationFrame : (f) => setTimeout(f, 16);
+    const raf = typeof requestAnimationFrame !== "undefined" ? requestAnimationFrame : (f: () => void): number => setTimeout(f, 16) as unknown as number;
     this._frame = raf(() => {
       this._frame = 0;
       if (!this._dirty) return;
@@ -114,9 +137,9 @@ export class BaseView {
     });
   }
 
-  renderCommon() {
+  renderCommon(): void {
     const r = this.root;
-    const [w, h] = this.get("size") || [160, 160];
+    const [w, h] = (this.get("size") as [number, number] | undefined) || [160, 160];
     r.classList.toggle("awi-indicator", this.get("mode") === "indicator");
     r.classList.toggle("awi-control", this.get("mode") === "control");
     r.classList.toggle("awi-disabled", !!this.get("disabled"));
@@ -131,24 +154,24 @@ export class BaseView {
     r.style.setProperty("--awi-h", `${h}px`);
     this.body.style.width = `${w}px`;
     this.body.style.height = `${h}px`;
-    const tip = this.get("tooltip");
+    const tip = this.get("tooltip") as string;
     if (tip) r.title = tip;
     else r.removeAttribute("title");
-    const label = this.get("label") || "";
+    const label = String(this.get("label") || "");
     this.labelEl.textContent = label;
     this.labelEl.hidden = !label;
     r.classList.toggle("awi-stale", this.stale !== "live");
     this.staleBadge.hidden = this.stale === "live";
-    this.staleBadge.textContent = STALE_TEXT[this.stale] || "";
+    this.staleBadge.textContent = STALE_TEXT[this.stale];
     if (this.get("disabled") || this.stale !== "live") r.setAttribute("aria-disabled", "true");
     else r.removeAttribute("aria-disabled");
   }
 
   /** Subclasses draw their content here. */
-  draw() {}
+  draw(): void {}
 
   /** Set a CSS custom property from a trait color, if it is a safe color. */
-  setColorVar(name, value) {
+  setColorVar(name: string, value: unknown): void {
     const c = safeColor(value);
     if (c) this.root.style.setProperty(name, c);
     else this.root.style.removeProperty(name);
@@ -158,15 +181,15 @@ export class BaseView {
    * Send a new value to the kernel (API-006). Intermediate values are rate
    * limited by `update_rate` (NUM-009); `final` values are always sent.
    */
-  sendValue(value, final = false) {
+  sendValue(value: unknown, final = false): void {
     if (this.stale !== "live") return;
-    const rate = this.get("update_rate") || 30;
+    const rate = Number(this.get("update_rate")) || 30;
     const now = Date.now();
     const interval = 1000 / rate;
     const flush = () => {
       this._pendingSend = null;
       this._lastSend = Date.now();
-      this.model.set("value", this._pendingValue);
+      (this.model as unknown as AnyModel<Traits>).set("value", this._pendingValue);
       this.model.save_changes();
     };
     this._pendingValue = value;
@@ -178,7 +201,7 @@ export class BaseView {
     }
   }
 
-  destroy() {
+  destroy(): void {
     if (this._frame && typeof cancelAnimationFrame !== "undefined") cancelAnimationFrame(this._frame);
     if (this._pendingSend) clearTimeout(this._pendingSend);
     for (const d of this._disposers) d();

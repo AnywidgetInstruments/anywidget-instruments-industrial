@@ -1,13 +1,16 @@
 // Front-end build (GEN-004). Deterministic: no timestamps, no absolute paths,
 // pinned esbuild version (package-lock.json) — see js/scripts/check-reproducible.mjs.
+//
+// The bundle is not minified and ships with its source map (HOST-006): the
+// module embedded in the wheel stays readable.
 import { build } from "esbuild";
 import { fileURLToPath } from "node:url";
 
 const OUT = "src/anywidget_instruments/static";
 
 export const targets = [
-  { entryPoints: ["js/src/index.js"], outfile: `${OUT}/index.js`, bundle: true, format: "esm", minify: true, legalComments: "none", target: "es2020" },
-  { entryPoints: ["js/src/styles.css"], outfile: `${OUT}/index.css`, bundle: true, minify: true },
+  { entryPoints: ["js/src/index.js"], outfile: `${OUT}/index.js`, bundle: true, format: "esm", minify: false, sourcemap: "linked", sourcesContent: true, legalComments: "inline", target: "es2020", charset: "utf8" },
+  { entryPoints: ["js/src/styles.css"], outfile: `${OUT}/index.css`, bundle: true, minify: false, charset: "utf8" },
 ];
 
 export async function buildAll({ write = true } = {}) {

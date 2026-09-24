@@ -8,11 +8,11 @@
 //   s  SI prefix        %.3s  -> 12.3 k, 4.70 µ
 // Optional literal text may surround the spec, e.g. "x = %.2f".
 
-const SI = { "-24": "y", "-21": "z", "-18": "a", "-15": "f", "-12": "p", "-9": "n", "-6": "µ", "-3": "m", 0: "", 3: "k", 6: "M", 9: "G", 12: "T", 15: "P", 18: "E", 21: "Z", 24: "Y" };
+const SI: Record<string, string> = { "-24": "y", "-21": "z", "-18": "a", "-15": "f", "-12": "p", "-9": "n", "-6": "µ", "-3": "m", 0: "", 3: "k", 6: "M", 9: "G", 12: "T", 15: "P", 18: "E", 21: "Z", 24: "Y" };
 
 const SPEC = /%(\.(\d+))?([fegns])/;
 
-function engParts(v, precision) {
+function engParts(v: number, precision: number): { mant: string; exp: number } {
   if (v === 0) return { mant: (0).toFixed(Math.max(0, precision - 1)), exp: 0 };
   let exp = Math.floor(Math.log10(Math.abs(v)) / 3) * 3;
   let mant = v / 10 ** exp;
@@ -31,14 +31,14 @@ function engParts(v, precision) {
 }
 
 /** Format a number with a printf-like spec. Non-finite values give "NaN", "+Inf", "-Inf". */
-export function formatValue(v, fmt = "%.1f") {
+export function formatValue(v: number, fmt: string | null | undefined = "%.1f"): string {
   if (Number.isNaN(v)) return "NaN";
   if (v === Infinity) return "+Inf";
   if (v === -Infinity) return "-Inf";
   const m = SPEC.exec(fmt || "");
   if (!m) return String(v);
   const precision = m[2] === undefined ? (m[3] === "f" ? 1 : 3) : Number(m[2]);
-  let body;
+  let body: string;
   switch (m[3]) {
     case "f":
       body = v.toFixed(Math.min(precision, 20));
@@ -64,24 +64,24 @@ export function formatValue(v, fmt = "%.1f") {
       body = String(v);
   }
   if (body === "-0" || /^-0\.?0*$/.test(body)) body = body.slice(1);
-  return fmt.replace(SPEC, body);
+  return (fmt || "").replace(SPEC, body);
 }
 
 /** Join a formatted value and a unit, taking care of SI prefixes ("4.7 k" + "Ω" -> "4.7 kΩ"). */
-export function withUnit(text, unit) {
+export function withUnit(text: string, unit: string | null | undefined): string {
   if (!unit) return text;
   if (/ [a-zA-Zµ]$/.test(text)) return `${text}${unit}`;
   return `${text} ${unit}`;
 }
 
 /** Compact format used for scale labels, derived from the value format. */
-export function tickFormat(fmt) {
+export function tickFormat(fmt: string | null | undefined): string {
   const m = SPEC.exec(fmt || "");
   const type = m ? m[3] : "f";
   return type === "f" || type === "g" ? "%.4g" : `%.2${type}`;
 }
 
-const PREFIX = { y: -24, z: -21, a: -18, f: -15, p: -12, n: -9, u: -6, "µ": -6, m: -3, k: 3, M: 6, G: 9, T: 12, P: 15, E: 18 };
+const PREFIX: Record<string, number> = { y: -24, z: -21, a: -18, f: -15, p: -12, n: -9, u: -6, "µ": -6, m: -3, k: 3, M: 6, G: 9, T: 12, P: 15, E: 18 };
 const ENTRY = /^([-+]?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?)\s*([yzafpnuµmkMGTPE]?)$/i;
 
 /**
@@ -89,7 +89,7 @@ const ENTRY = /^([-+]?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?)\s*([yzafpnuµmkMGTPE]?)
  * exponent, optional SI prefix and optional trailing unit
  * ("2,5", "1e3", "4.7 k", "250 mV" with unit "V"). Returns NaN otherwise.
  */
-export function parseEntry(text, unit = "") {
+export function parseEntry(text: unknown, unit = ""): number {
   let t = String(text ?? "").trim().replace(",", ".");
   if (unit && t.endsWith(unit)) t = t.slice(0, -unit.length).trim();
   const m = ENTRY.exec(t);
