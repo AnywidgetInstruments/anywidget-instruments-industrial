@@ -1,6 +1,16 @@
 // Boolean widgets and mechanical actions (BOOL-001..BOOL-014).
 import { clear, svg, svgText } from "../core/dom.js";
+import type { AnyModel } from "../core/model.js";
 import { BaseView } from "../core/view.js";
+import type { BooleanTraits, LEDTraits, PushButtonTraits, ToggleSwitchTraits } from "../generated/contract.js";
+
+/** Traits of the Boolean widgets, from their schemas (LED and PushButton both have a shape). */
+export type BooleanViewTraits = BooleanTraits &
+  Partial<Pick<LEDTraits, "on_color" | "off_color" | "blink" | "blink_hz"> & Pick<ToggleSwitchTraits, "orientation"> & Pick<PushButtonTraits, "text" | "color" | "lamp" | "lamp_color" | "lamp_blink">> & {
+    shape?: LEDTraits["shape"] | PushButtonTraits["shape"];
+  };
+
+type Phase = "press" | "release";
 
 const BOOL_TRAITS = [
   "value", "default_state", "mechanical_action", "confirm", "shape", "on_color", "off_color",
@@ -11,7 +21,7 @@ const BOOL_TRAITS = [
  * Value transitions of a mechanical action.
  * Returns the value to set on "press" / "release", or null for no change.
  */
-export function mechanicalTransition(action, phase, value, defaultState) {
+export function mechanicalTransition(action: string, phase: Phase, value: boolean, defaultState: boolean): boolean | null {
   const active = !defaultState;
   switch (action) {
     case "switch_when_pressed":
@@ -30,8 +40,13 @@ export function mechanicalTransition(action, phase, value, defaultState) {
   }
 }
 
-export class BooleanView extends BaseView {
-  constructor(model, el) {
+export class BooleanView extends BaseView<BooleanViewTraits> {
+  readonly svgEl: SVGElement;
+  readonly stateText: SVGElement;
+  protected _armedUntil: number;
+  protected _pressed: boolean;
+
+  constructor(model: AnyModel<BooleanViewTraits>, el: HTMLElement) {
     super(model, el, BOOL_TRAITS);
     this.svgEl = svg("svg", { class: "awi-svg", "aria-hidden": "true" });
     this.body.appendChild(this.svgEl);
@@ -66,7 +81,7 @@ export class BooleanView extends BaseView {
         this.phase("release", true);
       }
     });
-    this.listen("msg:custom", (msg) => {
+    this.listen("msg:custom", (msg: { type?: string } | null) => {
       if (msg && msg.type === "latch_expired") {
         this.root.classList.add("awi-expired");
         setTimeout(() => this.root.classList.remove("awi-expired"), 600);
@@ -75,11 +90,11 @@ export class BooleanView extends BaseView {
     this.schedule();
   }
 
-  get isLed() {
+  get isLed(): boolean {
     return this.kind === "led";
   }
 
-  phase(phase, inside = true) {
+  phase(phase: Phase, inside = true): void {
     const value = !!this.get("value");
     const def = !!this.get("default_state");
     const action = this.get("mechanical_action");
@@ -89,7 +104,7 @@ export class BooleanView extends BaseView {
       else this.write(null, phase === "press");
       return;
     }
-    let next = mechanicalTransition(action, phase, value, def);
+    let next: boolean | null = mechanicalTransition(action, phase, value, def);
     if (phase === "release" && !inside && action !== "switch_until_released") next = null; // released outside: cancel
     // BOOL-014: two-step confirmation for toggling actions
     if (next !== null && this.get("confirm") && action !== "switch_until_released" && next !== value) {
@@ -107,7 +122,7 @@ export class BooleanView extends BaseView {
     this.write(next, phase === "press");
   }
 
-  write(value, pressed) {
+  write(value: boolean | null, pressed: boolean): void {
     if (this.stale !== "live") return;
     this._pressed = pressed;
     this.root.classList.toggle("awi-pressed", pressed);
@@ -119,7 +134,7 @@ export class BooleanView extends BaseView {
     this.schedule();
   }
 
-  draw() {
+  override draw(): void {
     const on = !!this.get("value");
     const [w, h] = this.get("size");
     const s = this.svgEl;
@@ -145,7 +160,7 @@ export class BooleanView extends BaseView {
       b.setAttribute("role", "button");
       b.setAttribute("aria-pressed", String(on));
       b.removeAttribute("aria-label");
-      if (!this.get("label")) b.setAttribute("aria-label", this.kind === "pushbutton" ? this.get("text") : "Emergency stop");
+      if (!this.get("label")) b.setAttribute("aria-label", this.kind === "pushbutton" ? String(this.get("text") ?? "") : "Emergency stop");
       const lamp = this.get("lamp");
       if (this.kind === "pushbutton" && (lamp === true || lamp === false)) b.setAttribute("aria-description", `lamp ${lamp ? "on" : "off"}${lamp && this.get("lamp_blink") ? ", flashing" : ""}`);
       else b.removeAttribute("aria-description");
@@ -155,18 +170,18 @@ export class BooleanView extends BaseView {
       if (!this.get("label")) b.setAttribute("aria-label", this.kind);
     }
 
-    const draw = {
+    const draw = ({
       led: () => this.drawLed(w, h, on),
       toggleswitch: () => this.drawToggle(w, h, on),
       rockerswitch: () => this.drawRocker(w, h, on),
       slideswitch: () => this.drawSlide(w, h, on),
       pushbutton: () => this.drawPush(w, h, on, armed),
       emergencystop: () => this.drawEstop(w, h, on),
-    }[this.kind];
+    } as Record<string, () => void>)[this.kind];
     draw?.();
   }
 
-  drawLed(w, h, on) {
+  drawLed(w: number, h: number, on: boolean): void {
     const r = Math.min(w, h) / 2 - 3;
     const cx = w / 2;
     const cy = h / 2;
@@ -178,7 +193,7 @@ export class BooleanView extends BaseView {
     if (on) this.svgEl.appendChild(svg("circle", { class: "awi-led-glint", cx: cx - r * 0.35, cy: cy - r * 0.35, r: r * 0.25 }));
   }
 
-  drawToggle(w, h, on) {
+  drawToggle(w: number, h: number, on: boolean): void {
     const vertical = this.get("orientation") !== "horizontal";
     const cx = w / 2;
     const cy = h / 2;
@@ -196,7 +211,7 @@ export class BooleanView extends BaseView {
     this.svgEl.appendChild(label);
   }
 
-  drawRocker(w, h, on) {
+  drawRocker(w: number, h: number, on: boolean): void {
     const s = this.svgEl;
     s.appendChild(svg("rect", { class: "awi-plate", x: 2, y: 2, width: w - 4, height: h - 4, rx: 6 }));
     const inset = 8;
@@ -207,7 +222,7 @@ export class BooleanView extends BaseView {
     s.appendChild(svgText("O", { class: "awi-state-text", x: w / 2, y: inset + half * 1.5, "text-anchor": "middle", "dominant-baseline": "central" }));
   }
 
-  drawSlide(w, h, on) {
+  drawSlide(w: number, h: number, on: boolean): void {
     const s = this.svgEl;
     const r = (h - 8) / 2;
     s.appendChild(svg("rect", { class: "awi-slide-track", x: 4, y: 4, width: w - 8, height: h - 8, rx: r }));
@@ -216,7 +231,7 @@ export class BooleanView extends BaseView {
     s.appendChild(svgText(on ? "ON" : "OFF", { class: "awi-state-small", x: on ? 4 + r + 4 : w - 4 - r - 4, y: h / 2, "text-anchor": "middle", "dominant-baseline": "central" }));
   }
 
-  drawPush(w, h, on, armed) {
+  drawPush(w: number, h: number, on: boolean, armed: boolean): void {
     const s = this.svgEl;
     const lamp = this.get("lamp");
     const hasLamp = lamp === true || lamp === false;
@@ -224,7 +239,7 @@ export class BooleanView extends BaseView {
     const cap = hasLamp ? `awi-lamp-${this.get("lamp_color")}` : `awi-cap-${this.get("color") || "grey"}`;
     const lit = hasLamp && lamp;
     const cls = `awi-button ${cap}${lit ? " awi-lit" : ""}${lit && this.get("lamp_blink") ? " awi-lamp-blink" : ""}${this._pressed || on ? " awi-down" : ""}`;
-    const text = armed ? "Confirm?" : this.get("text");
+    const text = armed ? "Confirm?" : String(this.get("text") ?? "");
     if (this.get("shape") === "round") {
       const cx = w / 2;
       const cy = h / 2;
@@ -242,7 +257,7 @@ export class BooleanView extends BaseView {
     if (on && !hasLamp && this.get("shape") !== "round") s.appendChild(svg("rect", { class: "awi-button-lamp", x: 8, y: h - 8, width: w - 16, height: 3, rx: 1.5 }));
   }
 
-  drawEstop(w, h, on) {
+  drawEstop(w: number, h: number, on: boolean): void {
     const s = this.svgEl;
     const cx = w / 2;
     const cy = h / 2;

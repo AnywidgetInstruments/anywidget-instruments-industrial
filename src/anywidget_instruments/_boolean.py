@@ -8,7 +8,7 @@ from typing import Any
 import traitlets as t
 
 from . import _dispatch
-from ._base import Callback, InstrumentWidget, _report_callback_error
+from ._base import Callback, InstrumentWidget, _report_callback_error, mode_trait, size_trait
 
 MECHANICAL_ACTIONS: tuple[str, ...] = (
     "switch_when_pressed",
@@ -129,6 +129,8 @@ class LED(BooleanWidget):
     _kind = t.Unicode("led").tag(sync=True)
     _default_mode = "indicator"
     _default_size = (48, 48)
+    mode = mode_trait(_default_mode)
+    size = size_trait(*_default_size)
     shape = t.Enum(["round", "square"], default_value="round").tag(sync=True)
     on_color = t.Unicode("#22c55e").tag(sync=True)
     off_color = t.Unicode("").tag(sync=True)
@@ -141,6 +143,7 @@ class ToggleSwitch(BooleanWidget):
 
     _kind = t.Unicode("toggleswitch").tag(sync=True)
     _default_size = (60, 100)
+    size = size_trait(*_default_size)
     orientation = t.Enum(["vertical", "horizontal"], default_value="vertical").tag(sync=True)
 
     def __init__(self, value: bool | None = None, **kwargs: Any) -> None:
@@ -154,6 +157,7 @@ class RockerSwitch(BooleanWidget):
 
     _kind = t.Unicode("rockerswitch").tag(sync=True)
     _default_size = (60, 100)
+    size = size_trait(*_default_size)
 
 
 class SlideSwitch(BooleanWidget):
@@ -161,6 +165,7 @@ class SlideSwitch(BooleanWidget):
 
     _kind = t.Unicode("slideswitch").tag(sync=True)
     _default_size = (90, 44)
+    size = size_trait(*_default_size)
 
 
 BUTTON_COLORS: tuple[str, ...] = ("grey", "green", "red", "black", "yellow", "blue", "white")
@@ -182,6 +187,7 @@ class PushButton(BooleanWidget):
 
     _kind = t.Unicode("pushbutton").tag(sync=True)
     _default_size = (110, 44)
+    size = size_trait(*_default_size)
     text = t.Unicode("OK").tag(sync=True)
     color = t.Enum(list(BUTTON_COLORS), default_value="grey").tag(sync=True)
     shape = t.Enum(["rect", "round"], default_value="rect").tag(sync=True)
@@ -215,6 +221,7 @@ class EmergencyStop(BooleanWidget):
 
     _kind = t.Unicode("emergencystop").tag(sync=True)
     _default_size = (110, 110)
+    size = size_trait(*_default_size)
     _callback_priority = _dispatch.PRIORITY_EMERGENCY
     mechanical_action = t.Enum(["switch_when_pressed"], default_value="switch_when_pressed").tag(
         sync=True

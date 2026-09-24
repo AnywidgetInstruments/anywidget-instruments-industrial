@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://s-celles.github.io/anywidget-instruments/schema/emergencystop.schema.json",
+  "title": "EmergencyStop",
+  "description": "Red mushroom emergency stop button (BOOL-012); a drawing, not an emergency stop device.",
+  "type": "object",
+  "x-awi-class": "EmergencyStop",
+  "allOf": [
+    {
+      "$ref": "boolean.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "emergencystop",
+      "default": "emergencystop",
+      "x-awi-writer": "host"
+    },
+    "size": {
+      "default": [
+        110,
+        110
+      ]
+    },
+    "mechanical_action": {
+      "enum": [
+        "switch_when_pressed"
+      ],
+      "description": "Only switch_when_pressed: a press latches the stop.",
+      "default": "switch_when_pressed"
+    },
+    "value": {
+      "description": "True once pressed. The front end only ever writes true; only the host resets it to false (Python: reset()). A Python kernel refuses false from any other source."
+    }
+  }
+}

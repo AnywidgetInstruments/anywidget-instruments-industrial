@@ -201,6 +201,54 @@ describe("Gauge without a kernel", () => {
   });
 });
 
+describe("Boolean widgets without a kernel", () => {
+  const press = (body: HTMLElement) => {
+    body.dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true }));
+    body.dispatchEvent(new KeyboardEvent("keyup", { key: " ", bubbles: true }));
+  };
+
+  test("an LED is an indicator by default and never stale", async () => {
+    const { root, body } = mount({ ...defaults("LED"), value: true, label: "Run" });
+    await frame();
+    expect(root.classList.contains("awi-indicator")).toBe(true);
+    expect(body.style.width).toBe("48px");
+    expect(body.getAttribute("aria-label")).toBe("Run: on");
+    await vi.advanceTimersByTimeAsync(60_000);
+    expect(root.classList.contains("awi-stale")).toBe(false);
+  });
+
+  test("a toggle switch writes its value and a sequence number back", async () => {
+    const { model, body } = mount({ ...defaults("ToggleSwitch"), label: "Pump" });
+    await frame();
+    press(body);
+    expect(model.get("value")).toBe(true);
+    expect(model.saved.at(-1)).toMatchObject({ value: true, _pressed: false, _seq: 2 });
+    press(body);
+    expect(model.get("value")).toBe(false);
+  });
+
+  test("the emergency stop latches and never writes false", async () => {
+    const { model, body } = mount({ ...defaults("EmergencyStop"), label: "E-stop" });
+    await frame();
+    press(body);
+    expect(model.get("value")).toBe(true);
+    press(body);
+    expect(model.get("value")).toBe(true);
+    expect(model.saved.some((s) => s.value === false)).toBe(false);
+    model.push("value", false); // reset by the host
+    await frame();
+    expect(body.getAttribute("aria-pressed")).toBe("false");
+  });
+
+  test("invalid traits fall back to the schema", async () => {
+    const { model, body } = mount({ ...defaults("PushButton"), mechanical_action: "explode", color: "pink", text: 42 });
+    await frame();
+    expect(body.querySelector(".awi-cap-grey")).not.toBeNull();
+    press(body); // latch_when_released (the PushButton default)
+    expect(model.get("value")).toBe(true);
+  });
+});
+
 describe("Tank without a kernel", () => {
   test("indicator by default, markers read through the schema", async () => {
     const { root, body, el } = mount({ ...defaults("Tank"), value: 3.2, max: 4, unit: "m", markers: [0.5, "x", 3.5], hi: 3, hihi: 3.5 });

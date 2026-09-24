@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://s-celles.github.io/anywidget-instruments/schema/slideswitch.schema.json",
+  "title": "SlideSwitch",
+  "description": "Two-position slide switch (BOOL-005).",
+  "type": "object",
+  "x-awi-class": "SlideSwitch",
+  "allOf": [
+    {
+      "$ref": "boolean.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "slideswitch",
+      "default": "slideswitch",
+      "x-awi-writer": "host"
+    },
+    "size": {
+      "default": [
+        90,
+        44
+      ]
+    }
+  }
+}

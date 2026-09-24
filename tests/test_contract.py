@@ -18,7 +18,7 @@ import pytest
 import traitlets as t
 
 import anywidget_instruments as ai
-from anywidget_instruments import _base, _numeric
+from anywidget_instruments import _base, _boolean, _numeric
 
 PKG = pathlib.Path(ai.__file__).parent
 SCHEMA_DIR = PKG / "schema"
@@ -37,6 +37,7 @@ CLASSES: dict[str, type] = {
     "InstrumentWidget": _base.InstrumentWidget,
     "NumericWidget": _numeric.NumericWidget,
     "_PeakMixin": _numeric._PeakMixin,
+    "BooleanWidget": _boolean.BooleanWidget,
 }
 WIDGETS = sorted(CONTRACT["widgets"].items())
 IDS = [title for title, _ in WIDGETS]
@@ -70,6 +71,12 @@ MIGRATED = {
     "Gauge",
     "Meter",
     "VUMeter",
+    "LED",
+    "ToggleSwitch",
+    "RockerSwitch",
+    "SlideSwitch",
+    "PushButton",
+    "EmergencyStop",
 }
 
 

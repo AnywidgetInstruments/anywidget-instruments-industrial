@@ -209,6 +209,74 @@
         "orientation": "horizontal",
         "peak_hold": true
       }
+    },
+    {
+      "widget": "LED",
+      "traits": {
+        "value": true,
+        "shape": "square",
+        "on_color": "#ff0000",
+        "off_color": "",
+        "blink": true,
+        "blink_hz": 10
+      }
+    },
+    {
+      "widget": "ToggleSwitch",
+      "traits": {
+        "value": true,
+        "orientation": "horizontal",
+        "size": [
+          100,
+          60
+        ],
+        "mechanical_action": "switch_until_released",
+        "confirm": true
+      }
+    },
+    {
+      "widget": "RockerSwitch",
+      "traits": {
+        "value": false,
+        "default_state": true
+      }
+    },
+    {
+      "widget": "SlideSwitch",
+      "traits": {
+        "value": true,
+        "mode": "indicator"
+      }
+    },
+    {
+      "widget": "PushButton",
+      "traits": {
+        "text": "START",
+        "color": "green",
+        "shape": "round",
+        "size": [
+          90,
+          90
+        ],
+        "lamp": true,
+        "lamp_color": "amber",
+        "lamp_blink": true,
+        "latch_timeout": 2.5
+      }
+    },
+    {
+      "widget": "PushButton",
+      "traits": {
+        "lamp": null,
+        "mechanical_action": "latch_when_pressed"
+      }
+    },
+    {
+      "widget": "EmergencyStop",
+      "traits": {
+        "value": true,
+        "label": "E-stop"
+      }
     }
   ]
 }

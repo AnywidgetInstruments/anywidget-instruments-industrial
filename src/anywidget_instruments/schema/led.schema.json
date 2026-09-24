@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://s-celles.github.io/anywidget-instruments/schema/led.schema.json",
+  "title": "LED",
+  "description": "Round or square LED indicator (BOOL-001, BOOL-002).",
+  "type": "object",
+  "x-awi-class": "LED",
+  "allOf": [
+    {
+      "$ref": "boolean.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "led",
+      "default": "led",
+      "x-awi-writer": "host"
+    },
+    "blink": {
+      "type": "boolean",
+      "description": "Blink while on (steady outline when reduced motion is requested, A11Y-005).",
+      "default": false,
+      "x-awi-writer": "host"
+    },
+    "blink_hz": {
+      "type": "number",
+      "minimum": 0.1,
+      "maximum": 10.0,
+      "description": "Blink frequency in Hz.",
+      "default": 2.0,
+      "x-awi-writer": "host"
+    },
+    "mode": {
+      "default": "indicator"
+    },
+    "off_color": {
+      "type": "string",
+      "description": "CSS color when off; empty: a dark version of on_color.",
+      "default": "",
+      "x-awi-writer": "host"
+    },
+    "on_color": {
+      "type": "string",
+      "description": "CSS color when lit; unsafe colors are ignored (SEC-002).",
+      "default": "#22c55e",
+      "x-awi-writer": "host"
+    },
+    "shape": {
+      "enum": [
+        "round",
+        "square"
+      ],
+      "description": "LED shape (the state is also given by text for assistive technologies, A11Y-003).",
+      "default": "round",
+      "x-awi-writer": "host"
+    },
+    "size": {
+      "default": [
+        48,
+        48
+      ]
+    }
+  }
+}
