@@ -7,6 +7,18 @@ import { widget } from "../e2e/helpers.js";
 
 test.setTimeout(300_000);
 
+// Browser console and page text in the job log: the in-browser Python
+// runtimes report their errors there.
+test.beforeEach(async ({ page }) => {
+  page.on("console", (m) => console.log(`[browser ${m.type()}] ${m.text()}`));
+  page.on("pageerror", (e) => console.log(`[page error] ${e.message}`));
+});
+test.afterEach(async ({ page }, testInfo) => {
+  if (testInfo.status !== testInfo.expectedStatus) {
+    console.log(`[page text]\n${await page.locator("body").innerText().catch(() => "")}`);
+  }
+});
+
 test("marimo WebAssembly export", async ({ page }) => {
   await page.goto("/marimo/");
   const setpoint = widget(page, "Setpoint");
