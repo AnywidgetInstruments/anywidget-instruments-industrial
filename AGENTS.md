@@ -16,8 +16,11 @@ revision history).
 | Path | Content |
 |---|---|
 | `src/anywidget_instruments/` | Python package (one module per widget family, private `_*.py`) |
-| `src/anywidget_instruments/static/` | Built front-end bundle (not minified, with source map): generated, never edited, not committed |
+| `src/anywidget_instruments/schema/` | Trait contract: one JSON Schema per widget, single source of truth for Python, TypeScript and hosts |
+| `src/anywidget_instruments/static/` | Built front-end bundle (not minified, with source map) and `contract.json`: generated, never edited, not committed |
 | `js/src/core/` | Shared front end (TypeScript): `view.ts` (base view), `model.ts` (AFM model), `scale.ts`, `format.ts`, `dom.ts`, `liveness.ts`, `plot.js` (graphs) |
+| `js/src/contract/` | Trait contract runtime: spec types and schema-driven helpers |
+| `js/src/generated/` | `contract.ts`, generated from the schemas by `npm run gen`: not committed |
 | `js/src/widgets/` | One view per widget family; registered by `_kind` in `js/src/index.js`; being converted to TypeScript |
 | `js/src/styles.css` | All styles, scoped under `.awi-root`, colors as `--awi-*` custom properties |
 | `js/test/` | vitest unit tests (jsdom) |
@@ -31,7 +34,7 @@ revision history).
 ## Commands
 
 ```bash
-npm install && npm run build        # build the bundle (required before Python tests/E2E)
+npm install && npm run build        # contract + bundle (required before Python tests/E2E)
 npm run typecheck                   # tsc --noEmit
 npm test                            # vitest
 npm run lint                        # eslint (js/ and e2e/)
@@ -81,6 +84,9 @@ pushing changes to the front end or to the kernel/front-end protocol.
 - TypeScript (new and converted code; JavaScript files are converted when
   touched), bundled by esbuild (`js/build.mjs`) into one readable ES module
   with a source map; no runtime dependency, no network access, no CDN.
+- Traits come from the JSON Schemas in `src/anywidget_instruments/schema/`:
+  change a trait there first; `tests/test_contract.py` fails when Python
+  diverges, `tsc` when TypeScript does.
 - Only the AFM model API (`get`, `set`, `save_changes`, `on`, `off`, `send`);
   `widget_manager` only with a fallback.
 - Security: never `innerHTML`, `eval`, `new Function`; text through

@@ -26,7 +26,7 @@ dependencies = ["anywidget>=0.9", "traitlets>=5.9", "numpy>=1.23"]
 
 [project.optional-dependencies]
 units = ["pint>=0.22"]
-dev = ["pytest>=8", "pytest-cov", "ruff>=0.6", "mypy>=1.10", "pint>=0.22", "jupyterlab>=4", "notebook>=7", "marimo"]
+dev = ["pytest>=8", "pytest-cov", "jsonschema>=4.18", "ruff>=0.6", "mypy>=1.10", "pint>=0.22", "jupyterlab>=4", "notebook>=7", "marimo"]
 
 docs = [
   "mkdocs>=1.6,<2",
@@ -52,6 +52,7 @@ build-function = "hatch_jupyter_builder.npm_builder"
 ensured-targets = [
   "src/anywidget_instruments/static/index.js",
   "src/anywidget_instruments/static/index.css",
+  "src/anywidget_instruments/static/contract.json",
 ]
 skip-if-exists = ["src/anywidget_instruments/static/index.js"]
 dependencies = ["hatch-jupyter-builder>=0.8"]

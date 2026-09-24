@@ -2,9 +2,11 @@
 // pinned esbuild version (package-lock.json) — see js/scripts/check-reproducible.mjs.
 //
 // The bundle is not minified and ships with its source map (HOST-006): the
-// module embedded in the wheel stays readable.
+// module embedded in the wheel stays readable. The trait contract is
+// generated from the JSON Schemas first (js/scripts/gen-contract.mjs).
 import { build } from "esbuild";
 import { fileURLToPath } from "node:url";
+import { generate } from "./scripts/gen-contract.mjs";
 
 const OUT = "src/anywidget_instruments/static";
 
@@ -14,6 +16,7 @@ export const targets = [
 ];
 
 export async function buildAll({ write = true } = {}) {
+  generate({ write });
   const results = [];
   for (const t of targets) {
     const r = await build({ ...t, write, logLevel: write ? "info" : "silent" });

@@ -12,6 +12,8 @@ node_modules/
 .ipynb_checkpoints/
 # Built front-end bundle (produced by `npm run build`)
 src/anywidget_instruments/static/
+# Trait contract generated from the JSON Schemas (`npm run gen`)
+js/src/generated/
 test-results/
 playwright-report/
 __marimo__/

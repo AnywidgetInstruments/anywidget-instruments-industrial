@@ -6,9 +6,11 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
+    "gen": "node js/scripts/gen-contract.mjs",
     "build": "node js/build.mjs",
-    "dev": "esbuild js/src/index.js --bundle --format=esm --target=es2020 --sourcemap --outfile=src/anywidget_instruments/static/index.js --watch",
-    "typecheck": "tsc -p .",
+    "dev": "node js/scripts/gen-contract.mjs && esbuild js/src/index.js --bundle --format=esm --target=es2020 --sourcemap --outfile=src/anywidget_instruments/static/index.js --watch",
+    "typecheck": "node js/scripts/gen-contract.mjs && tsc -p .",
+    "pretest": "node js/scripts/gen-contract.mjs",
     "test": "vitest run",
     "lint": "eslint js e2e e2e-site",
     "check:reproducible": "node js/scripts/check-reproducible.mjs",
