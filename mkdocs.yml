@@ -24,6 +24,7 @@ nav:
       - Alarm conventions: alarm-conventions.md
       - Hosts and liveness: hosts.md
   - API reference: api.md
+  - Specification: specification.md
   - Requirements status: requirements-status.md
 plugins:
   - search

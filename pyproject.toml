@@ -41,7 +41,7 @@ docs = [
 [project.urls]
 Homepage = "https://github.com/s-celles/anywidget-instruments"
 Issues = "https://github.com/s-celles/anywidget-instruments/issues"
-Specification = "https://gist.github.com/s-celles/3343599158e4742e543ced320aa12743"
+Specification = "https://s-celles.github.io/anywidget-instruments/specification/"
 
 [tool.hatch.build]
 only-packages = true

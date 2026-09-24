@@ -9,7 +9,7 @@ JupyterLab, Jupyter Notebook 7, VS Code, Google Colab and marimo, and you don't
 need a JavaScript toolchain to use them.
 
 > **Status: pre-alpha (0.1.0.dev0).** The project follows the
-> [specification](https://gist.github.com/s-celles/3343599158e4742e543ced320aa12743)
+> [specification](docs/specification.md)
 > (EARS requirements). [`docs/requirements-status.md`](docs/requirements-status.md)
 > lists which requirements are implemented.
 

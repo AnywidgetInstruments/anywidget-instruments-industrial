@@ -1,7 +1,7 @@
 # Requirements status
 
 Status of each requirement of the
-[specification v0.1](https://gist.github.com/s-celles/3343599158e4742e543ced320aa12743).
+[specification](specification.md) (version 0.2).
 
 Legend: ✅ implemented and tested · 🟡 partial / not verifiable here · ⬜ not started
 
@@ -106,7 +106,7 @@ JupyterLab / Notebook 7 / marimo (`e2e/`).
 |---|---|---|---|
 | DOC-001 | M | ✅ | MkDocs + mkdocstrings API reference (`mkdocs build --strict`) |
 | DOC-002 | M | ✅ | Gallery notebook |
-| DOC-003 | M | ⬜ | Mapping table to a third-party product: removed on request |
+| DOC-003 | — | — | Withdrawn in specification 0.2 |
 | DOC-004 | S | ✅ | PID tuning, tank supervision, signal acquisition (executed by pytest and e2e) |
 | DOC-005 | S | ✅ | Offline-capable static site (no web fonts / CDN), `docs.yml` deploys to GitHub Pages from `main` |
 | DOC-006 | C | ✅ | JupyterLite and marimo WebAssembly exports with the package wheel; the Docs workflow opens both in a browser and checks a control drives an indicator (`e2e-site/`) |

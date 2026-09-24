@@ -7,7 +7,9 @@ Guidance for AI coding agents (and humans) working on this repository.
 `anywidget-instruments`: instrumentation widgets (knobs, gauges, LEDs, charts,
 alarms, supervisory objects) for computational notebooks, built on
 [anywidget](https://anywidget.dev). Requirements come from the EARS
-specification linked in `README.md`; `docs/requirements-status.md` tracks them.
+specification in `docs/specification.md`; `docs/requirements-status.md` tracks
+them. Changes to requirements go through that file (bump its version and
+revision history).
 
 ## Layout
 
