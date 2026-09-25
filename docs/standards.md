@@ -36,6 +36,9 @@ This page names them so that readers can go to the original texts.
 | ANSI/ISA-18.2 and IEC 62682 | Management of alarm systems for the process industries | Alarm states (active / cleared, acknowledged / unacknowledged), priorities, shelving, suppression, out of service, alarm banner and alarm list | ALARM-001 .. , IND-050 .. IND-053 |
 | ANSI/ISA-5.1 | Instrumentation symbols and identification | Tag naming (for example `TIC-101`, `LS-100`) and the general look of process symbols (valve, pump, motor) | SCADA-001 .. |
 | ISA-TR88.00.02 (PackML) | Machine and unit states | Default state model of `StateMachine`: states, acting states and operator commands | IND-060 .. IND-063 |
+| GEMMA (ADEPA, 1981) | Running and stopping modes study guide (Guide d'Étude des Modes de Marches et d'Arrêts) | `GEMMA_MODEL` of `StateMachine`: the 16 procedures in the families A, F and D, their titles and usual loops | IND-064, IND-066 |
+| ISA-88 and IEC 61512-1 | Batch control: models and terminology | `ISA88_MODEL` of `StateMachine`: states and commands of a procedural element; the equipment levels of `EquipmentTree` | IND-065, IND-119 |
+| IEC 62264 (ISA-95) | Enterprise-control system integration | The equipment hierarchy (enterprise, site, area, work center, work unit) suggested for the levels of `EquipmentTree` | IND-119 |
 | NAMUR NE 107 | Self-monitoring and diagnosis of field devices | The five device status categories shown by `Transmitter` (normal, failure, function check, out of specification, maintenance required), each with its own symbol and text | IND-080 .. IND-082 |
 | ISO 22400 | Key performance indicators for manufacturing operations management | Definition of overall equipment effectiveness (availability × performance × quality) used by the `oee()` helper of `KPITile` | IND-103 |
 

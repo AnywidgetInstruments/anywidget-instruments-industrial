@@ -8,7 +8,7 @@
 | Author | Sébastien Celles |
 | Document type | Software requirements specification |
 | Notation | EARS (Easy Approach to Requirements Syntax) |
-| Version | 0.10 |
+| Version | 0.11 |
 | Date | 2026-09-25 |
 | Status | Baseline for version 1.0 |
 
@@ -419,6 +419,9 @@ IEC 62682 (alarm management), IEC 60073 (indicator colors), ISA-TR88.00.02
 | IND-061 | S | The StateMachine shall offer only the commands valid in the current state (Start, Stop, Hold, Unhold, Suspend, Unsuspend, Reset, Abort, Clear), and the kernel shall reject any other command. |
 | IND-062 | S | When an acting state completes (for example Starting → Execute), the kernel code shall advance the model with `state_complete()`; the widget shall not advance on its own. |
 | IND-063 | C | The StateMachine shall accept a custom model given as states and transitions. |
+| IND-064 | S | The library shall provide a GEMMA model for the StateMachine (the running and stopping modes study guide): the 16 procedures of the families A (stop and restart), F (operation) and D (failure), with their usual transitions. |
+| IND-065 | C | The library shall provide an ISA-88 / IEC 61512-1 model for the StateMachine: the 12 states and 8 commands of a procedural element. |
+| IND-066 | C | Where a state model gives state titles, groups or global commands, the StateMachine shall show each title with its state, shade the states of a group in a labelled zone, and summarize the global commands in a note instead of drawing their transitions; the models of IND-060, IND-064 and IND-065 shall be published in the trait contract for hosts. |
 
 ### 18.8 Trend Chart
 
@@ -560,7 +563,7 @@ authors in the documentation.
 | Controller faceplate | PIDFaceplate, PID | IND-030 to IND-034 |
 | Annunciator panel | Annunciator | IND-040 to IND-043 |
 | Alarm summary | AlarmList | IND-050 to IND-053 |
-| Machine state model | StateMachine | IND-060 to IND-063 |
+| Machine state model | StateMachine | IND-060 to IND-066 |
 | Time-based trend | TrendChart | IND-070 to IND-075 |
 | Instrument bubble with device status | Transmitter | IND-080 to IND-083 |
 | Event journal | EventLog | IND-090 to IND-093 |
@@ -598,3 +601,4 @@ authors in the documentation.
 | 0.8 | HOST-001 .. HOST-008: trait contract in JSON Schema, schema-driven reading in the front end, heartbeats only when announced, authority over the state (19.1), parity cases, readable front-end module, class defaults, buffer decoding. Author named in the metadata. |
 | 0.9 | HOST-009 .. HOST-012: nested widgets through the host widget manager, binary traits as buffers or base64 text, continuous integration against divergence of Python, schemas and front end, operator actions sent and applied; 19.1 extended to operator actions and process events. |
 | 0.10 | IND-110 .. IND-119: hexadecimal, binary and octal formats, bit field, recipe table, XY graph, setpoint pointer, logarithmic and secondary chart axes, value labels, equipment tree. |
+| 0.11 | IND-064 .. IND-066: GEMMA and ISA-88 / IEC 61512-1 state models, state titles, groups and global commands, models published in the trait contract. |

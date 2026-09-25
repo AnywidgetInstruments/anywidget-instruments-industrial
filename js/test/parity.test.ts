@@ -172,7 +172,10 @@ describe("state machine", () => {
   });
   for (const c of machineCases.sequences) {
     test(c.name, () => {
-      const m = (c.model ? normalizeMachine(c.model) : normalizeMachine(CONTRACTS.StateMachine.traits.machine.default)) as Machine;
+      const spec = CONTRACTS.StateMachine.traits.machine;
+      // a model given by name is a preset of the schema (IND-064, IND-065)
+      const raw = typeof c.model === "string" ? spec.presets?.[c.model] : (c.model ?? spec.default);
+      const m = normalizeMachine(raw) as Machine;
       let state = m.initial;
       for (const [command, expected, available] of c.steps as Array<[string, string, string[]]>) {
         // SC is a host event; operator commands never apply it

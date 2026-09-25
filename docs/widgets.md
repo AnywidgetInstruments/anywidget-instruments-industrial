@@ -228,6 +228,59 @@ machine.state_complete()  # the kernel ends acting states
 
 ![Filling line](img/filling_line.png)
 
+### Operating modes: PackML, GEMMA and ISA-88
+
+`StateMachine` ships three models of the running and stopping of a machine
+or a process. Each is a plain dictionary, also published in the trait
+contract for hosts (`presets` of the `machine` trait):
+
+| Model | Name | Origin | What it describes |
+|---|---|---|---|
+| `PACKML_MODEL` (default) | `"packml"` | ISA-TR88.00.02 (PackML) | 17 machine states and 9 commands, with acting states (`Starting`, `Stopping`, ...) that end by themselves; packaging machines and lines |
+| `GEMMA_MODEL` | `"gemma"` | GEMMA, the running and stopping modes study guide (ADEPA, 1981), widely taught in France | 16 procedures seen from the operative part: A (stop and restart), F (operation, including preparation, closing, checks and tests), D (failure, including the emergency stop and running despite a failure) |
+| `ISA88_MODEL` | `"isa88"` | ISA-88 / IEC 61512-1 (batch control) | 12 states and 8 commands of a procedural element (a phase, an operation, a unit procedure) |
+
+```python
+gemma = ai.StateMachine("gemma", label="Drilling station", size=(760, 400))
+gemma.command("Prepare")  # A1 -> F2 (preparation run)
+gemma.state_complete()  # F2 -> F1 (normal production)
+gemma.state_title  # 'Normal production'
+gemma.path_to("A4")  # ['Stop', 'SC']: commands leading to a state
+```
+
+The GEMMA model draws the three families as shaded zones, gives each
+procedure its title, and summarizes the emergency stop, possible from every
+procedure, in a note rather than as arrows. Its transitions are the usual
+loops of the guide; a real machine keeps the procedures and loops it needs,
+which a custom model (states with `title` and `group`, `global_commands`)
+expresses. The `D1` procedure represents the emergency stop in the
+software model only: the emergency stop itself is a hardwired safety
+function (see the [safety notice](safety.md)).
+
+The three models answer different questions. GEMMA lists what the operative
+part is doing, modes (production, checks, tests) and states together.
+ISA-88 and PackML separate the **mode** (automatic, semi-automatic, manual
+for ISA-88; production, maintenance, manual for PackML unit modes) from the
+**state** within that mode. The correspondence is therefore approximate:
+
+| Situation | GEMMA | ISA-88 procedural state | PackML state |
+|---|---|---|---|
+| Stopped, ready to start | A1 | Idle | Idle |
+| Start-up, warm-up | F2 | Running (start of the procedure) | Starting |
+| Normal production | F1 | Running | Execute |
+| Stop at the end of the cycle | A2, then A1 | Complete (end of the procedure) | Completing, then Complete |
+| Stop in a given state, then restart | A3, A4, then F1 | Pausing, Paused, Resume; or Holding, Held, Restart | Holding, Held, Unholding |
+| Waiting for upstream or downstream | not distinguished (a condition of F1) | not distinguished | Suspending, Suspended, Unsuspending |
+| Closing run (emptying the machine) | F3 | end of the procedure | Completing |
+| Checks and tests | F4, F5, F6 | manual or semi-automatic mode | maintenance or manual unit mode |
+| Controlled stop | A2 or A3 | Stopping, Stopped | Stopping, Stopped |
+| Failure diagnosis | D2 | Holding, Held (exception handling) | Holding, Held; or Aborting |
+| Running despite a failure | D3 | not modeled | not modeled |
+| Emergency stop | D1 | Aborting, Aborted | Aborting, Aborted |
+| Back to the initial state after a failure | A5, A6 (or A7 then A4) | Reset to Idle | Clearing, Stopped, Resetting, Idle |
+
+The operating modes demo of the [examples](examples.md) runs the three models side by side.
+
 ## Trends, instruments and compact indicators
 
 Objects of supervision screens (IND-070 .. IND-104).

@@ -1,7 +1,7 @@
 # Requirements status
 
 Status of each requirement of the
-[specification](specification.md) (version 0.10).
+[specification](specification.md) (version 0.11).
 
 Legend: ✅ implemented and tested · 🟡 partial / not verifiable here · ⬜ not started
 
@@ -117,6 +117,9 @@ JupyterLab / Notebook 7 / marimo (`e2e/`).
 | IND-040 … IND-043 | S | ✅ | Annunciator: ISA-18.1 sequences A, M, R with lock-in, first out, horn, Silence / Ack / Reset / Test |
 | IND-050 … IND-053 | S | ✅ | AlarmList: sort and filter, timed shelving with automatic unshelving, suppressed / out of service |
 | IND-060 … IND-063 | S/C | ✅ | StateMachine: PackML model (17 states), valid commands only, `state_complete()`, custom models |
+| IND-064 | S | ✅ | `StateMachine("gemma")`, `GEMMA_MODEL`: 16 procedures in families A, F, D; py, js (parity), preview |
+| IND-065 | C | ✅ | `StateMachine("isa88")`, `ISA88_MODEL`: 12 states, 8 commands; py, js (parity) |
+| IND-066 | C | ✅ | State `title` and `group`, `global_commands`; models as `x-awi-presets` in the contract; `path_to()`, `state_title` |
 | IND-070 … IND-075 | S/C | ✅ | `TrendChart`: pens with own scales, float64 times over binary buffers, live / history (◀ ▶, zoom, span, Live), limit and setpoint lines, `history` bound, cursors, time entry, CSV / PNG / SVG (py, js, e2e) |
 | IND-080 … IND-083 | S/C | ✅ | `Transmitter`: ISA-5.1 style bubble, NE 107 status by shape and text, **✕ BAD** and no `aria-valuenow` on failure, alarm limits (py, js, e2e) |
 | IND-090 … IND-093 | S/C | ✅ | `EventLog`: `log()`, `max_events`, category chips, filter by category and text, CSV, `connect()` / `disconnect()` audit trail (py, js, e2e) |

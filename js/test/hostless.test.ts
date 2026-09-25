@@ -465,6 +465,32 @@ describe("State machine without a kernel", () => {
     expect(model.get("available_commands")).toEqual(["Start"]);
   });
 
+  test("GEMMA preset: family zones, titles, the emergency stop as a note (IND-064, IND-066)", async () => {
+    const gemma = CONTRACTS.StateMachine.traits.machine.presets?.gemma;
+    const { model, el, body } = mount({ ...defaults("StateMachine"), machine: gemma, label: "Modes", size: [760, 380] });
+    await frame();
+    expect(model.get("value")).toBe("A1");
+    expect(model.get("available_commands")).toEqual(["Start", "Prepare", "Check", "Step check", "Test", "E-stop"]);
+    expect([...el.querySelectorAll(".awi-sm-zone-label")].map((t) => t.textContent)).toEqual(["A: stop and restart procedures", "F: operating procedures", "D: failure procedures"]);
+    expect(el.querySelectorAll(".awi-sm-zone")).toHaveLength(16);
+    expect([...el.querySelectorAll(".awi-sm-title")].map((t) => t.textContent)).toContain("Normal production");
+    // E-stop from every procedure: summarized in the status, never drawn as an arrow
+    expect(el.querySelector(".awi-sm-status")?.textContent).toBe("State: A1 Stop in the initial state · E-stop: from most states");
+    expect(el.querySelectorAll(".awi-sm-edge")).toHaveLength(27);
+    cmd(el, "Start").click();
+    await frame();
+    expect(body.getAttribute("aria-label")).toBe("Modes: F1 Normal production; available commands: End of cycle, Stop, Close, Fault, E-stop");
+  });
+
+  test("ISA-88 preset: Stop and Abort as notes (IND-065)", async () => {
+    const { model, el } = mount({ ...defaults("StateMachine"), machine: CONTRACTS.StateMachine.traits.machine.presets?.isa88 });
+    await frame();
+    expect(model.get("value")).toBe("Idle");
+    cmd(el, "Start").click();
+    expect(model.get("available_commands")).toEqual(["Pause", "Hold", "Stop", "Abort"]);
+    expect(el.querySelector(".awi-sm-status")?.textContent).toContain("Stop / Abort: from most states");
+  });
+
   test("with a kernel, commands are only sent", async () => {
     const { model, el } = mount({ ...defaults("StateMachine"), _session: "kernel", value: "Stopped", available_commands: ["Reset", "Abort"] });
     await frame();

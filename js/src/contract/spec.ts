@@ -59,6 +59,8 @@ export interface TraitSpec extends ValueSpec {
   simulated?: Record<string, string>;
   /** Trait a derived alarm level is computed from (default: value). */
   source?: string;
+  /** Named values a host can copy into the trait (state models of a StateMachine). */
+  presets?: Record<string, unknown>;
   description?: string;
 }
 

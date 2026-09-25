@@ -1,4 +1,8 @@
-"""Machine state model display and logic (IND-060 .. IND-063, ISA-TR88.00.02)."""
+"""Machine state models: display and logic (IND-060 .. IND-066).
+
+Models: ISA-TR88.00.02 (PackML) machine states, GEMMA (running and stopping
+modes) and the ISA-88 / IEC 61512-1 procedural states.
+"""
 
 from __future__ import annotations
 
@@ -100,6 +104,152 @@ PACKML_MODEL: dict[str, Any] = {
 }
 
 
+# -- GEMMA (IND-064) ------------------------------------------------------------------
+# Guide d'Etude des Modes de Marches et d'Arrets (ADEPA, 1981): 16 running and
+# stopping procedures in three families. The transitions below are the usual
+# loops of the guide; a real machine keeps the procedures and loops it needs.
+_GEMMA_STATES = [
+    # name, title, group, (x, y), acting
+    ("A6", "Reset to the initial state", "A", (0, 0), True),
+    ("A1", "Stop in the initial state", "A", (1, 0), False),
+    ("A2", "Stop requested at end of cycle", "A", (2, 0), True),
+    ("A3", "Stop requested in a given state", "A", (3, 0), True),
+    ("A4", "Stop reached", "A", (4, 0), False),
+    ("A5", "Preparation for restart after failure", "A", (0, 1), False),
+    ("A7", "Set to a given state", "A", (1, 1), True),
+    ("F2", "Preparation run", "F", (2, 1), True),
+    ("F1", "Normal production", "F", (3, 1), False),
+    ("F3", "Closing run", "F", (4, 1), True),
+    ("F4", "Check run out of order", "F", (1, 2), False),
+    ("F5", "Check run in order", "F", (2, 2), False),
+    ("F6", "Test run", "F", (3, 2), False),
+    ("D1", "Emergency stop", "D", (1, 3), False),
+    ("D2", "Failure diagnosis and treatment", "D", (2, 3), False),
+    ("D3", "Production despite a failure", "D", (3, 3), False),
+]
+_GEMMA_GROUPS = {
+    "A": "A: stop and restart procedures",
+    "F": "F: operating procedures",
+    "D": "D: failure procedures",
+}
+_GEMMA_TRANSITIONS = [
+    ["A1", "Start", "F1"],
+    ["A1", "Prepare", "F2"],
+    ["F2", SC, "F1"],
+    ["F1", "End of cycle", "A2"],
+    ["A2", SC, "A1"],
+    ["F1", "Stop", "A3"],
+    ["A3", SC, "A4"],
+    ["A4", "Start", "F1"],
+    ["F1", "Close", "F3"],
+    ["F3", SC, "A1"],
+    ["A1", "Check", "F5"],
+    ["F5", "Finish", "A1"],
+    ["A1", "Step check", "F4"],
+    ["F4", "Finish", "A6"],
+    ["A1", "Test", "F6"],
+    ["F6", "Finish", "A1"],
+    ["F1", "Fault", "D2"],
+    ["F2", "Fault", "D2"],
+    ["F3", "Fault", "D2"],
+    ["D2", "Degraded run", "D3"],
+    ["D3", "End of cycle", "A2"],
+    ["D2", "Repaired", "A5"],
+    ["D1", "Rearm", "A5"],
+    ["A5", "To initial state", "A6"],
+    ["A5", "To given state", "A7"],
+    ["A6", SC, "A1"],
+    ["A7", SC, "A4"],
+] + [[name, "E-stop", "D1"] for name, *_ in _GEMMA_STATES if name != "D1"]
+
+#: GEMMA running and stopping modes (ADEPA, 1981): 16 procedures in the families
+#: A (stop and restart), F (operation) and D (failure) (IND-064).
+GEMMA_MODEL: dict[str, Any] = {
+    "states": [
+        {"name": n, "title": title, "group": _GEMMA_GROUPS[g], "x": x, "y": y, "acting": acting}
+        for n, title, g, (x, y), acting in _GEMMA_STATES
+    ],
+    "transitions": _GEMMA_TRANSITIONS,
+    "commands": [
+        "Start",
+        "Prepare",
+        "End of cycle",
+        "Stop",
+        "Close",
+        "Check",
+        "Step check",
+        "Test",
+        "Finish",
+        "Fault",
+        "Degraded run",
+        "Repaired",
+        "E-stop",
+        "Rearm",
+        "To initial state",
+        "To given state",
+    ],
+    "global_commands": ["E-stop"],
+    "initial": "A1",
+}
+
+# -- ISA-88 / IEC 61512-1 procedural states (IND-065) ---------------------------------------
+_ISA88_LAYOUT = {
+    "Idle": (0, 0),
+    "Running": (1, 0),
+    "Complete": (2, 0),
+    "Pausing": (1, 1),
+    "Paused": (0, 1),
+    "Holding": (2, 1),
+    "Restarting": (0, 2),
+    "Held": (1, 2),
+    "Stopping": (0, 3),
+    "Stopped": (1, 3),
+    "Aborting": (2, 3),
+    "Aborted": (3, 3),
+}
+_ISA88_ACTING = {"Pausing", "Holding", "Restarting", "Stopping", "Aborting"}
+_ISA88_ACTIVE = ["Running", "Pausing", "Paused", "Holding", "Held", "Restarting"]
+
+#: ISA-88 / IEC 61512-1 states of a procedural element (a phase, an operation):
+#: 12 states and 8 commands (IND-065).
+ISA88_MODEL: dict[str, Any] = {
+    "states": [
+        {"name": n, "x": x, "y": y, "acting": n in _ISA88_ACTING}
+        for n, (x, y) in _ISA88_LAYOUT.items()
+    ],
+    "transitions": [
+        ["Idle", "Start", "Running"],
+        ["Running", SC, "Complete"],
+        ["Running", "Pause", "Pausing"],
+        ["Pausing", SC, "Paused"],
+        ["Paused", "Resume", "Running"],
+        ["Running", "Hold", "Holding"],
+        ["Pausing", "Hold", "Holding"],
+        ["Paused", "Hold", "Holding"],
+        ["Holding", SC, "Held"],
+        ["Held", "Restart", "Restarting"],
+        ["Restarting", SC, "Running"],
+        ["Stopping", SC, "Stopped"],
+        ["Aborting", SC, "Aborted"],
+        ["Complete", "Reset", "Idle"],
+        ["Stopped", "Reset", "Idle"],
+        ["Aborted", "Reset", "Idle"],
+    ]
+    + [[s, "Stop", "Stopping"] for s in _ISA88_ACTIVE]
+    + [[s, "Abort", "Aborting"] for s in [*_ISA88_ACTIVE, "Stopping"]],
+    "commands": ["Start", "Pause", "Resume", "Hold", "Restart", "Stop", "Abort", "Reset"],
+    "global_commands": ["Stop", "Abort"],
+    "initial": "Idle",
+}
+
+#: Models by name, for ``StateMachine("gemma")`` and the like.
+STATE_MODELS: dict[str, dict[str, Any]] = {
+    "packml": PACKML_MODEL,
+    "gemma": GEMMA_MODEL,
+    "isa88": ISA88_MODEL,
+}
+
+
 def _check_model(model: dict[str, Any]) -> dict[str, Any]:
     states = model.get("states")
     if not isinstance(states, list) or not states:
@@ -108,6 +258,9 @@ def _check_model(model: dict[str, Any]) -> dict[str, Any]:
     for k, s in enumerate(states):
         if not isinstance(s, dict) or not isinstance(s.get("name"), str):
             raise ValueError("each state needs a 'name'")
+        for key in ("title", "group"):
+            if key in s and not isinstance(s[key], str):
+                raise ValueError(f"the {key!r} of state {s['name']!r} must be a string")
         s.setdefault("x", k % 5)
         s.setdefault("y", k // 5)
         s.setdefault("acting", False)
@@ -121,6 +274,12 @@ def _check_model(model: dict[str, Any]) -> dict[str, Any]:
         if tr[1] != SC and tr[1] not in commands:
             commands.append(tr[1])
     model["commands"] = commands
+    if "global_commands" in model:
+        if not isinstance(model["global_commands"], list):
+            raise ValueError("global_commands must be a list of commands")
+        extra = [c for c in model["global_commands"] if c not in commands]
+        if extra:
+            raise ValueError(f"global_commands not in the commands: {extra!r}")
     model.setdefault("initial", names[0])
     if model["initial"] not in names:
         raise ValueError(f"unknown initial state {model['initial']!r}")
@@ -135,10 +294,16 @@ class StateMachine(InstrumentWidget):
     are accepted and offered (IND-061). Acting states such as ``Starting``
     end when the kernel calls :meth:`state_complete` (IND-062).
 
-    ``machine`` is the model: ISA-TR88.00.02 (PackML) by default, or a custom
-    dict ``{"states": [{"name", "x", "y", "acting"}], "transitions":
-    [[from, command, to], ...], "initial": name}`` where the command ``"SC"``
-    marks the completion of an acting state (IND-063).
+    ``machine`` is the model: ISA-TR88.00.02 (PackML) by default, one of the
+    names of :data:`STATE_MODELS` (``"gemma"`` for GEMMA, IND-064; ``"isa88"`` for
+    the ISA-88 / IEC 61512-1 procedural states, IND-065), or a custom dict
+    ``{"states": [{"name", "x", "y", "acting", "title", "group"}],
+    "transitions": [[from, command, to], ...], "initial": name,
+    "global_commands": [...]}`` where the command ``"SC"`` marks the
+    completion of an acting state (IND-063). A state ``title`` is shown under
+    its name and states of the same ``group`` share a shaded zone; commands
+    of ``global_commands`` (valid from most states, such as Stop and Abort)
+    are summarized in a note instead of drawn as arrows (IND-066).
 
     Warnings
     --------
@@ -156,9 +321,13 @@ class StateMachine(InstrumentWidget):
     available_commands = t.List(t.Unicode(), read_only=True).tag(sync=True)
     last_command = t.Unicode("", read_only=True).tag(sync=True)
 
-    def __init__(self, machine: dict[str, Any] | None = None, **kwargs: Any) -> None:
+    def __init__(self, machine: dict[str, Any] | str | None = None, **kwargs: Any) -> None:
         initial = kwargs.pop("value", None)
         super().__init__(**kwargs)
+        if isinstance(machine, str):
+            if machine.lower() not in STATE_MODELS:
+                raise ValueError(f"unknown model {machine!r}; known models: {sorted(STATE_MODELS)}")
+            machine = STATE_MODELS[machine.lower()]
         self.machine = copy.deepcopy(PACKML_MODEL if machine is None else machine)
         self.set_trait("value", initial or self.machine["initial"])
         self._update_commands()
@@ -189,6 +358,31 @@ class StateMachine(InstrumentWidget):
     def _update_commands(self) -> None:
         valid = [c for c in self.machine.get("commands", []) if self._next(c) is not None]
         self.set_trait("available_commands", valid)
+
+    @property
+    def state_title(self) -> str:
+        """Title of the current state (``""`` when the model gives none)."""
+        states = self.machine["states"]
+        return next((s.get("title", "") for s in states if s["name"] == self.value), "")
+
+    def path_to(self, state: str) -> list[str] | None:
+        """Shortest sequence of commands (``"SC"`` for a completion) leading to ``state``.
+
+        ``[]`` when already there, None when ``state`` cannot be reached.
+        """
+        if state not in [s["name"] for s in self.machine["states"]]:
+            raise KeyError(f"no state {state!r} in this model")
+        seen: dict[str, list[str]] = {self.value: []}
+        queue = [self.value]
+        while queue:
+            cur = queue.pop(0)
+            if cur == state:
+                return seen[cur]
+            for frm, cmd, to in self.machine.get("transitions", []):
+                if frm == cur and to not in seen:
+                    seen[to] = [*seen[cur], cmd]
+                    queue.append(to)
+        return None
 
     @property
     def is_acting(self) -> bool:

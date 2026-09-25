@@ -457,3 +457,38 @@ def test_pid_faceplate_accepts_sp_and_op_at_creation() -> None:
     fp = ai.PIDFaceplate(sp=75, op=10, pv_max=150)
     assert (fp.sp, fp.op) == (75, 10)
     assert fp.value["sp"] == 75
+
+
+def test_state_model_presets_match_the_schema():
+    # IND-064, IND-065: hosts read the models from the schema (x-awi-presets).
+    import json
+    import pathlib
+
+    schema = pathlib.Path(ai.__file__).parent / "schema" / "statemachine.schema.json"
+    presets = json.loads(schema.read_text())["properties"]["machine"]["x-awi-presets"]
+    assert presets == ai.STATE_MODELS
+    for name, model in ai.STATE_MODELS.items():
+        assert ai.StateMachine(name).machine == ai.StateMachine(model).machine
+
+
+def test_gemma_and_isa88_models():
+    gemma = ai.StateMachine("gemma")
+    assert len(gemma.machine["states"]) == 16
+    assert (gemma.value, gemma.state_title) == ("A1", "Stop in the initial state")
+    assert gemma.path_to("D3") == ["Start", "Fault", "Degraded run"]
+    assert gemma.path_to("A1") == []
+    # the emergency stop is reachable from every procedure but D1 itself
+    targets = {frm: to for frm, cmd, to in gemma.machine["transitions"] if cmd == "E-stop"}
+    assert set(targets) == {s["name"] for s in gemma.machine["states"]} - {"D1"}
+    assert set(targets.values()) == {"D1"}
+    isa88 = ai.StateMachine("ISA88")
+    assert len(isa88.machine["states"]) == 12
+    assert isa88.available_commands == ["Start"]
+    with pytest.raises(ValueError, match="unknown model"):
+        ai.StateMachine("nope")
+    with pytest.raises(KeyError):
+        gemma.path_to("Z9")
+    unreachable = ai.StateMachine(
+        {"states": [{"name": "A"}, {"name": "B"}], "transitions": [["B", "Go", "A"]]}
+    )
+    assert unreachable.path_to("B") is None

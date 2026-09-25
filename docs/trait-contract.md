@@ -79,6 +79,7 @@ followed), easier to read from another language.
 | `transitions` | `[state, event, next state]` rows of a state trait; other pairs keep the state |
 | `simulated` | Simulated state after each command of a process object |
 | `source` | Trait an alarm level is computed from (the PV of a PID faceplate) |
+| `presets` | Named values a host can copy into the trait: the PackML, GEMMA and ISA-88 models of `StateMachine.machine` |
 | `description` | What the trait means, with the requirement IDs |
 
 ### Who writes a trait

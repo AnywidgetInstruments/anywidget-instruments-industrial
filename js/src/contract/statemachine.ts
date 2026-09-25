@@ -11,6 +11,10 @@ export interface MachineState {
   x: number;
   y: number;
   acting: boolean;
+  /** Shown under the name (IND-066). */
+  title?: string;
+  /** States of a group share a shaded zone (IND-066). */
+  group?: string;
 }
 
 export interface Machine {
@@ -18,6 +22,8 @@ export interface Machine {
   transitions: Array<[string, string, string]>;
   commands: string[];
   initial: string;
+  /** Commands valid from most states, drawn as a note (IND-066). */
+  global_commands?: string[];
 }
 
 /**
@@ -33,7 +39,13 @@ export function normalizeMachine(raw: unknown): Machine | null {
   for (const [k, s] of m.states.entries()) {
     if (!s || typeof s !== "object" || typeof (s as { name?: unknown }).name !== "string") return null;
     const st = s as Record<string, unknown>;
-    states.push({ name: st.name as string, x: "x" in st ? Number(st.x) : k % 5, y: "y" in st ? Number(st.y) : Math.floor(k / 5), acting: "acting" in st ? !!st.acting : false });
+    const state: MachineState = { name: st.name as string, x: "x" in st ? Number(st.x) : k % 5, y: "y" in st ? Number(st.y) : Math.floor(k / 5), acting: "acting" in st ? !!st.acting : false };
+    for (const key of ["title", "group"] as const) {
+      if (!(key in st)) continue;
+      if (typeof st[key] !== "string") return null;
+      state[key] = st[key] as string;
+    }
+    states.push(state);
   }
   const names = states.map((s) => s.name);
   if (new Set(names).size !== names.length) return null;
@@ -46,7 +58,13 @@ export function normalizeMachine(raw: unknown): Machine | null {
   }
   const initial = "initial" in m ? m.initial : names[0];
   if (typeof initial !== "string" || !names.includes(initial)) return null;
-  return { states, transitions, commands, initial };
+  const machine: Machine = { states, transitions, commands, initial };
+  if ("global_commands" in m) {
+    const global = Array.isArray(m.global_commands) ? m.global_commands.map(String) : null;
+    if (!global || global.some((c) => !commands.includes(c))) return null;
+    machine.global_commands = global;
+  }
+  return machine;
 }
 
 /** State after `command` from `state`, or null when the command is not valid there. */
@@ -58,6 +76,11 @@ export function nextState(machine: Machine, state: string, command: string): str
 /** Commands valid in `state`, in the order of the model (IND-061). */
 export function availableCommands(machine: Machine, state: string): string[] {
   return machine.commands.filter((c) => nextState(machine, state, c) !== null);
+}
+
+/** Commands drawn as a note rather than as arrows: global_commands, else Stop and Abort. */
+export function globalCommands(machine: Machine): string[] {
+  return machine.global_commands ?? ["Stop", "Abort"];
 }
 
 /** Current state: `value` when it is a state of the model, else the initial state. */

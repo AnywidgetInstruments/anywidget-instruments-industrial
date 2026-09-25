@@ -53,7 +53,14 @@ from ._process import PIPE_SHAPES, Motor, Pipe, ProcessObject, Pump, SynopticCan
 from ._recipe import COLUMN_TYPES, RecipeTable
 from ._sanitize import sanitize_svg
 from ._scada import ALARM_PRIORITIES, ALARM_STATES, AlarmBanner, AlarmIndicator, alarm_transition
-from ._statemachine import PACKML_COMMANDS, PACKML_MODEL, StateMachine
+from ._statemachine import (
+    GEMMA_MODEL,
+    ISA88_MODEL,
+    PACKML_COMMANDS,
+    PACKML_MODEL,
+    STATE_MODELS,
+    StateMachine,
+)
 from ._style import (
     STYLES,
     THEMES,
@@ -83,6 +90,8 @@ __all__ = [
     "COLUMN_TYPES",
     "DEVICE_STATUSES",
     "EVENT_CATEGORIES",
+    "GEMMA_MODEL",
+    "ISA88_MODEL",
     "LAMP_COLORS",
     "LED",
     "MECHANICAL_ACTIONS",
@@ -94,6 +103,7 @@ __all__ = [
     "PIPE_SHAPES",
     "STACK_COLORS",
     "STACK_STATES",
+    "STATE_MODELS",
     "STYLES",
     "THEMES",
     "THEME_SWITCH_POSITIONS",
