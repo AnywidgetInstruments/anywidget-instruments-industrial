@@ -51,12 +51,17 @@ function attachAlarmLevel(model: AnyModel<Traits>, contract: WidgetContract): ()
   const hasCoerce = "coerce" in contract.traits;
   const ALARM_INPUTS = [source, "min", "max", "coerce", "lolo", "lo", "hi", "hihi", "deadband", "alarm_level", "_session"];
   let previous = read("alarm_level") as AlarmLevel;
+  let hostLevel = false; // previous is the host's level, read when taking over
   let writing = false;
   const update = (): void => {
     if (writing) return;
     if (hostOwnsState(model)) {
-      previous = read("alarm_level") as AlarmLevel;
+      hostLevel = true;
       return;
+    }
+    if (hostLevel) {
+      previous = read("alarm_level") as AlarmLevel;
+      hostLevel = false;
     }
     const raw = num(source) as number;
     const value = hasCoerce ? coerceValue(raw, num("min") as number, num("max") as number, !!read("coerce")) : raw;

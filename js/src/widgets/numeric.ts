@@ -1,7 +1,7 @@
 // Shared behaviour of numeric widgets: value text, alarm and range badges,
 // keyboard / wheel interaction and ARIA attributes.
 import { coerceValue, type Scale, ScaleGuard } from "../contract/numeric.js";
-import { html, parseSkin, svg } from "../core/dom.js";
+import { html, parseSkin, setAttr, setAttrs, setHidden, setText, svg } from "../core/dom.js";
 import { checkEntry } from "../core/entry.js";
 import { formatValue, withUnit } from "../core/format.js";
 import type { AnyModel } from "../core/model.js";
@@ -136,27 +136,27 @@ export class NumericView<T extends object = NumericTraits> extends BaseView<T> {
     const format = this.get("format") as string;
     const unit = this.get("unit") as string;
     const text = withUnit(formatValue(v, format), unit);
-    this.valueText.textContent = text;
+    setText(this.valueText, text);
     this.renderEntry(v);
     // A11Y-003: state conveyed by text, not only by color.
     const parts: string[] = [];
     if (p.over) parts.push("▲ OVER");
     if (p.under) parts.push("▼ UNDER");
     if (ALARM_TEXT[level]) parts.push(ALARM_TEXT[level]);
-    this.badge.textContent = parts.join(" ");
-    this.badge.hidden = parts.length === 0;
+    setText(this.badge, parts.join(" "));
+    setHidden(this.badge, parts.length === 0);
 
     // A11Y-002
     const b = this.body;
-    b.setAttribute("role", this.get("mode") === "control" ? this.role : "meter");
-    b.setAttribute("aria-valuemin", String(this.min));
-    b.setAttribute("aria-valuemax", String(this.max));
-    if (Number.isFinite(v)) b.setAttribute("aria-valuenow", String(v));
-    else b.removeAttribute("aria-valuenow");
-    b.setAttribute("aria-valuetext", `${text}${parts.length ? ` (${parts.join(", ")})` : ""}`);
-    if (!this.get("label")) b.setAttribute("aria-label", this.kind);
-    else b.removeAttribute("aria-label");
-    b.tabIndex = this.get("mode") === "control" ? 0 : -1;
+    setAttrs(b, {
+      role: this.get("mode") === "control" ? this.role : "meter",
+      "aria-valuemin": String(this.min),
+      "aria-valuemax": String(this.max),
+      "aria-valuenow": Number.isFinite(v) ? String(v) : null,
+      "aria-valuetext": `${text}${parts.length ? ` (${parts.join(", ")})` : ""}`,
+      "aria-label": this.get("label") ? null : this.kind,
+      tabindex: this.get("mode") === "control" ? "0" : "-1",
+    });
   }
 
   /** Show the entry field in control mode (NUM-010), without disturbing typing. */
@@ -165,17 +165,17 @@ export class NumericView<T extends object = NumericTraits> extends BaseView<T> {
     const unit = (this.get("unit") as string) || "";
     const format = this.get("format") as string;
     this.root.classList.toggle("awi-has-entry", on);
-    this.entryEl.hidden = !on;
-    this.entryUnit.hidden = !on || !unit;
-    this.valueText.setAttribute("aria-hidden", on ? "true" : "false");
+    setHidden(this.entryEl, !on);
+    setHidden(this.entryUnit, !on || !unit);
+    setAttr(this.valueText, "aria-hidden", on ? "true" : "false");
     if (!on) {
       this.showEntryError("");
       return;
     }
-    this.entryEl.disabled = !this.interactive;
-    this.entryUnit.textContent = unit;
+    if (this.entryEl.disabled !== !this.interactive) this.entryEl.disabled = !this.interactive;
+    setText(this.entryUnit, unit);
     const label = (this.get("label") as string) || this.kind;
-    this.entryEl.setAttribute("aria-label", `${label} value (${formatValue(this.min, format)} to ${formatValue(this.max, format)})`);
+    setAttr(this.entryEl, "aria-label", `${label} value (${formatValue(this.min, format)} to ${formatValue(this.max, format)})`);
     if (document.activeElement !== this.entryEl) this.resetEntry(v);
   }
 
@@ -183,15 +183,14 @@ export class NumericView<T extends object = NumericTraits> extends BaseView<T> {
     const format = this.get("format") as string;
     this._entryShown = Number.isFinite(v) ? formatValue(v, format) : "";
     this.entryEl.value = this._entryShown;
-    this.entryEl.placeholder = Number.isFinite(v) ? "" : formatValue(v);
+    setAttr(this.entryEl, "placeholder", Number.isFinite(v) ? null : formatValue(v));
     this.showEntryError("");
   }
 
   showEntryError(reason: string): void {
-    this.entryMsg.textContent = reason;
-    this.entryMsg.hidden = !reason;
-    if (reason) this.entryEl.setAttribute("aria-invalid", "true");
-    else this.entryEl.removeAttribute("aria-invalid");
+    setText(this.entryMsg, reason);
+    setHidden(this.entryMsg, !reason);
+    setAttr(this.entryEl, "aria-invalid", reason ? "true" : null);
   }
 
   /** Validate and send the typed value (NUM-010); rejected entries stay for correction. */

@@ -94,6 +94,26 @@ describe("rendering", () => {
     expect(el.querySelector(".awi-body").getAttribute("role")).toBe("meter");
   });
 
+  it("a value update only touches what changes (PERF-002)", async () => {
+    const model = fakeModel({ ...common, mode: "indicator", _kind: "gauge", value: 10, min: 0, max: 100, step: 0, unit: "", scale: "linear", ticks: 5, minor_ticks: 4, format: "%.1f", alarm_level: "normal", variant: "circular", ranges: [] });
+    const el = document.createElement("div");
+    document.body.appendChild(el);
+    widget.render({ model, el });
+    await new Promise((r) => setTimeout(r, 30));
+    const changed = new Set();
+    const obs = new MutationObserver((ms) => ms.forEach((m) => changed.add(m.attributeName || m.target.className || m.target.parentNode?.className)));
+    obs.observe(el, { subtree: true, attributes: true, childList: true, characterData: true });
+    model.set("value", 20);
+    model.emit("change:value");
+    await new Promise((r) => setTimeout(r, 30));
+    obs.takeRecords().forEach((m) => changed.add(m.attributeName || m.target.className));
+    obs.disconnect();
+    for (const unchanged of ["hidden", "role", "tabindex", "aria-valuemin", "aria-valuemax", "title", "awi-label"]) expect(changed).not.toContain(unchanged);
+    expect(changed).toContain("aria-valuenow");
+    expect(el.querySelector(".awi-body").getAttribute("aria-valuenow")).toBe("20");
+    el.remove();
+  });
+
   it("push button latch on keyboard press/release", async () => {
     const model = fakeModel({ ...common, _kind: "pushbutton", value: false, default_state: false, mechanical_action: "latch_when_released", confirm: false, text: "Go", _pressed: false });
     const el = document.createElement("div");

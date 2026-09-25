@@ -4,9 +4,11 @@ import { describe, expect, test, vi } from "vitest";
 import { attachDerived, hostOwnsState } from "../src/contract/derived.js";
 import { ScaleGuard } from "../src/contract/numeric.js";
 import type { TraitSpec } from "../src/contract/spec.js";
+import * as traits from "../src/contract/traits.js";
 import { defaultOf, readTrait, readValue } from "../src/contract/traits.js";
 import { announcedInterval, liveness } from "../src/core/liveness.js";
 import type { AnyModel } from "../src/core/model.js";
+import { BaseView } from "../src/core/view.js";
 import { BY_KIND, CONTRACTS } from "../src/generated/contract.js";
 // @ts-expect-error: JavaScript test helper
 import { fakeModel } from "./helpers.js";
@@ -172,6 +174,16 @@ describe("derived alarm_level (HOST-004)", () => {
     expect(m.sent).toHaveLength(0);
   });
 
+  test("taking over from a host starts from the host's level", () => {
+    const m = eventModel({ _kind: "knob", _session: "kernel", value: 79, hi: 80, deadband: 2, alarm_level: "normal" });
+    attachDerived(m);
+    m.set("alarm_level", "hi"); // set by the host
+    m.set("_session", ""); // the host leaves: the front end computes from "hi"
+    expect(m.get("alarm_level")).toBe("hi"); // 79 is inside the deadband
+    m.set("value", 77);
+    expect(m.get("alarm_level")).toBe("normal");
+  });
+
   test("widgets without a schema are left alone", () => {
     const m = eventModel({ _kind: "not-a-widget", value: 95, hi: 80 });
     attachDerived(m);
@@ -218,5 +230,24 @@ describe("transitions", () => {
     expect(applyTransition(table, "active_unacknowledged", "acknowledge")).toBe("active_acknowledged");
     expect(applyTransition(table, "normal", "acknowledge")).toBe("normal");
     expect(applyTransition(undefined, "x", "y")).toBe("x");
+  });
+});
+
+describe("BaseView.get", () => {
+  test("a trait is read again only when its raw value changes (PERF-002)", () => {
+    const size = [200, 100];
+    const m = eventModel({ _kind: "knob", size, value: 5 });
+    const view = new BaseView(m, document.createElement("div"));
+    const spy = vi.spyOn(traits, "readTrait");
+    const first = view.get("size");
+    expect(view.get("size")).toBe(first);
+    expect(spy).toHaveBeenCalledTimes(1);
+    m.set("size", [300, 100]);
+    expect(view.get("size")).toEqual([300, 100]);
+    m.set("value", NaN);
+    expect(view.get("value")).toBeNaN();
+    expect(view.get("value")).toBeNaN();
+    expect(spy).toHaveBeenCalledTimes(3);
+    spy.mockRestore();
   });
 });

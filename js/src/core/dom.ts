@@ -36,11 +36,30 @@ export function html(tag: string, { cls, text, attrs }: HtmlOptions = {}, childr
   return node;
 }
 
+// Views redraw on every trait change: the writers below leave the DOM alone
+// when the value is unchanged, so that a redraw only touches what changed
+// (fewer style invalidations and mutation records, PERF-002).
+
+/** Set or remove (null, undefined, false) attributes, each only if it changes. */
 export function setAttrs(node: Element, attrs: Attrs): void {
-  for (const [k, v] of Object.entries(attrs)) {
-    if (v === null || v === undefined || v === false) node.removeAttribute(k);
-    else node.setAttribute(k, String(v));
-  }
+  for (const [k, v] of Object.entries(attrs)) setAttr(node, k, v === null || v === undefined || v === false ? null : String(v));
+}
+
+/** Set an attribute, or remove it (null), only if it changes. */
+export function setAttr(node: Element, name: string, value: string | null): void {
+  if (value === null) {
+    if (node.hasAttribute(name)) node.removeAttribute(name);
+  } else if (node.getAttribute(name) !== value) node.setAttribute(name, value);
+}
+
+/** Set the text content only if it changes. */
+export function setText(node: Node, text: string): void {
+  if (node.textContent !== text) node.textContent = text;
+}
+
+/** Show or hide an element only if its state changes. */
+export function setHidden(node: HTMLElement, hidden: boolean): void {
+  if (node.hidden !== hidden) node.hidden = hidden;
 }
 
 /** SVG <text> node with plain text content. */

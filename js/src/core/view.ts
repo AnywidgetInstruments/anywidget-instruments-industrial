@@ -3,7 +3,7 @@
 import type { WidgetContract } from "../contract/spec.js";
 import { readTrait } from "../contract/traits.js";
 import { BY_KIND } from "../generated/contract.js";
-import { html, safeColor } from "./dom.js";
+import { html, safeColor, setAttr, setHidden, setText } from "./dom.js";
 import { type Liveness, liveness, recordBeat } from "./liveness.js";
 import type { AnyModel, Handler, Traits } from "./model.js";
 import { hostIsDark } from "./pagetheme.js";
@@ -25,6 +25,8 @@ export class BaseView<T extends object = Traits> {
   /** Trait contract of the widget, when its `_kind` has a schema (HOST-001). */
   readonly contract: WidgetContract | undefined;
   private _invalid = new Set<string>();
+  /** Last read of each trait: the value is read again only when the raw value changes. */
+  private _reads = new Map<string, { raw: unknown; value: unknown }>();
   readonly root: HTMLDivElement;
   readonly labelEl: HTMLDivElement;
   readonly body: HTMLDivElement;
@@ -117,11 +119,17 @@ export class BaseView<T extends object = Traits> {
     const raw = (this.model as unknown as AnyModel<Traits>).get(name);
     const spec = this.contract?.traits[name];
     if (!spec) return raw;
-    return readTrait(spec, raw, () => {
+    // renderCommon() reads some twenty traits on every change: a value
+    // unchanged since the last read (same object) is not read again (PERF-002)
+    const last = this._reads.get(name);
+    if (last && Object.is(last.raw, raw)) return last.value;
+    const value = readTrait(spec, raw, () => {
       if (this._invalid.has(name)) return;
       this._invalid.add(name);
       console.warn(`anywidget-instruments: ${this.kind}.${name}: invalid value ${JSON.stringify(raw)}, using the default`);
     });
+    this._reads.set(name, { raw, value });
+    return value;
   }
 
   /** True when user input may modify the value (API-004, API-011). */
@@ -173,16 +181,14 @@ export class BaseView<T extends object = Traits> {
     this.body.style.width = `${w}px`;
     this.body.style.height = `${h}px`;
     const tip = this.get("tooltip") as string;
-    if (tip) r.title = tip;
-    else r.removeAttribute("title");
+    setAttr(r, "title", tip || null);
     const label = String(this.get("label") || "");
-    this.labelEl.textContent = label;
-    this.labelEl.hidden = !label;
+    setText(this.labelEl, label);
+    setHidden(this.labelEl, !label);
     r.classList.toggle("awi-stale", this.stale !== "live");
-    this.staleBadge.hidden = this.stale === "live";
-    this.staleBadge.textContent = STALE_TEXT[this.stale];
-    if (this.get("disabled") || this.stale !== "live") r.setAttribute("aria-disabled", "true");
-    else r.removeAttribute("aria-disabled");
+    setHidden(this.staleBadge, this.stale === "live");
+    setText(this.staleBadge, STALE_TEXT[this.stale]);
+    setAttr(r, "aria-disabled", this.get("disabled") || this.stale !== "live" ? "true" : null);
   }
 
   /** Subclasses draw their content here. */
