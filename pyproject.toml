@@ -45,7 +45,12 @@ Specification = "https://s-celles.github.io/anywidget-instruments/specification/
 
 [tool.hatch.build]
 only-packages = true
-artifacts = ["src/anywidget_instruments/static/*"]
+# data directories are not Python packages: only-packages would leave them out
+artifacts = [
+  "src/anywidget_instruments/static/*",
+  "src/anywidget_instruments/schema/*.json",
+  "src/anywidget_instruments/templates/*.svg",
+]
 
 [tool.hatch.build.hooks.jupyter-builder]
 build-function = "hatch_jupyter_builder.npm_builder"

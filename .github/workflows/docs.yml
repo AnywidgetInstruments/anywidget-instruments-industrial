@@ -30,6 +30,14 @@ jobs:
           python-version: "3.12"
       - run: pip install build uv -e ".[docs]" # uv: import analysis of the marimo export
       - run: python -m build --wheel -o dist
+      - name: The wheel ships the bundle, the contract, the schemas and the SVG templates
+        run: |
+          python - <<'PY'
+          import glob, zipfile
+          names = zipfile.ZipFile(glob.glob("dist/*.whl")[0]).namelist()
+          for needed in ("static/index.js", "static/contract.json", "schema/knob.schema.json", "templates/voltmeter.svg"):
+              assert any(n.endswith("anywidget_instruments/" + needed) for n in names), needed
+          PY
       - name: MkDocs (offline-capable, strict)
         run: mkdocs build --strict -d site
       - name: JupyterLite with the package wheel
