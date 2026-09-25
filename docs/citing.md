@@ -21,6 +21,9 @@ The citation metadata is in
 at the root of the repository; GitHub shows it as *Cite this repository*,
 and reference managers can import it.
 
+Author: Sébastien Celles, Université de Poitiers,
+ORCID [0000-0001-9987-4338](https://orcid.org/0000-0001-9987-4338).
+
 APA:
 
 > Celles, S. (2026). *anywidget-instruments: instrumentation widgets for
