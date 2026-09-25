@@ -153,7 +153,7 @@ export class StateMachineView extends BaseView<StateMachineTraits> {
       const top = cy - (lines.length * 10) / 2;
       s.appendChild(svgText(label, { class: `awi-sm-label${st.name === current ? " awi-sm-label-current" : ""}`, x: cx, y: lines.length ? top : cy, "text-anchor": "middle", "dominant-baseline": "central" }));
       lines.forEach((line, i) => {
-        s.appendChild(svgText(line, { class: `awi-sm-title${st.name === current ? " awi-sm-label-current" : ""}`, x: cx, y: top + 10 * (i + 1), "text-anchor": "middle", "dominant-baseline": "central" }));
+        s.appendChild(svgText(line, { class: `awi-sm-title${st.name === current ? " awi-sm-title-current" : ""}`, x: cx, y: top + 10 * (i + 1), "text-anchor": "middle", "dominant-baseline": "central" }));
       });
     }
 

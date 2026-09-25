@@ -781,7 +781,7 @@
 
 /* StateMachine titles and group zones (IND-066) */
 .awi-root .awi-sm-title { fill: var(--awi-muted); font-size: 8.5px; font-family: var(--awi-font); }
-.awi-root .awi-sm-title.awi-sm-label-current { fill: var(--awi-face); font-weight: 600; }
+.awi-root .awi-sm-title-current { fill: var(--awi-face); font-weight: 600; }
 .awi-root .awi-sm-zone { stroke: none; }
 .awi-root .awi-sm-zone-0 { fill: var(--awi-fg); fill-opacity: 0.035; }
 .awi-root .awi-sm-zone-1 { fill: var(--awi-accent); fill-opacity: 0.06; }

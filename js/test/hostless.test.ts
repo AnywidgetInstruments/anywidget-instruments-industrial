@@ -474,6 +474,8 @@ describe("State machine without a kernel", () => {
     expect([...el.querySelectorAll(".awi-sm-zone-label")].map((t) => t.textContent)).toEqual(["A: stop and restart procedures", "F: operating procedures", "D: failure procedures"]);
     expect(el.querySelectorAll(".awi-sm-zone")).toHaveLength(16);
     expect([...el.querySelectorAll(".awi-sm-title")].map((t) => t.textContent)).toContain("Normal production");
+    // one current label (the name), whatever the titles: hosts and tests select it
+    expect([...el.querySelectorAll(".awi-sm-label-current")].map((t) => t.textContent)).toEqual(["▶ A1"]);
     // E-stop from every procedure: summarized in the status, never drawn as an arrow
     expect(el.querySelector(".awi-sm-status")?.textContent).toBe("State: A1 Stop in the initial state · E-stop: from most states");
     expect(el.querySelectorAll(".awi-sm-edge")).toHaveLength(27);
