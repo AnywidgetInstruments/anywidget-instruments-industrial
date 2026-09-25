@@ -756,6 +756,7 @@ describe("Hexadecimal and binary display (IND-110)", () => {
     const key = (name: string) => el.querySelector(`button[aria-label="${name}"]`) as HTMLButtonElement;
     expect(key("F").hidden).toBe(false);
     expect(key("Decimal point").disabled).toBe(true);
+    expect(key("Clear the entry").textContent).toBe("Clr"); // not to be confused with the C digit
     key("1").click();
     key("A").click();
     key("F").click();

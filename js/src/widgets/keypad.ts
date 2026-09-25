@@ -1,5 +1,5 @@
 // NumericEntry: numeric keypad for touch panels (IND-104).
-import { html } from "../core/dom.js";
+import { html, setText } from "../core/dom.js";
 import { checkEntry } from "../core/entry.js";
 import { formatValue, radixOf, withUnit } from "../core/format.js";
 import type { AnyModel } from "../core/model.js";
@@ -142,6 +142,8 @@ export class KeypadView extends BaseView<NumericEntryTraits> {
       const action = KEYS[i][1];
       k.disabled = !on || !keyAllowed(action, radix);
       k.hidden = digitOf(action) >= 10 && radix !== 16;
+      // the C digit and the clear key must not look alike in hexadecimal
+      if (action === "clear") setText(k, radix === 16 ? "Clr" : KEYS[i][0]);
     });
     const range = `${formatValue(parseNumber(this.get("min")), this.get("format"))} to ${formatValue(parseNumber(this.get("max")), this.get("format"))}`;
     this.body.setAttribute("aria-description", `value ${withUnit(formatValue(parseNumber(this.get("value")), this.get("format")), unit)}, range ${range}${editing ? `, typing ${this.draft}` : ""}`);

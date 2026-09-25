@@ -137,6 +137,18 @@ const specs = [
     { id: 3, time: 1767254520, source: "LT-101", category: "alarm", message: "Wet well level high" },
     { id: 4, time: 1767254580, source: "FT-102", category: "system", message: "Maintenance required: sensor drift" }], size: [520, 150] },
   { ...base, _kind: "statemachine", label: "StateMachine (PackML)", value: "Execute", machine: {"states": [{"name": "Idle", "x": 0, "y": 0, "acting": false}, {"name": "Starting", "x": 1, "y": 0, "acting": true}, {"name": "Execute", "x": 2, "y": 0, "acting": false}, {"name": "Completing", "x": 3, "y": 0, "acting": true}, {"name": "Complete", "x": 4, "y": 0, "acting": false}, {"name": "Resetting", "x": 0, "y": 1, "acting": true}, {"name": "Unholding", "x": 1, "y": 1, "acting": true}, {"name": "Held", "x": 2, "y": 1, "acting": false}, {"name": "Holding", "x": 3, "y": 1, "acting": true}, {"name": "Unsuspending", "x": 1, "y": 2, "acting": true}, {"name": "Suspended", "x": 2, "y": 2, "acting": false}, {"name": "Suspending", "x": 3, "y": 2, "acting": true}, {"name": "Stopped", "x": 0, "y": 3, "acting": false}, {"name": "Stopping", "x": 1, "y": 3, "acting": true}, {"name": "Clearing", "x": 2, "y": 3, "acting": true}, {"name": "Aborted", "x": 3, "y": 3, "acting": false}, {"name": "Aborting", "x": 4, "y": 3, "acting": true}], "transitions": [["Stopped", "Reset", "Resetting"], ["Resetting", "SC", "Idle"], ["Idle", "Start", "Starting"], ["Starting", "SC", "Execute"], ["Execute", "SC", "Completing"], ["Completing", "SC", "Complete"], ["Complete", "Reset", "Resetting"], ["Execute", "Hold", "Holding"], ["Holding", "SC", "Held"], ["Held", "Unhold", "Unholding"], ["Unholding", "SC", "Execute"], ["Execute", "Suspend", "Suspending"], ["Suspending", "SC", "Suspended"], ["Suspended", "Unsuspend", "Unsuspending"], ["Unsuspending", "SC", "Execute"], ["Stopping", "SC", "Stopped"], ["Aborting", "SC", "Aborted"], ["Aborted", "Clear", "Clearing"], ["Clearing", "SC", "Stopped"], ["Idle", "Stop", "Stopping"], ["Idle", "Abort", "Aborting"], ["Starting", "Stop", "Stopping"], ["Starting", "Abort", "Aborting"], ["Execute", "Stop", "Stopping"], ["Execute", "Abort", "Aborting"], ["Completing", "Stop", "Stopping"], ["Completing", "Abort", "Aborting"], ["Complete", "Stop", "Stopping"], ["Complete", "Abort", "Aborting"], ["Resetting", "Stop", "Stopping"], ["Resetting", "Abort", "Aborting"], ["Unholding", "Stop", "Stopping"], ["Unholding", "Abort", "Aborting"], ["Held", "Stop", "Stopping"], ["Held", "Abort", "Aborting"], ["Holding", "Stop", "Stopping"], ["Holding", "Abort", "Aborting"], ["Unsuspending", "Stop", "Stopping"], ["Unsuspending", "Abort", "Aborting"], ["Suspended", "Stop", "Stopping"], ["Suspended", "Abort", "Aborting"], ["Suspending", "Stop", "Stopping"], ["Suspending", "Abort", "Aborting"], ["Stopped", "Abort", "Aborting"], ["Stopping", "Abort", "Aborting"], ["Clearing", "Abort", "Aborting"]], "commands": ["Start", "Stop", "Hold", "Unhold", "Suspend", "Unsuspend", "Reset", "Abort", "Clear"], "initial": "Stopped"}, available_commands: ["Stop", "Hold", "Suspend", "Abort"], last_command: "SC", size: [560, 250] },
+  { ...base, _kind: "bitfield", mode: "indicator", label: "BitField (drive status word)", value: 0x0813, bits: 16, labels: ["Ready", "Running", "Warning", "At speed", "Fault", "", "", "", "Remote", "", "", "Brake", "", "", "", ""], colors: ["", "", "#f59e0b", "", "#dc2626"], on_color: "#22c55e", msb_first: true, show_hex: true, size: [520, 76] },
+  { ...base, _kind: "numericentry", label: "NumericEntry (register, hex)", value: 0x1f3a, min: 0, max: 65535, step: 0, unit: "", format: "%04X", confirm_delta: null, coerce: false, size: [180, 280] },
+  { ...base, _kind: "recipetable", label: "RecipeTable", row_edit: true, max_rows: 20, columns: [
+    { name: "step", type: "text" },
+    { name: "temp", title: "Temperature", unit: "°C", min: 20, max: 90, step: 0.5, format: "%.1f" },
+    { name: "time", title: "Hold", unit: "min", min: 0, max: 240, step: 1, format: "%.0f" },
+    { name: "agitator", type: "choice", choices: ["off", "slow", "fast"] },
+    { name: "vacuum", type: "bool" }], value: [
+    { step: "Heat", temp: 65, time: 30, agitator: "slow", vacuum: false },
+    { step: "React", temp: 82.5, time: 120, agitator: "fast", vacuum: true },
+    { step: "Cool", temp: 30, time: 45, agitator: "slow", vacuum: false }], size: [560, 150] },
+  { ...base, _kind: "xygraph", mode: "indicator", label: "XYGraph (pump curve)", series: [{ name: "Head", color: "", style: "line", width: 1.5 }, { name: "Measured", color: "", style: "markers", width: 1.5 }], x_min: 0, x_max: null, y_min: 0, y_max: null, show_legend: true, cursors: [{ x: 75, name: "C1", color: "" }], cursor_values: [], annotations: [], export: true, x_unit: "m³/h", unit: "m", value: {}, size: [420, 240] },
 ];
 const grid = document.getElementById("grid");
 window.models = [];
@@ -173,6 +185,12 @@ for (const s of specs) {
     for (let i = 0; i < n; i++) { ts[i] = t0 + 5 * i; lv[i] = 2 + 0.8 * Math.sin(i / 15) + 0.05 * rand(); fl[i] = 25 + 10 * Math.cos(i / 22); }
     const dv = (a) => new DataView(a.buffer);
     m.emit("msg:custom", { type: "snapshot", pens: [[0, n, n], [1, n, n]] }, [dv(ts), dv(lv), dv(ts), dv(fl)]);
+  }
+  if (s._kind === "xygraph") {
+    const n = 25, q = new Float64Array(n), head = new Float64Array(n);
+    for (let i = 0; i < n; i++) { q[i] = 5 * i; head[i] = 42 - 0.002 * q[i] ** 2; }
+    const dv = (a) => new DataView(a.buffer);
+    m.emit("msg:custom", { type: "data", clear: true, sets: [["Head", n], ["Measured", 3]] }, [dv(q), dv(head), dv(new Float64Array([30, 60, 90])), dv(new Float64Array([40.5, 35.0, 26.3]))]);
   }
   if (s._kind === "waveformchart") {
     const n = 600;
