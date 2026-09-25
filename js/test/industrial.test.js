@@ -209,10 +209,48 @@ describe("StateMachine (IND-060..063)", () => {
     initial: "Off",
   };
 
-  it("edge points lie on the box border", async () => {
-    const { boxEdge } = await import("../src/widgets/statemachine.js");
-    expect(boxEdge(0, 0, 100, 0, 40, 20)).toEqual([80, 0]);
-    expect(boxEdge(100, 100, 100, 0, 40, 20)).toEqual([100, 10]);
+  it("arrows leave and reach the box borders with right angles (IND-066)", async () => {
+    const { routePoints } = await import("../src/widgets/smlayout.js");
+    const a = { cx: 50, cy: 50, w: 40, h: 20 };
+    const b = { cx: 150, cy: 50, w: 40, h: 20 };
+    expect(routePoints(a, b, null, [a, b])).toEqual([[70, 50], [130, 50]]);
+    // a state in between: the arrow goes round it through a channel
+    const mid = { cx: 100, cy: 50, w: 40, h: 20 };
+    const pts = routePoints(a, b, null, { boxes: [a, mid, b], used: [], rowGaps: [0, 100], colGaps: [] });
+    expect(pts.length).toBe(4);
+    expect(pts[1][1]).toBe(pts[2][1]);
+    expect(Math.abs(pts[1][1] - 50)).toBeGreaterThan(10);
+    for (let i = 0; i + 1 < pts.length; i++) expect(pts[i][0] === pts[i + 1][0] || pts[i][1] === pts[i + 1][1]).toBe(true);
+    // waypoints fix the path; the ends leave vertically when above or below
+    const c = { cx: 150, cy: 150, w: 40, h: 20 };
+    expect(routePoints(a, c, [[60, 100], [150, 100]], [a, c])).toEqual([[60, 60], [60, 100], [150, 100], [150, 140]]);
+  });
+
+  it("zone outlines, inset outlines and exits (IND-066)", async () => {
+    const { zoneOutline, insetOutline, zoneExit, inZone } = await import("../src/widgets/smlayout.js");
+    // an L made of two rectangles: 6 sides
+    const L = [[0, 0, 2, 1], [0, 1, 1, 2]];
+    expect(zoneOutline(L)).toHaveLength(6);
+    expect(inZone(L, 1.5, 1.5)).toBe(false);
+    // inset: outer corners shortened, the inner corner lengthened
+    const inset = insetOutline(L, 100, 100, 5);
+    expect(inset).toContainEqual([5, 5, 195, 5]); // top
+    expect(inset).toContainEqual([95, 95, 195, 95]); // under the arm, to the inner corner
+    expect(inset).toContainEqual([95, 95, 95, 195]); // right of the foot, from the inner corner
+    // an arrow to a state under the arm starts on the arm's lower side
+    expect(zoneExit(L, 1.5, 1.5)?.[1]).toBeCloseTo(1, 1);
+    expect(zoneExit([[0, 0, 1, 1]], 5.5, 5.5, 2)).toBeNull();
+  });
+
+  it("labels keep clear of states and of each other", async () => {
+    const { placeLabel } = await import("../src/widgets/smlayout.js");
+    const taken = [];
+    const path = [[0, 50], [200, 50]];
+    const first = placeLabel(path, 30, [], taken);
+    const second = placeLabel(path, 30, [], taken);
+    expect(first).toMatchObject({ x: 100, y: 50, horizontal: true });
+    expect(second.x !== first.x || second.side !== first.side).toBe(true);
+    expect(taken).toHaveLength(2);
   });
 
   it("highlights the current state and enables only valid commands (IND-061)", async () => {

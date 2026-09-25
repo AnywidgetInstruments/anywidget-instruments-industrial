@@ -7,6 +7,7 @@ modes) and the ISA-88 / IEC 61512-1 procedural states.
 from __future__ import annotations
 
 import copy
+import math
 from typing import Any
 
 import traitlets as t
@@ -40,17 +41,18 @@ _ACTING = {
     "Aborting",
     "Clearing",
 }
-# grid layout of the usual state model drawing (column, row)
+# grid layout of the usual state model drawing (column, row): the Hold loop
+# above the production line, the Suspend loop below, the stop states last
 _LAYOUT = {
-    "Idle": (0, 0),
-    "Starting": (1, 0),
-    "Execute": (2, 0),
-    "Completing": (3, 0),
-    "Complete": (4, 0),
-    "Resetting": (0, 1),
-    "Unholding": (1, 1),
-    "Held": (2, 1),
-    "Holding": (3, 1),
+    "Unholding": (1, 0),
+    "Held": (2, 0),
+    "Holding": (3, 0),
+    "Idle": (0, 1),
+    "Starting": (1, 1),
+    "Execute": (2, 1),
+    "Completing": (3, 1),
+    "Complete": (4, 1),
+    "Resetting": (0, 2),
     "Unsuspending": (1, 2),
     "Suspended": (2, 2),
     "Suspending": (3, 2),
@@ -59,6 +61,21 @@ _LAYOUT = {
     "Clearing": (2, 3),
     "Aborted": (3, 3),
     "Aborting": (4, 3),
+}
+# Stop leaves every state of the first three rows, Abort every state but
+# Aborting and Aborted: each drawn as one arrow out of a dashed zone
+_ZONES = [
+    {"rects": [[0, 0, 5, 3], [0, 3, 3, 4]], "commands": ["Abort"], "shade": True},
+    {"rects": [[0, 0, 5, 3]], "commands": ["Stop"]},
+]
+# arrows around the other states (waypoints in cell units, cell centres at +0.5)
+_ROUTES = {
+    "Execute>Holding": [[2.8, 1.0], [3.5, 1.0]],
+    "Unholding>Execute": [[1.5, 1.0], [2.2, 1.0]],
+    "Execute>Suspending": [[2.8, 2.0], [3.5, 2.0]],
+    "Unsuspending>Execute": [[1.5, 2.0], [2.2, 2.0]],
+    "Complete>Resetting": [[4.5, 2.8], [0.3, 2.8]],
+    "Clearing>Stopped": [[2.5, 3.85], [0.5, 3.85]],
 }
 
 
@@ -101,6 +118,8 @@ PACKML_MODEL: dict[str, Any] = {
     "transitions": _packml_transitions(),
     "commands": list(PACKML_COMMANDS),
     "initial": "Stopped",
+    "zones": _ZONES,
+    "routes": _ROUTES,
 }
 
 
@@ -190,22 +209,24 @@ GEMMA_MODEL: dict[str, Any] = {
     ],
     "global_commands": ["E-stop"],
     "initial": "A1",
+    # E-stop leaves every procedure but D1: one arrow out of a dashed zone
+    "zones": [{"rects": [[0, 0, 5, 3], [2, 3, 4, 4]], "commands": ["E-stop"]}],
 }
 
 # -- ISA-88 / IEC 61512-1 procedural states (IND-065) ---------------------------------------
 _ISA88_LAYOUT = {
-    "Idle": (0, 0),
-    "Running": (1, 0),
-    "Complete": (2, 0),
-    "Pausing": (1, 1),
-    "Paused": (0, 1),
-    "Holding": (2, 1),
-    "Restarting": (0, 2),
-    "Held": (1, 2),
-    "Stopping": (0, 3),
-    "Stopped": (1, 3),
-    "Aborting": (2, 3),
-    "Aborted": (3, 3),
+    "Restarting": (1, 0),
+    "Held": (2, 0),
+    "Holding": (3, 0),
+    "Idle": (0, 1),
+    "Running": (2, 1),
+    "Complete": (4, 1),
+    "Paused": (2, 2),
+    "Pausing": (3, 2),
+    "Stopped": (0, 3),
+    "Stopping": (1, 3),
+    "Aborting": (3, 3),
+    "Aborted": (4, 3),
 }
 _ISA88_ACTING = {"Pausing", "Holding", "Restarting", "Stopping", "Aborting"}
 _ISA88_ACTIVE = ["Running", "Pausing", "Paused", "Holding", "Held", "Restarting"]
@@ -240,6 +261,19 @@ ISA88_MODEL: dict[str, Any] = {
     "commands": ["Start", "Pause", "Resume", "Hold", "Restart", "Stop", "Abort", "Reset"],
     "global_commands": ["Stop", "Abort"],
     "initial": "Idle",
+    # Stop leaves every active state, Abort also Stopping, Hold the running
+    # ones: each drawn as one arrow out of a dashed zone
+    "zones": [
+        {"rects": [[1, 0, 4, 3], [1, 3, 2, 4]], "commands": ["Abort"], "shade": True},
+        {"rects": [[1, 0, 4, 3]], "commands": ["Stop"]},
+        {"rects": [[2, 1, 3, 3], [3, 2, 4, 3]], "commands": ["Hold"]},
+    ],
+    "routes": {
+        "Restarting>Running": [[1.5, 1.0], [2.2, 1.0]],
+        "Running>Pausing": [[2.8, 2.0], [3.25, 2.0]],
+        "Complete>Idle": [[4.5, 2.88], [0.3, 2.88]],
+        "Aborted>Idle": [[4.5, 2.88], [0.3, 2.88]],
+    },
 }
 
 #: Models by name, for ``StateMachine("gemma")`` and the like.
@@ -283,7 +317,52 @@ def _check_model(model: dict[str, Any]) -> dict[str, Any]:
     model.setdefault("initial", names[0])
     if model["initial"] not in names:
         raise ValueError(f"unknown initial state {model['initial']!r}")
+    _check_drawing(model, names, commands)
     return model
+
+
+def _is_number(v: Any) -> bool:
+    return isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v)
+
+
+def _check_drawing(model: dict[str, Any], names: list[str], commands: list[str]) -> None:
+    """Check the optional ``zones`` and ``routes`` of a model (IND-066)."""
+    if "zones" in model:
+        if not isinstance(model["zones"], list):
+            raise ValueError("zones must be a list")
+        for zone in model["zones"]:
+            rects = zone.get("rects") if isinstance(zone, dict) else None
+            if (
+                not isinstance(rects, list)
+                or not rects
+                or not all(
+                    isinstance(r, list) and len(r) == 4 and all(_is_number(v) for v in r)
+                    for r in rects
+                )
+            ):
+                raise ValueError(f"each zone needs 'rects': [[x0, y0, x1, y1], ...], got {zone!r}")
+            if "label" in zone and not isinstance(zone["label"], str):
+                raise ValueError("the label of a zone must be a string")
+            if "commands" in zone:
+                zc = zone["commands"]
+                extra = [c for c in zc if c not in commands] if isinstance(zc, list) else zc
+                if extra:
+                    raise ValueError(f"zone commands not in the commands: {extra!r}")
+            if "shade" in zone:
+                zone["shade"] = bool(zone["shade"])
+    if "routes" in model:
+        routes = model["routes"]
+        if not isinstance(routes, dict):
+            raise ValueError("routes must be a dict {'From>To': [[x, y], ...]}")
+        for key, points in routes.items():
+            ends = key.split(">") if isinstance(key, str) else []
+            if len(ends) != 2 or any(n not in names for n in ends):
+                raise ValueError(f"invalid route {key!r}: expected 'From>To' with known states")
+            if not isinstance(points, list) or not all(
+                isinstance(p, list) and len(p) == 2 and all(_is_number(v) for v in p)
+                for p in points
+            ):
+                raise ValueError(f"route {key!r} needs a list of [x, y] points")
 
 
 class StateMachine(InstrumentWidget):
@@ -313,7 +392,7 @@ class StateMachine(InstrumentWidget):
     """
 
     _kind = t.Unicode("statemachine").tag(sync=True)
-    _default_size = (560, 250)
+    _default_size = (720, 380)
     size = size_trait(*_default_size)
     value = t.Unicode("", read_only=True).tag(sync=True)
     #: The class default is the PackML model, so hosts reading class defaults get it.

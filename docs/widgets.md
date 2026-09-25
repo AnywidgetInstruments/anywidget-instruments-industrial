@@ -262,13 +262,61 @@ gemma.path_to("A4")  # ['Stop', 'SC']: commands leading to a state
 ```
 
 The GEMMA model draws the three families as shaded zones, gives each
-procedure its title, and summarizes the emergency stop, possible from every
-procedure, in a note rather than as arrows. Its transitions are the usual
-loops of the guide; a real machine keeps the procedures and loops it needs,
-which a custom model (states with `title` and `group`, `global_commands`)
-expresses. The `D1` procedure represents the emergency stop in the
+procedure its title, and draws the emergency stop, possible from every
+procedure but D1, as one arrow leaving a dashed zone. Its transitions are
+the usual loops of the guide; a real machine keeps the procedures and loops
+it needs, which a custom model (states with `title` and `group`,
+`global_commands`, `zones`, `routes`) expresses. The `D1` procedure represents the emergency stop in the
 software model only: the emergency stop itself is a hardwired safety
 function (see the [safety notice](safety.md)).
+
+#### How the diagram is drawn
+
+The diagram follows the usual drawing of a state model (IND-067):
+
+- **acting states** (they end by themselves, such as `Starting`) are rounded,
+  orange and dashed; **wait states** (such as `IDLE`) are square, blue and
+  in capitals; the current state is dark and marked ▶;
+- every transition is an arrow made of horizontal and vertical segments,
+  labelled with its command, or `SC` (state complete) for the end of an
+  acting state; the arrows leaving the current state are emphasised;
+- a **zone** is a dashed outline around states. When a command of the
+  zone leads from every state inside it to the same state, one arrow leaves
+  the zone instead of one arrow per state: in PackML, *Stop* leaves the zone
+  of the first three rows and *Abort* a larger, shaded zone.
+
+A model places its states on a grid (`x`, `y`: column and row). It may
+add `zones` (rectangles `[x0, y0, x1, y1]` in cell units, a state at
+`(x, y)` filling `[x, x+1] × [y, y+1]`) and `routes`, the waypoints of an
+arrow in cell units, the centre of a state being at `(x + 0.5, y + 0.5)`.
+Arrows without a route go round the states by the gaps between rows and
+columns.
+
+```python
+line = ai.StateMachine(
+    {
+        "states": [
+            {"name": "Stopped", "x": 0, "y": 1},
+            {"name": "Starting", "x": 0, "y": 0, "acting": True},
+            {"name": "Running", "x": 1, "y": 0},
+            {"name": "Stopping", "x": 2, "y": 0, "acting": True},
+        ],
+        "transitions": [
+            ["Stopped", "Start", "Starting"],
+            ["Starting", "SC", "Running"],
+            ["Starting", "Stop", "Stopping"],
+            ["Running", "Stop", "Stopping"],
+            ["Stopping", "SC", "Stopped"],
+        ],
+        # Stop from Starting and Running: one arrow out of the zone
+        "zones": [{"rects": [[0, 0, 2, 1]], "commands": ["Stop"]}],
+        # Stopping back to Stopped: down, then left along the second row
+        "routes": {"Stopping>Stopped": [[2.5, 1.5]]},
+    },
+    label="Conveyor",
+    size=(480, 260),
+)
+```
 
 The three models answer different questions. GEMMA lists what the operative
 part is doing, modes (production, checks, tests) and states together.

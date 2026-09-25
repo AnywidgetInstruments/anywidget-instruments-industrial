@@ -73,7 +73,7 @@ def _(ai):
 
 @app.cell(hide_code=True)
 def _(ai):
-    machine = ai.StateMachine(label="Line state", size=(560, 250))
+    machine = ai.StateMachine(label="Line state", size=(720, 380))
     light = ai.StackLight(
         tiers=["red", "amber", "green"],
         labels=["Fault", "Attention", "Producing"],

@@ -608,13 +608,20 @@
 .awi-root.awi-statemachine .awi-body { display: flex; flex-direction: column; gap: 4px; padding: 6px; box-sizing: border-box; border: 1px solid var(--awi-face-stroke); background: var(--awi-face); font-size: 12px; cursor: default; }
 .awi-root .awi-sm-diagram { flex: none; }
 .awi-root .awi-sm-state { fill: var(--awi-plot-bg); stroke: var(--awi-face-stroke); stroke-width: 1.2; }
-.awi-root .awi-sm-acting { stroke-dasharray: 4 2; }
+.awi-root .awi-sm-wait { fill: color-mix(in srgb, var(--awi-accent) 16%, var(--awi-plot-bg)); stroke: var(--awi-accent); }
+.awi-root .awi-sm-acting { fill: color-mix(in srgb, var(--awi-warn) 22%, var(--awi-plot-bg)); stroke: var(--awi-warn); stroke-dasharray: 4 2; }
 .awi-root .awi-sm-current { fill: var(--awi-fg); stroke: var(--awi-fg); stroke-width: 2; stroke-dasharray: none; }
 .awi-root .awi-sm-label { fill: var(--awi-fg); font-size: 10px; font-family: var(--awi-font); }
+.awi-root .awi-sm-label-wait { font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; }
 .awi-root .awi-sm-label-current { fill: var(--awi-face); font-weight: 800; }
 .awi-root .awi-sm-edge { fill: none; stroke: var(--awi-muted); stroke-width: 1; opacity: 0.7; }
 .awi-root .awi-sm-edge-next { stroke: var(--awi-fg); stroke-width: 2; opacity: 1; }
 .awi-root .awi-sm-arrowhead { fill: var(--awi-muted); }
+.awi-root .awi-sm-edge-label { fill: var(--awi-muted); font-size: 9px; font-family: var(--awi-font); paint-order: stroke; stroke: var(--awi-face); stroke-width: 3px; stroke-linejoin: round; }
+.awi-root .awi-sm-edge-label-next { fill: var(--awi-fg); font-weight: 700; }
+.awi-root .awi-sm-zone-edge { stroke-width: 1.4; }
+.awi-root .awi-sm-area { fill: none; stroke: var(--awi-muted); stroke-width: 1; stroke-dasharray: 5 3; }
+.awi-root .awi-sm-area-shade { fill: var(--awi-fg); fill-opacity: 0.04; stroke: none; }
 .awi-root .awi-sm-status { font-weight: 700; min-height: 16px; }
 .awi-root .awi-sm-commands { display: flex; gap: 4px; flex-wrap: wrap; }
 .awi-root .awi-sm-cmd { font: inherit; font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 3px; border: 1px solid var(--awi-fg); background: var(--awi-knob); color: var(--awi-fg); cursor: pointer; }
@@ -786,7 +793,7 @@
 .awi-root .awi-sm-zone-0 { fill: var(--awi-fg); fill-opacity: 0.035; }
 .awi-root .awi-sm-zone-1 { fill: var(--awi-accent); fill-opacity: 0.06; }
 .awi-root .awi-sm-zone-2 { fill: var(--awi-danger); fill-opacity: 0.06; }
-.awi-root .awi-sm-zone-label { fill: var(--awi-muted); font-size: 9px; font-weight: 700; font-family: var(--awi-font); }
+.awi-root .awi-sm-zone-label { fill: var(--awi-muted); font-size: 9px; font-weight: 700; font-family: var(--awi-font); paint-order: stroke; stroke: var(--awi-face); stroke-width: 3px; stroke-linejoin: round; }
 
 /* SvgPanel (IND-120 .. IND-126): the drawing keeps its own colors */
 .awi-root.awi-svgpanel .awi-body { display: flex; flex-direction: column; gap: 4px; min-height: 0; }

@@ -24,6 +24,59 @@ export interface Machine {
   initial: string;
   /** Commands valid from most states, drawn as a note (IND-066). */
   global_commands?: string[];
+  /** Dashed areas of the drawing; a command of the area leaves it as one arrow (IND-066). */
+  zones?: MachineZone[];
+  /** Waypoints of a transition arrow, by "From>To", in cell units (IND-066). */
+  routes?: Record<string, Array<[number, number]>>;
+}
+
+export interface MachineZone {
+  label?: string;
+  /** Union of rectangles [x0, y0, x1, y1] in cell units: a state at (x, y) fills [x, x+1] × [y, y+1]. */
+  rects: Array<[number, number, number, number]>;
+  /** Commands valid from every state of the zone to the same state, drawn as a single arrow. */
+  commands?: string[];
+  shade?: boolean;
+}
+
+const isNum = (v: unknown): v is number => typeof v === "number" && Number.isFinite(v);
+
+/** Zones and routes as the kernel checks them (_check_drawing), or null when invalid. */
+function drawingOf(m: Record<string, unknown>, names: string[], commands: string[]): Pick<Machine, "zones" | "routes"> | null {
+  const out: Pick<Machine, "zones" | "routes"> = {};
+  if ("zones" in m) {
+    if (!Array.isArray(m.zones)) return null;
+    const zones: MachineZone[] = [];
+    for (const z of m.zones) {
+      if (!z || typeof z !== "object") return null;
+      const zr = z as Record<string, unknown>;
+      if (!Array.isArray(zr.rects) || !zr.rects.length || !zr.rects.every((r) => Array.isArray(r) && r.length === 4 && r.every(isNum))) return null;
+      const zone: MachineZone = { rects: zr.rects.map((r) => [...r] as [number, number, number, number]) };
+      if ("label" in zr) {
+        if (typeof zr.label !== "string") return null;
+        zone.label = zr.label;
+      }
+      if ("commands" in zr) {
+        if (!Array.isArray(zr.commands) || zr.commands.some((c) => !commands.includes(c))) return null;
+        zone.commands = zr.commands.map(String);
+      }
+      if ("shade" in zr) zone.shade = !!zr.shade;
+      zones.push(zone);
+    }
+    out.zones = zones;
+  }
+  if ("routes" in m) {
+    if (!m.routes || typeof m.routes !== "object" || Array.isArray(m.routes)) return null;
+    const routes: Record<string, Array<[number, number]>> = {};
+    for (const [key, pts] of Object.entries(m.routes as Record<string, unknown>)) {
+      const ends = key.split(">");
+      if (ends.length !== 2 || !ends.every((n) => names.includes(n))) return null;
+      if (!Array.isArray(pts) || !pts.every((p) => Array.isArray(p) && p.length === 2 && p.every(isNum))) return null;
+      routes[key] = pts.map((p) => [p[0], p[1]] as [number, number]);
+    }
+    out.routes = routes;
+  }
+  return out;
 }
 
 /**
@@ -64,7 +117,9 @@ export function normalizeMachine(raw: unknown): Machine | null {
     if (!global || global.some((c) => !commands.includes(c))) return null;
     machine.global_commands = global;
   }
-  return machine;
+  const drawing = drawingOf(m, names, commands);
+  if (!drawing) return null;
+  return { ...machine, ...drawing };
 }
 
 /** State after `command` from `state`, or null when the command is not valid there. */

@@ -465,7 +465,7 @@ describe("State machine without a kernel", () => {
     expect(model.get("available_commands")).toEqual(["Start"]);
   });
 
-  test("GEMMA preset: family zones, titles, the emergency stop as a note (IND-064, IND-066)", async () => {
+  test("GEMMA preset: family zones, titles, the emergency stop as one arrow (IND-064, IND-066)", async () => {
     const gemma = CONTRACTS.StateMachine.traits.machine.presets?.gemma;
     const { model, el, body } = mount({ ...defaults("StateMachine"), machine: gemma, label: "Modes", size: [760, 380] });
     await frame();
@@ -476,21 +476,46 @@ describe("State machine without a kernel", () => {
     expect([...el.querySelectorAll(".awi-sm-title")].map((t) => t.textContent)).toContain("Normal production");
     // one current label (the name), whatever the titles: hosts and tests select it
     expect([...el.querySelectorAll(".awi-sm-label-current")].map((t) => t.textContent)).toEqual(["▶ A1"]);
-    // E-stop from every procedure: summarized in the status, never drawn as an arrow
-    expect(el.querySelector(".awi-sm-status")?.textContent).toBe("State: A1 Stop in the initial state · E-stop: from most states");
-    expect(el.querySelectorAll(".awi-sm-edge")).toHaveLength(27);
+    // E-stop from every procedure but D1: one arrow out of the dashed zone
+    expect(el.querySelector(".awi-sm-status")?.textContent).toBe("State: A1 Stop in the initial state");
+    expect(el.querySelectorAll(".awi-sm-zone-edge")).toHaveLength(1);
+    expect(el.querySelectorAll(".awi-sm-edge")).toHaveLength(28);
     cmd(el, "Start").click();
     await frame();
     expect(body.getAttribute("aria-label")).toBe("Modes: F1 Normal production; available commands: End of cycle, Stop, Close, Fault, E-stop");
   });
 
-  test("ISA-88 preset: Stop and Abort as notes (IND-065)", async () => {
+  test("ISA-88 preset: Stop, Abort and Hold leave their zones (IND-065, IND-066)", async () => {
     const { model, el } = mount({ ...defaults("StateMachine"), machine: CONTRACTS.StateMachine.traits.machine.presets?.isa88 });
     await frame();
     expect(model.get("value")).toBe("Idle");
     cmd(el, "Start").click();
+    await frame();
     expect(model.get("available_commands")).toEqual(["Pause", "Hold", "Stop", "Abort"]);
-    expect(el.querySelector(".awi-sm-status")?.textContent).toContain("Stop / Abort: from most states");
+    expect(el.querySelector(".awi-sm-status")?.textContent).toBe("State: Running");
+    expect(el.querySelectorAll(".awi-sm-zone-edge")).toHaveLength(3);
+  });
+
+  test("PackML drawing: right angles, a label on every arrow, Stop and Abort out of zones (IND-066)", async () => {
+    const { el } = mount({ ...defaults("StateMachine"), value: "Execute" });
+    await frame();
+    const edges = [...el.querySelectorAll(".awi-sm-edge")];
+    const labels = [...el.querySelectorAll(".awi-sm-edge-label")].map((t) => t.textContent);
+    // 19 transitions between distinct states, plus one arrow each for Stop and Abort
+    expect(edges).toHaveLength(21);
+    expect(labels).toHaveLength(21);
+    expect(labels.filter((t) => t === "SC")).toHaveLength(11);
+    expect([...el.querySelectorAll(".awi-sm-zone-edge")].map((e) => labels[edges.indexOf(e)])).toEqual(["Abort", "Stop"]);
+    expect(el.querySelectorAll(".awi-sm-area")).toHaveLength(2);
+    // no diagonal: every segment of every arrow is horizontal or vertical
+    for (const e of edges) {
+      const pts = [...(e.getAttribute("d") || "").matchAll(/[ML](-?[\d.]+) (-?[\d.]+)/g)].map((m) => [Number(m[1]), Number(m[2])]);
+      expect(pts.length).toBeGreaterThanOrEqual(2);
+      for (let i = 0; i + 1 < pts.length; i++) expect(pts[i][0] === pts[i + 1][0] || pts[i][1] === pts[i + 1][1]).toBe(true);
+    }
+    // the next moves from Execute are emphasised, the others are not
+    expect([...el.querySelectorAll(".awi-sm-edge-label-next")].map((t) => t.textContent).sort()).toEqual(["Abort", "Hold", "SC", "Stop", "Suspend"]);
+    expect(el.querySelector(".awi-sm-status")?.textContent).toBe("State: Execute");
   });
 
   test("with a kernel, commands are only sent", async () => {

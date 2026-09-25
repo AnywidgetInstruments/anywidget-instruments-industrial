@@ -63,7 +63,7 @@ plant_nodes(status) = [Dict("label" => "Plant", "level" => "site", "children" =>
 """
 
 #%% code id=machine
-@bind machine awi("StateMachine"; label = "R-101 state (PackML)", size = [560, 250])
+@bind machine awi("StateMachine"; label = "R-101 state (PackML)", size = [720, 380])
 
 #%% code id=light
 @bind light awi("StackLight"; tiers = ["red", "amber", "green"],

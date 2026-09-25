@@ -18,8 +18,8 @@
     },
     "size": {
       "default": [
-        560,
-        250
+        720,
+        380
       ]
     },
     "machine": {
@@ -74,63 +74,108 @@
             "type": "string"
           },
           "description": "Commands valid from most states, summarized in a note instead of drawn as arrows (IND-066); default Stop and Abort."
+        },
+        "zones": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "rects": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "description": "Union of rectangles [x0, y0, x1, y1] in cell units: a state at (x, y) fills [x, x+1] × [y, y+1]."
+              },
+              "commands": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Commands valid from every state of the zone to one state outside it, drawn as a single arrow leaving the zone."
+              },
+              "shade": {
+                "type": "boolean"
+              }
+            }
+          },
+          "description": "Dashed zones of the drawing, outermost first (IND-066)."
+        },
+        "routes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            }
+          },
+          "description": "Waypoints of the arrow of a transition, by \"From>To\", in cell units (a state's centre is at (x + 0.5, y + 0.5)); other arrows are routed with right angles (IND-066)."
         }
       },
-      "description": "State model: {states: [{name, x, y, acting, title, group}], transitions: [[from, command, to]], commands, initial, global_commands}; the command SC completes an acting state (a host event). Missing positions, acting flags, commands and initial state are completed as the kernel does; an invalid model reads as this default (PackML).",
+      "description": "State model: {states: [{name, x, y, acting, title, group}], transitions: [[from, command, to]], commands, initial, global_commands, zones, routes}; the command SC completes an acting state (a host event). Missing positions, acting flags, commands and initial state are completed as the kernel does; an invalid model reads as this default (PackML).",
       "default": {
         "states": [
           {
-            "name": "Idle",
-            "x": 0,
-            "y": 0,
-            "acting": false
-          },
-          {
-            "name": "Starting",
-            "x": 1,
-            "y": 0,
-            "acting": true
-          },
-          {
-            "name": "Execute",
-            "x": 2,
-            "y": 0,
-            "acting": false
-          },
-          {
-            "name": "Completing",
-            "x": 3,
-            "y": 0,
-            "acting": true
-          },
-          {
-            "name": "Complete",
-            "x": 4,
-            "y": 0,
-            "acting": false
-          },
-          {
-            "name": "Resetting",
-            "x": 0,
-            "y": 1,
-            "acting": true
-          },
-          {
             "name": "Unholding",
             "x": 1,
-            "y": 1,
+            "y": 0,
             "acting": true
           },
           {
             "name": "Held",
             "x": 2,
-            "y": 1,
+            "y": 0,
             "acting": false
           },
           {
             "name": "Holding",
             "x": 3,
+            "y": 0,
+            "acting": true
+          },
+          {
+            "name": "Idle",
+            "x": 0,
             "y": 1,
+            "acting": false
+          },
+          {
+            "name": "Starting",
+            "x": 1,
+            "y": 1,
+            "acting": true
+          },
+          {
+            "name": "Execute",
+            "x": 2,
+            "y": 1,
+            "acting": false
+          },
+          {
+            "name": "Completing",
+            "x": 3,
+            "y": 1,
+            "acting": true
+          },
+          {
+            "name": "Complete",
+            "x": 4,
+            "y": 1,
+            "acting": false
+          },
+          {
+            "name": "Resetting",
+            "x": 0,
+            "y": 2,
             "acting": true
           },
           {
@@ -279,6 +324,36 @@
             "Stopped"
           ],
           [
+            "Unholding",
+            "Stop",
+            "Stopping"
+          ],
+          [
+            "Unholding",
+            "Abort",
+            "Aborting"
+          ],
+          [
+            "Held",
+            "Stop",
+            "Stopping"
+          ],
+          [
+            "Held",
+            "Abort",
+            "Aborting"
+          ],
+          [
+            "Holding",
+            "Stop",
+            "Stopping"
+          ],
+          [
+            "Holding",
+            "Abort",
+            "Aborting"
+          ],
+          [
             "Idle",
             "Stop",
             "Stopping"
@@ -335,36 +410,6 @@
           ],
           [
             "Resetting",
-            "Abort",
-            "Aborting"
-          ],
-          [
-            "Unholding",
-            "Stop",
-            "Stopping"
-          ],
-          [
-            "Unholding",
-            "Abort",
-            "Aborting"
-          ],
-          [
-            "Held",
-            "Stop",
-            "Stopping"
-          ],
-          [
-            "Held",
-            "Abort",
-            "Aborting"
-          ],
-          [
-            "Holding",
-            "Stop",
-            "Stopping"
-          ],
-          [
-            "Holding",
             "Abort",
             "Aborting"
           ],
@@ -425,64 +470,161 @@
           "Abort",
           "Clear"
         ],
-        "initial": "Stopped"
+        "initial": "Stopped",
+        "zones": [
+          {
+            "rects": [
+              [
+                0,
+                0,
+                5,
+                3
+              ],
+              [
+                0,
+                3,
+                3,
+                4
+              ]
+            ],
+            "commands": [
+              "Abort"
+            ],
+            "shade": true
+          },
+          {
+            "rects": [
+              [
+                0,
+                0,
+                5,
+                3
+              ]
+            ],
+            "commands": [
+              "Stop"
+            ]
+          }
+        ],
+        "routes": {
+          "Execute>Holding": [
+            [
+              2.8,
+              1.0
+            ],
+            [
+              3.5,
+              1.0
+            ]
+          ],
+          "Unholding>Execute": [
+            [
+              1.5,
+              1.0
+            ],
+            [
+              2.2,
+              1.0
+            ]
+          ],
+          "Execute>Suspending": [
+            [
+              2.8,
+              2.0
+            ],
+            [
+              3.5,
+              2.0
+            ]
+          ],
+          "Unsuspending>Execute": [
+            [
+              1.5,
+              2.0
+            ],
+            [
+              2.2,
+              2.0
+            ]
+          ],
+          "Complete>Resetting": [
+            [
+              4.5,
+              2.8
+            ],
+            [
+              0.3,
+              2.8
+            ]
+          ],
+          "Clearing>Stopped": [
+            [
+              2.5,
+              3.85
+            ],
+            [
+              0.5,
+              3.85
+            ]
+          ]
+        }
       },
       "x-awi-writer": "host",
       "x-awi-presets": {
         "packml": {
           "states": [
             {
-              "name": "Idle",
-              "x": 0,
-              "y": 0,
-              "acting": false
-            },
-            {
-              "name": "Starting",
-              "x": 1,
-              "y": 0,
-              "acting": true
-            },
-            {
-              "name": "Execute",
-              "x": 2,
-              "y": 0,
-              "acting": false
-            },
-            {
-              "name": "Completing",
-              "x": 3,
-              "y": 0,
-              "acting": true
-            },
-            {
-              "name": "Complete",
-              "x": 4,
-              "y": 0,
-              "acting": false
-            },
-            {
-              "name": "Resetting",
-              "x": 0,
-              "y": 1,
-              "acting": true
-            },
-            {
               "name": "Unholding",
               "x": 1,
-              "y": 1,
+              "y": 0,
               "acting": true
             },
             {
               "name": "Held",
               "x": 2,
-              "y": 1,
+              "y": 0,
               "acting": false
             },
             {
               "name": "Holding",
               "x": 3,
+              "y": 0,
+              "acting": true
+            },
+            {
+              "name": "Idle",
+              "x": 0,
               "y": 1,
+              "acting": false
+            },
+            {
+              "name": "Starting",
+              "x": 1,
+              "y": 1,
+              "acting": true
+            },
+            {
+              "name": "Execute",
+              "x": 2,
+              "y": 1,
+              "acting": false
+            },
+            {
+              "name": "Completing",
+              "x": 3,
+              "y": 1,
+              "acting": true
+            },
+            {
+              "name": "Complete",
+              "x": 4,
+              "y": 1,
+              "acting": false
+            },
+            {
+              "name": "Resetting",
+              "x": 0,
+              "y": 2,
               "acting": true
             },
             {
@@ -631,6 +773,36 @@
               "Stopped"
             ],
             [
+              "Unholding",
+              "Stop",
+              "Stopping"
+            ],
+            [
+              "Unholding",
+              "Abort",
+              "Aborting"
+            ],
+            [
+              "Held",
+              "Stop",
+              "Stopping"
+            ],
+            [
+              "Held",
+              "Abort",
+              "Aborting"
+            ],
+            [
+              "Holding",
+              "Stop",
+              "Stopping"
+            ],
+            [
+              "Holding",
+              "Abort",
+              "Aborting"
+            ],
+            [
               "Idle",
               "Stop",
               "Stopping"
@@ -687,36 +859,6 @@
             ],
             [
               "Resetting",
-              "Abort",
-              "Aborting"
-            ],
-            [
-              "Unholding",
-              "Stop",
-              "Stopping"
-            ],
-            [
-              "Unholding",
-              "Abort",
-              "Aborting"
-            ],
-            [
-              "Held",
-              "Stop",
-              "Stopping"
-            ],
-            [
-              "Held",
-              "Abort",
-              "Aborting"
-            ],
-            [
-              "Holding",
-              "Stop",
-              "Stopping"
-            ],
-            [
-              "Holding",
               "Abort",
               "Aborting"
             ],
@@ -777,7 +919,104 @@
             "Abort",
             "Clear"
           ],
-          "initial": "Stopped"
+          "initial": "Stopped",
+          "zones": [
+            {
+              "rects": [
+                [
+                  0,
+                  0,
+                  5,
+                  3
+                ],
+                [
+                  0,
+                  3,
+                  3,
+                  4
+                ]
+              ],
+              "commands": [
+                "Abort"
+              ],
+              "shade": true
+            },
+            {
+              "rects": [
+                [
+                  0,
+                  0,
+                  5,
+                  3
+                ]
+              ],
+              "commands": [
+                "Stop"
+              ]
+            }
+          ],
+          "routes": {
+            "Execute>Holding": [
+              [
+                2.8,
+                1.0
+              ],
+              [
+                3.5,
+                1.0
+              ]
+            ],
+            "Unholding>Execute": [
+              [
+                1.5,
+                1.0
+              ],
+              [
+                2.2,
+                1.0
+              ]
+            ],
+            "Execute>Suspending": [
+              [
+                2.8,
+                2.0
+              ],
+              [
+                3.5,
+                2.0
+              ]
+            ],
+            "Unsuspending>Execute": [
+              [
+                1.5,
+                2.0
+              ],
+              [
+                2.2,
+                2.0
+              ]
+            ],
+            "Complete>Resetting": [
+              [
+                4.5,
+                2.8
+              ],
+              [
+                0.3,
+                2.8
+              ]
+            ],
+            "Clearing>Stopped": [
+              [
+                2.5,
+                3.85
+              ],
+              [
+                0.5,
+                3.85
+              ]
+            ]
+          }
         },
         "gemma": {
           "states": [
@@ -1143,79 +1382,100 @@
           "global_commands": [
             "E-stop"
           ],
-          "initial": "A1"
+          "initial": "A1",
+          "zones": [
+            {
+              "rects": [
+                [
+                  0,
+                  0,
+                  5,
+                  3
+                ],
+                [
+                  2,
+                  3,
+                  4,
+                  4
+                ]
+              ],
+              "commands": [
+                "E-stop"
+              ]
+            }
+          ]
         },
         "isa88": {
           "states": [
             {
-              "name": "Idle",
-              "x": 0,
-              "y": 0,
-              "acting": false
-            },
-            {
-              "name": "Running",
-              "x": 1,
-              "y": 0,
-              "acting": false
-            },
-            {
-              "name": "Complete",
-              "x": 2,
-              "y": 0,
-              "acting": false
-            },
-            {
-              "name": "Pausing",
-              "x": 1,
-              "y": 1,
-              "acting": true
-            },
-            {
-              "name": "Paused",
-              "x": 0,
-              "y": 1,
-              "acting": false
-            },
-            {
-              "name": "Holding",
-              "x": 2,
-              "y": 1,
-              "acting": true
-            },
-            {
               "name": "Restarting",
-              "x": 0,
-              "y": 2,
+              "x": 1,
+              "y": 0,
               "acting": true
             },
             {
               "name": "Held",
-              "x": 1,
+              "x": 2,
+              "y": 0,
+              "acting": false
+            },
+            {
+              "name": "Holding",
+              "x": 3,
+              "y": 0,
+              "acting": true
+            },
+            {
+              "name": "Idle",
+              "x": 0,
+              "y": 1,
+              "acting": false
+            },
+            {
+              "name": "Running",
+              "x": 2,
+              "y": 1,
+              "acting": false
+            },
+            {
+              "name": "Complete",
+              "x": 4,
+              "y": 1,
+              "acting": false
+            },
+            {
+              "name": "Paused",
+              "x": 2,
               "y": 2,
               "acting": false
             },
             {
-              "name": "Stopping",
-              "x": 0,
-              "y": 3,
+              "name": "Pausing",
+              "x": 3,
+              "y": 2,
               "acting": true
             },
             {
               "name": "Stopped",
-              "x": 1,
+              "x": 0,
               "y": 3,
               "acting": false
             },
             {
+              "name": "Stopping",
+              "x": 1,
+              "y": 3,
+              "acting": true
+            },
+            {
               "name": "Aborting",
-              "x": 2,
+              "x": 3,
               "y": 3,
               "acting": true
             },
             {
               "name": "Aborted",
-              "x": 3,
+              "x": 4,
               "y": 3,
               "acting": false
             }
@@ -1381,7 +1641,103 @@
             "Stop",
             "Abort"
           ],
-          "initial": "Idle"
+          "initial": "Idle",
+          "zones": [
+            {
+              "rects": [
+                [
+                  1,
+                  0,
+                  4,
+                  3
+                ],
+                [
+                  1,
+                  3,
+                  2,
+                  4
+                ]
+              ],
+              "commands": [
+                "Abort"
+              ],
+              "shade": true
+            },
+            {
+              "rects": [
+                [
+                  1,
+                  0,
+                  4,
+                  3
+                ]
+              ],
+              "commands": [
+                "Stop"
+              ]
+            },
+            {
+              "rects": [
+                [
+                  2,
+                  1,
+                  3,
+                  3
+                ],
+                [
+                  3,
+                  2,
+                  4,
+                  3
+                ]
+              ],
+              "commands": [
+                "Hold"
+              ]
+            }
+          ],
+          "routes": {
+            "Restarting>Running": [
+              [
+                1.5,
+                1.0
+              ],
+              [
+                2.2,
+                1.0
+              ]
+            ],
+            "Running>Pausing": [
+              [
+                2.8,
+                2.0
+              ],
+              [
+                3.25,
+                2.0
+              ]
+            ],
+            "Complete>Idle": [
+              [
+                4.5,
+                2.88
+              ],
+              [
+                0.3,
+                2.88
+              ]
+            ],
+            "Aborted>Idle": [
+              [
+                4.5,
+                2.88
+              ],
+              [
+                0.3,
+                2.88
+              ]
+            ]
+          }
         }
       }
     },

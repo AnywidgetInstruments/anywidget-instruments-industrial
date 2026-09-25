@@ -47,7 +47,7 @@
       ].map(([id, label]) => ({ id, label, level: "equipment", status: status[id] || "normal" })) }] }] }];
       // the traits of examples/kaimonslate/batch_reactor.jl
       const widgets = {
-        machine: ["StateMachine", { label: "R-101 state (PackML)", size: [560, 250] }],
+        machine: ["StateMachine", { label: "R-101 state (PackML)", size: [720, 380] }],
         light: ["StackLight", { tiers: ["red", "amber", "green"], labels: ["Fault", "Attention", "Running"], label: "Stack light" }],
         batches: ["KPITile", { value: 0, unit: "batches", format: "%.0f", target: 3, label: "Batches today", size: [240, 110] }],
         recipe: ["RecipeTable", { label: "Recipe PR-12 (edit while Idle)", size: [560, 170],

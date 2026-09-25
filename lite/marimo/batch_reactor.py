@@ -92,7 +92,7 @@ def _(ai, time):
     COOLING = 0.3  # °C/s, jacket cooling water in the Cool phase
 
     # -- operator station ---------------------------------------------------------------
-    machine = ai.StateMachine(label="R-101 state (PackML)", size=(560, 250))
+    machine = ai.StateMachine(label="R-101 state (PackML)", size=(720, 380))
     light = ai.StackLight(
         tiers=["red", "amber", "green"],
         labels=["Fault", "Attention", "Running"],
