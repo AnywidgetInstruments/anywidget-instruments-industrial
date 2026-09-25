@@ -93,8 +93,8 @@ JupyterLab / Notebook 7 / marimo (`e2e/`).
 | ID | Pri | Status | Notes |
 |---|---|---|---|
 | PERF-001 | M | ✅ | e2e benchmark: p95 < 50 ms (≈ 23 ms measured) |
-| PERF-002 | M | ✅ | e2e benchmark: 50 indicators at 20 Hz, input p95 < 100 ms (≈ 25 ms measured) |
-| PERF-003, PERF-005 | S | ✅ | One render per frame; off-screen widgets skip drawing |
+| PERF-002 | M | ✅ | e2e benchmark: 50 indicators at 20 Hz, keydown p95 < 100 ms; CI runners measured 96–104 ms until off-screen updates were coalesced, 72–80 ms since on a machine throttled to CI speed |
+| PERF-003, PERF-005 | S | ✅ | One render per frame; off-screen widgets skip drawing and refresh their DOM state (text, ARIA) at most every 100 ms (js test) |
 | PERF-004 | M | ✅ | ≈ 32 kB gzipped (JS + CSS), CI budget 150 kB |
 | A11Y-001 … A11Y-003 | M | ✅ | Keyboard (host shortcuts suppressed), ARIA roles, text/shape redundancy |
 | A11Y-004 | S | ✅ | WCAG 2.1 AA contrast of light and dark palettes (js) |

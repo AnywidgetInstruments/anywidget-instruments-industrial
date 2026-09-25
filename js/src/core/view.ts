@@ -10,6 +10,9 @@ import { hostIsDark } from "./pagetheme.js";
 
 export const COMMON_TRAITS = ["mode", "label", "disabled", "visible", "tooltip", "size", "style", "theme", "skin", "_heartbeat"];
 
+/** Refresh period of the DOM state of a widget scrolled out of view (PERF-002, PERF-005). */
+export const OFFSCREEN_MS = 100;
+
 const STALE_TEXT: Record<Liveness, string> = {
   live: "", stale: "⚠ STALE — kernel lost", nokernel: "⚠ NO KERNEL — read-only" };
 
@@ -33,6 +36,7 @@ export class BaseView<T extends object = Traits> {
   readonly staleBadge: HTMLDivElement;
   stale: Liveness;
   protected _frame: number;
+  protected _offscreen: ReturnType<typeof setTimeout> | 0;
   protected _dirty: boolean;
   protected _inViewport: boolean;
   protected _disposers: Array<() => void>;
@@ -53,6 +57,7 @@ export class BaseView<T extends object = Traits> {
     this.kind = String((model as unknown as AnyModel<Traits>).get("_kind") ?? "");
     this.contract = BY_KIND[this.kind];
     this._frame = 0;
+    this._offscreen = 0;
     this._dirty = true;
     this._inViewport = true;
     this._disposers = [];
@@ -149,7 +154,15 @@ export class BaseView<T extends object = Traits> {
   schedule(): void {
     this._dirty = true;
     if (!this._inViewport) {
-      this.renderCommon(); // cheap DOM state (label, classes) stays current off-screen
+      // the DOM state (label, value text, ARIA) stays current off-screen, at
+      // most every OFFSCREEN_MS: a kernel updating many hidden indicators
+      // must not cost one update per message (PERF-002)
+      if (!this._offscreen) {
+        this._offscreen = setTimeout(() => {
+          this._offscreen = 0;
+          if (this._dirty) this.renderCommon();
+        }, OFFSCREEN_MS);
+      }
       return;
     }
     if (this._frame) return;
@@ -227,6 +240,7 @@ export class BaseView<T extends object = Traits> {
 
   destroy(): void {
     if (this._frame && typeof cancelAnimationFrame !== "undefined") cancelAnimationFrame(this._frame);
+    if (this._offscreen) clearTimeout(this._offscreen);
     if (this._pendingSend) clearTimeout(this._pendingSend);
     for (const d of this._disposers) d();
     this.root.remove();
