@@ -1,0 +1,235 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://s-celles.github.io/anywidget-instruments/schema/picture.schema.json",
+  "title": "PictureControl",
+  "description": "Drawing surface driven by the host with drawing commands (SPEC-005 .. SPEC-007).",
+  "type": "object",
+  "x-awi-class": "PictureControl",
+  "allOf": [
+    {
+      "$ref": "instrument.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "picture",
+      "default": "picture",
+      "x-awi-writer": "host"
+    },
+    "size": {
+      "default": [
+        320,
+        200
+      ]
+    },
+    "value": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "button": {
+          "type": "integer",
+          "description": "Mouse button (0: main)."
+        }
+      },
+      "description": "Last click {x, y, button} in CSS pixels from the top-left corner (SPEC-006), control mode only. Written by the host when it owns the state; without one, the front end writes it back (HOST-004). The click is always sent as a click message.",
+      "default": {},
+      "readOnly": true,
+      "x-awi-writer": "derived"
+    },
+    "background": {
+      "type": "string",
+      "description": "CSS color of the background; empty: transparent.",
+      "default": "",
+      "x-awi-writer": "host"
+    }
+  },
+  "x-awi-messages": [
+    {
+      "type": "draw",
+      "direction": "host-to-front",
+      "description": "Drawing commands, rendered in one frame once their images are decoded (SPEC-007). With clear, the display list is emptied first. Sent for each batch of commands and, with clear and the whole display list, in reply to sync_request.",
+      "fields": {
+        "clear": {
+          "type": "boolean"
+        },
+        "commands": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "op"
+            ],
+            "properties": {
+              "op": {
+                "enum": [
+                  "line",
+                  "rect",
+                  "arc",
+                  "polygon",
+                  "text",
+                  "image"
+                ]
+              },
+              "x0": {
+                "type": "number"
+              },
+              "y0": {
+                "type": "number"
+              },
+              "x1": {
+                "type": "number"
+              },
+              "y1": {
+                "type": "number"
+              },
+              "x": {
+                "type": "number"
+              },
+              "y": {
+                "type": "number"
+              },
+              "w": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "h": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "cx": {
+                "type": "number"
+              },
+              "cy": {
+                "type": "number"
+              },
+              "r": {
+                "type": "number"
+              },
+              "start": {
+                "type": "number",
+                "description": "Arc start, degrees clockwise from 3 o'clock."
+              },
+              "end": {
+                "type": "number",
+                "description": "Arc end; |end - start| >= 360: full circle."
+              },
+              "points": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "closed": {
+                "type": "boolean"
+              },
+              "stroke": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "CSS color or \"currentColor\" (the foreground color); null or empty: none."
+              },
+              "fill": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "CSS color or \"currentColor\" (the foreground color); null or empty: none."
+              },
+              "width": {
+                "type": "number",
+                "description": "Line width in CSS pixels."
+              },
+              "text": {
+                "type": "string",
+                "description": "Plain text, drawn as canvas text (never HTML)."
+              },
+              "size": {
+                "type": "number",
+                "description": "Font size in CSS pixels."
+              },
+              "anchor": {
+                "enum": [
+                  "start",
+                  "middle",
+                  "end"
+                ]
+              },
+              "mime": {
+                "enum": [
+                  "image/png",
+                  "image/jpeg",
+                  "rgba"
+                ]
+              },
+              "pw": {
+                "type": "integer",
+                "description": "Width in pixels of an rgba image."
+              },
+              "ph": {
+                "type": "integer",
+                "description": "Height in pixels of an rgba image."
+              },
+              "buffer": {
+                "type": "integer",
+                "description": "Index, in the buffers of this message, of the image bytes."
+              }
+            }
+          }
+        }
+      },
+      "buffers": [
+        {
+          "dtype": "uint8",
+          "shape": [
+            "nbytes"
+          ],
+          "description": "One buffer per image command, at the index given by its buffer field: PNG or JPEG file bytes (mime image/png, image/jpeg) or pixels (mime rgba, row-major (ph, pw, 4))."
+        }
+      ]
+    },
+    {
+      "type": "click",
+      "direction": "front-to-host",
+      "description": "Click in control mode (SPEC-006).",
+      "fields": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "button": {
+          "type": "integer"
+        }
+      },
+      "buffers": []
+    },
+    {
+      "type": "sync_request",
+      "direction": "front-to-host",
+      "description": "Sent by each new view: the host answers with a draw message holding the whole display list (clear true). A host without a display list can ignore it.",
+      "fields": {},
+      "buffers": []
+    }
+  ]
+}

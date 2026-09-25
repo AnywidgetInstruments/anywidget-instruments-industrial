@@ -14,6 +14,7 @@ import math
 import pathlib
 from typing import Any
 
+import numpy as np
 import pytest
 import traitlets as t
 
@@ -100,6 +101,7 @@ MIGRATED = {
     "PolarPlot",
     "SmithChart",
     "RadarChart",
+    "PictureControl",
 }
 
 
@@ -258,3 +260,53 @@ def test_plotted_state_validates(w: Any) -> None:
     assert not errors, [e.message for e in errors]
     fields = set(spec["traits"]["value"]["items"]["properties"])
     assert all(set(s) <= fields for s in state["value"])
+
+
+def _sent(w: Any) -> list[tuple[dict[str, Any], list[Any]]]:
+    """Capture the custom messages a widget sends."""
+    out: list[tuple[dict[str, Any], list[Any]]] = []
+    w.send = lambda content, buffers=None: out.append((content, list(buffers or [])))
+    return out
+
+
+def _message_validator(spec: dict[str, Any], msg_type: str) -> Any:
+    jsonschema = pytest.importorskip("jsonschema")
+    m = next(m for m in spec["messages"] if m["type"] == msg_type)
+    schema = {
+        "type": "object",
+        "properties": {"type": {"const": msg_type}, **m.get("fields", {})},
+        "required": ["type", *m.get("fields", {})],
+    }
+    return m, jsonschema.Draft202012Validator(schema)
+
+
+def _picture_messages() -> Any:
+    pic = ai.PictureControl()
+    sent = _sent(pic)
+    pic.line(0, 0, 10, 10).rect(1, 2, 3, 4, fill="red").circle(5, 5, 2).arc(5, 5, 3, 0, 90)
+    pic.polygon([(0, 0), (1, 1), (2, 0)]).polyline([(0, 0), (3, 3)]).text(
+        1, 1, "hi", anchor="middle"
+    )
+    png = b"\x89PNG\r\n\x1a\n" + bytes(8)
+    pic.image(0, 0, png).image(10, 0, np.zeros((2, 3), dtype=np.uint8))
+    pic.flush()
+    pic._handle_front_msg(pic, {"type": "sync_request"}, [])
+    return pic, sent
+
+
+@pytest.mark.parametrize("make", [_picture_messages], ids=lambda f: f.__name__.strip("_"))
+def test_sent_messages_conform(make: Any) -> None:
+    """Messages sent by the host conform to x-awi-messages: fields and buffer count."""
+    w, sent = make()
+    spec = next(s for s in CONTRACT["widgets"].values() if s["class"] == type(w).__name__)
+    assert sent
+    for content, buffers in sent:
+        m, validator = _message_validator(spec, content["type"])
+        assert m["direction"] == "host-to-front"
+        errors = sorted(validator.iter_errors(json.loads(json.dumps(content))), key=str)
+        assert not errors, [e.message for e in errors]
+        if content["type"] == "draw":  # one buffer per image command, referenced by index
+            refs = sorted(c["buffer"] for c in content["commands"] if "buffer" in c)
+            assert refs == list(range(len(buffers)))
+        else:
+            assert len(buffers) == len(m["buffers"])

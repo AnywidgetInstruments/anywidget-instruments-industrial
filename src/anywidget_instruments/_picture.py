@@ -10,7 +10,7 @@ import numpy as np
 import traitlets as t
 
 from . import _dispatch
-from ._base import Callback, InstrumentWidget
+from ._base import Callback, InstrumentWidget, size_trait
 
 _pending: weakref.WeakSet[PictureControl] = weakref.WeakSet()
 _hook_installed = False
@@ -70,6 +70,7 @@ class PictureControl(InstrumentWidget):
 
     _kind = t.Unicode("picture").tag(sync=True)
     _default_size = (320, 200)
+    size = size_trait(*_default_size)
     value = t.Dict(read_only=True).tag(sync=True)
     background = t.Unicode("").tag(sync=True)
 

@@ -585,6 +585,32 @@ describe("Polar family without a kernel", () => {
   });
 });
 
+describe("Picture control without a kernel", () => {
+  test("draw messages with ArrayBuffer images; a click is recorded in value", async () => {
+    const { model, el } = mount({ ...defaults("PictureControl"), label: "Scene" });
+    const pixels = new Uint8Array([255, 0, 0, 255, 0, 255, 0, 255]).buffer; // 2×1 rgba
+    model.fireMsg({ type: "draw", clear: true, commands: [{ op: "rect", x: 1, y: 2, w: 3, h: 4, fill: "red" }, { op: "image", x: 0, y: 0, mime: "rgba", pw: 2, ph: 1, buffer: 0 }, null] }, [pixels]);
+    await frame();
+    const canvas = el.querySelector("canvas") as HTMLCanvasElement;
+    expect(el.querySelector(".awi-body")?.getAttribute("aria-label")).toBe("Scene");
+    canvas.getBoundingClientRect = () => ({ left: 0, top: 0, width: 320, height: 200 }) as DOMRect;
+    canvas.dispatchEvent(new MouseEvent("pointerdown", { clientX: 30, clientY: 40, button: 0 }));
+    expect(model.get("value")).toEqual({ x: 30, y: 40, button: 0 });
+    expect(model.saved.at(-1)).toMatchObject({ value: { x: 30, y: 40, button: 0 } });
+  });
+
+  test("with a host owning the state, the click is only sent", async () => {
+    const { model, el } = mount({ ...defaults("PictureControl"), _session: "kernel" });
+    const sent: unknown[] = [];
+    model.send = (c: unknown) => void sent.push(c);
+    const canvas = el.querySelector("canvas") as HTMLCanvasElement;
+    canvas.getBoundingClientRect = () => ({ left: 0, top: 0, width: 320, height: 200 }) as DOMRect;
+    canvas.dispatchEvent(new MouseEvent("pointerdown", { clientX: 5, clientY: 6, button: 2 }));
+    expect(sent).toEqual([{ type: "click", x: 5, y: 6, button: 2 }]);
+    expect(model.get("value")).toEqual({});
+  });
+});
+
 describe("Tank without a kernel", () => {
   test("indicator by default, markers read through the schema", async () => {
     const { root, body, el } = mount({ ...defaults("Tank"), value: 3.2, max: 4, unit: "m", markers: [0.5, "x", 3.5], hi: 3, hihi: 3.5 });
