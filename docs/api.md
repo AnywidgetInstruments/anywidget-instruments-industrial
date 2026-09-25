@@ -97,6 +97,7 @@ Generated from the docstrings (DOC-001).
 ::: anywidget_instruments.BitField
 ::: anywidget_instruments.RecipeTable
 ::: anywidget_instruments.XYGraph
+::: anywidget_instruments.EquipmentTree
 
 ## Utilities
 

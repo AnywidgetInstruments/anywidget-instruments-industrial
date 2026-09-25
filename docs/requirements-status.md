@@ -128,7 +128,7 @@ JupyterLab / Notebook 7 / marimo (`e2e/`).
 | IND-116 | S | ✅ | `setpoint` pointer of `Gauge`, `Meter` |
 | IND-117 | C | ✅ | Logarithmic and secondary Y axes of `WaveformChart` |
 | IND-118 | C | ✅ | `value_labels` |
-| IND-119 | C | ⬜ | `EquipmentTree` |
+| IND-119 | C | ✅ | `EquipmentTree` |
 
 Tests: py (`tests/test_industrial.py`), js (`js/test/industrial.test.js`), e2e
 (`allwidgets.spec.js`, both directions for each object), visual baselines;

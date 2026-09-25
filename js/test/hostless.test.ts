@@ -954,6 +954,64 @@ describe("Value labels (IND-118)", () => {
   });
 });
 
+describe("Equipment tree (IND-119)", () => {
+  const NODES = [
+    { label: "Plant", level: "site", children: [
+      { label: "Mixing", level: "area", children: [{ label: "Mixer", status: "running" }, { id: "P-102", label: "Pump", status: "alarm" }] },
+    ] },
+    { label: "Utilities", status: "warning" },
+  ];
+  const rows = (el: HTMLElement) => [...el.querySelectorAll('[role="treeitem"]')] as HTMLElement[];
+  const key = (el: HTMLElement, k: string) => (document.activeElement || el).dispatchEvent(new KeyboardEvent("keydown", { key: k, bubbles: true }));
+
+  test("rows, roll-up of a collapsed node, expand and select with the mouse", async () => {
+    const { model, el } = mount({ ...defaults("EquipmentTree"), nodes: NODES, label: "Plant model" });
+    await frame();
+    expect(el.querySelector('[role="tree"]')?.getAttribute("aria-label")).toBe("Plant model");
+    expect(rows(el).map((r) => r.getAttribute("aria-label"))).toEqual(["Plant, site, alarm below", "Utilities, warning"]);
+    expect(rows(el)[0].textContent).toContain("◆ alarm below");
+    expect(rows(el)[0].getAttribute("aria-expanded")).toBe("false");
+    (rows(el)[0].querySelector(".awi-et-twisty") as HTMLElement).click();
+    expect(model.get("expanded")).toEqual(["Plant"]);
+    await frame();
+    expect(rows(el).map((r) => r.dataset.id)).toEqual(["Plant", "Plant/Mixing", "Utilities"]);
+    expect(rows(el)[1].getAttribute("aria-level")).toBe("2");
+    rows(el)[2].click();
+    expect(model.get("value")).toBe("Utilities");
+    await frame();
+    expect(rows(el)[2].getAttribute("aria-selected")).toBe("true");
+  });
+
+  test("keyboard: arrows expand, move and collapse; Enter selects", async () => {
+    const { model, el } = mount({ ...defaults("EquipmentTree"), nodes: NODES });
+    await frame();
+    rows(el)[0].focus();
+    key(el, "ArrowRight"); // expand Plant
+    await frame();
+    key(el, "ArrowRight"); // to Mixing
+    key(el, "ArrowRight"); // expand Mixing
+    await frame();
+    key(el, "ArrowDown");
+    key(el, "ArrowDown"); // Pump
+    key(el, "Enter");
+    expect(model.get("value")).toBe("P-102");
+    expect(model.get("expanded")).toEqual(["Plant", "Plant/Mixing"]);
+    key(el, "ArrowLeft"); // to Mixing (Pump has no children)
+    key(el, "ArrowLeft"); // collapse Mixing
+    expect(model.get("expanded")).toEqual(["Plant"]);
+    await frame();
+    expect((document.activeElement as HTMLElement).dataset.id).toBe("Plant/Mixing");
+  });
+
+  test("indicator mode: navigation but no selection; invalid nodes skipped", async () => {
+    const { model, el } = mount({ ...defaults("EquipmentTree"), mode: "indicator", nodes: [{ label: "A", status: "bogus" }, { label: "B" }, { label: "B" }, { nope: 1 }] });
+    await frame();
+    expect(rows(el).map((r) => r.dataset.id)).toEqual(["B"]);
+    rows(el)[0].click();
+    expect(model.get("value")).toBe("");
+  });
+});
+
 describe("Tank without a kernel", () => {
   test("indicator by default, markers read through the schema", async () => {
     const { root, body, el } = mount({ ...defaults("Tank"), value: 3.2, max: 4, unit: "m", markers: [0.5, "x", 3.5], hi: 3, hihi: 3.5 });

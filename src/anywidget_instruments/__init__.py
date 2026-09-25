@@ -65,6 +65,7 @@ from ._style import (
 )
 from ._themeswitch import THEME_SWITCH_POSITIONS, ThemeSwitch
 from ._transmitter import DEVICE_STATUSES, Transmitter
+from ._tree import NODE_STATUSES, EquipmentTree
 from ._trend import TrendChart
 from ._xygraph import XY_STYLES, XYGraph
 
@@ -85,6 +86,7 @@ __all__ = [
     "LAMP_COLORS",
     "LED",
     "MECHANICAL_ACTIONS",
+    "NODE_STATUSES",
     "PACKML_COMMANDS",
     "PACKML_MODEL",
     "PID",
@@ -110,6 +112,7 @@ __all__ = [
     "Dial",
     "DigitalWaveformGraph",
     "EmergencyStop",
+    "EquipmentTree",
     "EventLog",
     "FillSlide",
     "Gauge",

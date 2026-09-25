@@ -8,6 +8,7 @@ import { AnnunciatorView } from "./widgets/annunciator.js";
 import { BooleanView } from "./widgets/boolean.js";
 import { BitFieldView } from "./widgets/bitfield.js";
 import { RecipeView } from "./widgets/recipe.js";
+import { TreeView } from "./widgets/tree.js";
 import { XYView } from "./widgets/xygraph.js";
 import { ChartView } from "./widgets/chart.js";
 import { DigitalView } from "./widgets/digital.js";
@@ -66,6 +67,7 @@ const VIEWS = {
   stacklight: StackLightView,
   bitfield: BitFieldView,
   recipetable: RecipeView,
+  equipmenttree: TreeView,
   xygraph: XYView,
   pidfaceplate: PIDView,
   annunciator: AnnunciatorView,

@@ -759,3 +759,22 @@
 /* Setpoint pointer of Gauge and Meter (IND-116): shape differs from the needle */
 .awi-root .awi-sp-line { stroke: var(--awi-accent); stroke-width: 2; stroke-dasharray: 5 3; stroke-linecap: round; }
 .awi-root .awi-sp-mark { fill: none; stroke: var(--awi-accent); stroke-width: 2; stroke-linejoin: round; }
+
+/* EquipmentTree (IND-119): status as a symbol and a word, not only a color */
+.awi-root.awi-equipmenttree .awi-body { display: flex; flex-direction: column; min-height: 0; }
+.awi-root .awi-et-list { overflow: auto; flex: 1; min-height: 0; font-size: 12px; padding: 2px 0; }
+.awi-root .awi-et-row { display: flex; align-items: center; gap: 6px; padding: 2px 6px 2px 4px; border-radius: 3px; cursor: default; white-space: nowrap; }
+.awi-root.awi-control .awi-et-row { cursor: pointer; }
+.awi-root .awi-et-row:hover { background: var(--awi-plot-bg); }
+.awi-root .awi-et-row:focus-visible { outline: 2px solid var(--awi-accent); outline-offset: -2px; }
+.awi-root .awi-et-row.awi-et-selected { background: var(--awi-face); box-shadow: inset 3px 0 0 var(--awi-accent); font-weight: 600; }
+.awi-root .awi-et-twisty { width: 12px; flex: none; text-align: center; color: var(--awi-muted); cursor: pointer; }
+.awi-root .awi-et-label { overflow: hidden; text-overflow: ellipsis; }
+.awi-root .awi-et-level { color: var(--awi-muted); font-size: 10px; }
+.awi-root .awi-et-status { font-size: 10px; font-weight: 600; text-transform: uppercase; flex: none; }
+.awi-root .awi-et-rollup { font-weight: 400; margin-left: auto; }
+.awi-root .awi-et-s-normal, .awi-root .awi-et-s-running { color: var(--awi-ok); }
+.awi-root .awi-et-s-stopped, .awi-root .awi-et-s-offline { color: var(--awi-muted); }
+.awi-root .awi-et-s-maintenance { color: var(--awi-ne107-maintenance); }
+.awi-root .awi-et-s-warning { color: var(--awi-warn); }
+.awi-root .awi-et-s-alarm, .awi-root .awi-et-s-fault { color: var(--awi-danger); }

@@ -1,0 +1,35 @@
+{
+  "description": "EquipmentTree (IND-119): ids given to nodes without one (path of labels), rows shown for a set of expanded nodes, and the most severe status of a node and of the nodes below it.",
+  "cases": [
+    {
+      "name": "plant",
+      "nodes": [
+        { "label": "Plant", "level": "site", "children": [
+          { "label": "Mixing", "level": "area", "status": "normal", "children": [
+            { "label": "Mixer M-101", "status": "running" },
+            { "id": "P-102", "label": "Pump P-102", "status": "alarm" }
+          ] },
+          { "label": "Packing", "level": "area", "children": [
+            { "label": "Filler", "status": "maintenance" }
+          ] }
+        ] },
+        { "label": "Utilities", "status": "warning" }
+      ],
+      "ids": ["Plant", "Plant/Mixing", "Plant/Mixing/Mixer M-101", "P-102", "Plant/Packing", "Plant/Packing/Filler", "Utilities"],
+      "visible": [
+        [[], ["Plant", "Utilities"]],
+        [["Plant"], ["Plant", "Plant/Mixing", "Plant/Packing", "Utilities"]],
+        [["Plant/Mixing"], ["Plant", "Utilities"]],
+        [["Plant", "Plant/Mixing", "unknown"], ["Plant", "Plant/Mixing", "Plant/Mixing/Mixer M-101", "P-102", "Plant/Packing", "Utilities"]]
+      ],
+      "rollup": [["Plant", "alarm"], ["Plant/Mixing", "alarm"], ["Plant/Packing", "maintenance"], ["Plant/Mixing/Mixer M-101", "running"], ["Utilities", "warning"]]
+    },
+    {
+      "name": "no status",
+      "nodes": [{ "label": "A", "children": [{ "label": "B" }] }],
+      "ids": ["A", "A/B"],
+      "visible": [[["A"], ["A", "A/B"]]],
+      "rollup": [["A", ""]]
+    }
+  ]
+}

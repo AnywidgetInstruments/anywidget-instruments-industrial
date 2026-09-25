@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://s-celles.github.io/anywidget-instruments/schema/equipmenttree.schema.json",
+  "title": "EquipmentTree",
+  "description": "Hierarchy of equipment (site, area, unit, module) with a status per node, that the operator expands, collapses and selects (IND-119).",
+  "type": "object",
+  "x-awi-class": "EquipmentTree",
+  "allOf": [
+    {
+      "$ref": "instrument.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "equipmenttree",
+      "default": "equipmenttree",
+      "x-awi-writer": "host"
+    },
+    "mode": {
+      "default": "control"
+    },
+    "size": {
+      "default": [
+        320,
+        280
+      ]
+    },
+    "value": {
+      "type": "string",
+      "description": "Id of the selected node, empty for none. Set by the host, or by the operator selecting a node in control mode.",
+      "default": "",
+      "x-awi-writer": "both"
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "description": "Unique id; missing or empty: the path of labels from the root joined by '/'."
+          },
+          "level": {
+            "type": "string",
+            "description": "Level shown next to the label (site, area, unit, ...)."
+          },
+          "status": {
+            "enum": [
+              "",
+              "normal",
+              "running",
+              "stopped",
+              "offline",
+              "maintenance",
+              "warning",
+              "alarm",
+              "fault"
+            ],
+            "description": "Status of the node, from the least to the most severe; a collapsed node also shows the most severe status below it."
+          },
+          "children": {
+            "type": "array",
+            "description": "Child nodes, of the same form."
+          }
+        },
+        "required": [
+          "label"
+        ]
+      },
+      "description": "Root nodes, each {label, id, level, status, children}. Python rejects a node without a label, an unknown status or a repeated id; without a kernel such a node (and its children) is skipped.",
+      "default": [],
+      "x-awi-writer": "host"
+    },
+    "expanded": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Ids of the expanded nodes. Set by the host, or by the operator expanding and collapsing nodes.",
+      "default": [],
+      "x-awi-writer": "both"
+    },
+    "show_level": {
+      "type": "boolean",
+      "description": "Show the level of each node next to its label.",
+      "default": true,
+      "x-awi-writer": "host"
+    }
+  }
+}

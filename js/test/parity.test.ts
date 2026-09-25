@@ -22,6 +22,8 @@ import trendCases from "../../tests/parity/trend.json";
 import waveformCases from "../../tests/parity/waveform.json";
 import xyCases from "../../tests/parity/xy.json";
 import valueLabelCases from "../../tests/parity/value_labels.json";
+import treeCases from "../../tests/parity/tree.json";
+import { flattenTree, rollupStatus, visibleIds } from "../src/contract/tree.js";
 import { type AlarmLevel, type AlarmLimits, computeAlarmLevel } from "../src/contract/alarm.js";
 import { acknowledgeRows, type AlarmRow, expireShelving, localIso, shelveRow, unshelveRow } from "../src/contract/alarms.js";
 import { type AnnEvent, annunciatorTransition, hornOn, type Panel, panelAction, type Sequence, setProcess } from "../src/contract/annunciator.js";
@@ -376,5 +378,14 @@ describe("value labels", () => {
     expect(labels.map((l) => l.label)).toEqual(c.sorted);
     for (const [value, expected] of c.label_of as Array<[number | string, string | null]>) expect(valueLabelOf(labels, parseNumber(value), c.min, c.max), String(value)).toBe(expected);
     for (const [text, expected] of c.value_of as Array<[string, number | null]>) expect(valueOfLabel(labels, text), text).toBe(expected);
+  });
+});
+
+describe("equipment tree", () => {
+  test.each(treeCases.cases)("$name", (c) => {
+    const flat = flattenTree(c.nodes);
+    expect(flat.map((n) => n.id)).toEqual(c.ids);
+    for (const [expanded, shown] of c.visible) expect(visibleIds(flat, expanded), expanded.join()).toEqual(shown);
+    for (const [id, status] of c.rollup) expect(rollupStatus(flat, id), id).toBe(status);
   });
 });

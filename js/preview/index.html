@@ -151,6 +151,13 @@ const specs = [
     { step: "Cool", temp: 30, time: 45, agitator: "slow", vacuum: false }], size: [560, 150] },
   { ...base, _kind: "xygraph", mode: "indicator", label: "XYGraph (pump curve)", series: [{ name: "Head", color: "", style: "line", width: 1.5 }, { name: "Measured", color: "", style: "markers", width: 1.5 }], x_min: 0, x_max: null, y_min: 0, y_max: null, show_legend: true, cursors: [{ x: 75, name: "C1", color: "" }], cursor_values: [], annotations: [], export: true, x_unit: "m³/h", unit: "m", value: {}, size: [420, 240] },
   { ...base, _kind: "waveformchart", mode: "indicator", label: "WaveformChart (log, right axis)", history: 300, n_traces: 2, update_mode: "strip", y_scale: "log", y_min: 1e-4, y_max: 1e3, autoscale_y: false, y2_min: 0, y2_max: 100, autoscale_y2: false, y2_unit: "%", paused: false, dt: 1, x_unit: "s", unit: "mbar", traces: [{ name: "Chamber pressure" }, { name: "Valve opening", axis: "right" }], show_legend: true, cursors: [{ x: 150, name: "C1", color: "" }], cursor_values: [], annotations: [], export: true, size: [420, 240] },
+  { ...base, _kind: "equipmenttree", mode: "control", label: "EquipmentTree", value: "P-102", expanded: ["Plant", "Plant/Mixing"], show_level: true, nodes: [
+    { label: "Plant", level: "site", children: [
+      { label: "Mixing", level: "area", status: "normal", children: [{ label: "Mixer M-101", level: "unit", status: "running" }, { id: "P-102", label: "Pump P-102", level: "equipment", status: "alarm" }, { label: "Valve XV-103", level: "equipment", status: "maintenance" }] },
+      { label: "Packing", level: "area", children: [{ label: "Filler", level: "unit", status: "stopped" }, { label: "Capper", level: "unit", status: "fault" }] },
+    ] },
+    { label: "Utilities", level: "area", status: "warning", children: [{ label: "Boiler", level: "unit", status: "offline" }] },
+  ], size: [320, 240] },
 ];
 const grid = document.getElementById("grid");
 window.models = [];

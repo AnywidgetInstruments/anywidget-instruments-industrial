@@ -465,3 +465,17 @@ def test_value_labels(case: dict[str, Any]) -> None:
         assert value_label_of(k.value_labels, _num(value), k.min, k.max) == expected, value
     for text, expected in case["value_of"]:
         assert value_of_label(k.value_labels, text) == expected, text
+
+
+TREE = _load("tree.json")["cases"]
+
+
+@pytest.mark.parametrize("case", TREE, ids=[c["name"] for c in TREE])
+def test_equipment_tree(case: dict[str, Any]) -> None:
+    tree = ai.EquipmentTree(nodes=case["nodes"])
+    assert tree.ids() == case["ids"]
+    for expanded, shown in case["visible"]:
+        tree.set_trait("expanded", expanded)
+        assert tree.shown() == shown, expanded
+    for node_id, status in case["rollup"]:
+        assert tree.rollup(node_id) == status, node_id

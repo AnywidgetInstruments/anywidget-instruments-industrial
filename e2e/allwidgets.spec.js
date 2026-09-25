@@ -275,6 +275,19 @@ test.describe("every widget", () => {
     await expect(w.locator(".awi-rt-msg")).toContainText("Out of range");
   });
 
+  test("EquipmentTree: both directions (IND-119)", async () => {
+    const w = widget(page, "EquipmentTree");
+    await w.scrollIntoViewIfNeeded();
+    await expect(w.getByRole("treeitem", { name: "Plant, alarm below" })).toBeVisible();
+    await py('W["EquipmentTree"].select("Plant/Pump")');
+    await expect(w.getByRole("treeitem", { name: "Pump, alarm" })).toHaveAttribute("aria-selected", "true");
+    await w.getByRole("treeitem", { name: "Utilities" }).click();
+    await expect.poll(() => py('print(W["EquipmentTree"].value)')).toBe("Utilities");
+    await w.getByRole("treeitem", { name: "Utilities" }).press("Home");
+    await page.keyboard.press("ArrowLeft");
+    await expect.poll(() => py('print(W["EquipmentTree"].expanded)')).toBe("[]");
+  });
+
   test("StackLight: kernel -> front", async () => {
     await widget(page, "StackLight").scrollIntoViewIfNeeded();
     await py('W["StackLight"].set("green", "blink")');

@@ -21,6 +21,7 @@ by default; every widget switches with `mode`.
 | Process symbols | `Valve`, `Pump`, `Motor`, `Pipe` (faceplates) | ISA-5.1 (symbols) |
 | Field instruments | `Transmitter` (I) | ISA-5.1, NAMUR NE 107 |
 | Supervisory objects | `PIDFaceplate` with `PID`, `StateMachine` | ISA-101, ISA-TR88.00.02 |
+| Recipes and plant structure | `RecipeTable` (I), `XYGraph` (I), `EquipmentTree` (C) | IEC 62264, IEC 61512 (`EquipmentTree` levels) |
 | Layout and session | `Panel`, `SynopticCanvas`, `ThemeSwitch` | |
 
 The sections below follow the families of the [specification](specification.md).
@@ -433,3 +434,50 @@ curve.plot([30, 60, 90], [40.5, 35.0, 26.3], name="Measured", style="markers")
 curve.add_cursor(75)
 ```
 
+### EquipmentTree
+
+A hierarchy of equipment for navigating a plant model: enterprise, site,
+area, unit, equipment module, control module (as in IEC 62264 and IEC 61512),
+or any other hierarchy. Each node has a label, an optional `level` shown next
+to it and an optional `status` (`normal`, `running`, `stopped`, `offline`,
+`maintenance`, `warning`, `alarm`, `fault`) shown as a symbol and a word. A
+collapsed node also shows the most severe status below it ("◆ alarm below"),
+so that a fault deep in the tree stays visible.
+
+The operator expands and collapses nodes with the arrow, a double click or
+the arrow keys, and selects one with a click or Enter; the selection
+(`value`, the id of the node) and the open nodes (`expanded`) are sent to the
+kernel. A node without an `id` is identified by the path of labels from the
+root.
+
+```python
+tree = ai.EquipmentTree(
+    nodes=[
+        {
+            "label": "Plant",
+            "level": "site",
+            "children": [
+                {
+                    "label": "Mixing",
+                    "level": "area",
+                    "children": [
+                        {"label": "Mixer M-101", "level": "unit", "status": "running"},
+                        {
+                            "id": "P-102",
+                            "label": "Pump P-102",
+                            "level": "equipment",
+                            "status": "alarm",
+                        },
+                    ],
+                },
+            ],
+        },
+        {"label": "Utilities", "level": "area", "status": "warning"},
+    ],
+    label="Plant model",
+)
+tree.on_change(lambda change: print("selected", change["new"]))
+tree.select("P-102")  # expands Plant and Mixing
+tree.rollup("Plant")  # 'alarm'
+tree.set_status("P-102", "normal")
+```
