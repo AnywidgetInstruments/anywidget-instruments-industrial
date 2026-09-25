@@ -56,6 +56,10 @@ followed), easier to read from another language.
   `NumericWidget`, `GraphWidget`, …) are bases already merged into the
   concrete widgets; a host only needs the entries with `abstract: false`.
 - `kind` is the value of the `_kind` trait, which selects the view.
+- `format` changes only when this layout changes in a way a host must adapt
+  to (a key renamed or removed, a meaning changed); new keys may be added
+  within a format. Hosts should check it, and the paths of the table above
+  are kept stable.
 - `frameworkTraits` are traits of the anywidget and ipywidgets machinery; a
   host can ignore them.
 
