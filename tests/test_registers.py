@@ -124,3 +124,13 @@ def test_recipe_readonly_column() -> None:
     sent = sent_messages(r)
     r._handle_front_msg(r, {"type": "edit", "row": 0, "column": "id", "value": "B"}, [])
     assert r.value[0]["id"] == "A" and sent[-1]["type"] == "rejected"
+
+
+def test_setpoint_pointer_of_gauge_and_meter():
+    # IND-116: an optional setpoint, None by default, synced to the front end.
+    for cls in (ai.Gauge, ai.Meter):
+        w = cls(40.0, max=100)
+        assert w.setpoint is None
+        w.setpoint = 60
+        assert w.setpoint == 60.0
+        assert "setpoint" in w.keys

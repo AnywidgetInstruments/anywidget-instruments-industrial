@@ -230,6 +230,8 @@ class Gauge(_PeakMixin):
     """Circular or semi-circular gauge with needle and colored ranges (NUM-103).
 
     ``ranges`` is a list of ``{"from": float, "to": float, "color": css_color}``.
+    ``setpoint`` (``None`` by default) is drawn as a second, dashed pointer
+    with a hollow marker, next to the needle of the value (IND-116).
     """
 
     _kind = t.Unicode("gauge").tag(sync=True)
@@ -237,10 +239,15 @@ class Gauge(_PeakMixin):
     mode = mode_trait(_default_mode)
     variant = t.Enum(["circular", "semicircular"], default_value="circular").tag(sync=True)
     ranges = t.List(t.Dict()).tag(sync=True)
+    setpoint = t.Float(None, allow_none=True).tag(sync=True)
 
 
 class Meter(_PeakMixin):
-    """Analog needle meter with a sector scale (NUM-104)."""
+    """Analog needle meter with a sector scale (NUM-104).
+
+    ``setpoint`` (``None`` by default) is drawn as a second, dashed pointer
+    (IND-116).
+    """
 
     _kind = t.Unicode("meter").tag(sync=True)
     _default_mode = "indicator"
@@ -248,6 +255,7 @@ class Meter(_PeakMixin):
     mode = mode_trait(_default_mode)
     size = size_trait(*_default_size)
     angle_range = t.Float(90.0, min=20.0, max=150.0).tag(sync=True)
+    setpoint = t.Float(None, allow_none=True).tag(sync=True)
 
 
 class VUMeter(_PeakMixin):

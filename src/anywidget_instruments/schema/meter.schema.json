@@ -32,6 +32,12 @@
       "description": "Angle swept by the scale, in degrees.",
       "default": 90,
       "x-awi-writer": "host"
+    },
+    "setpoint": {
+      "$ref": "instrument.schema.json#/$defs/optionalNumber",
+      "description": "Setpoint drawn as a second, dashed pointer with a hollow marker, and stated in the text alternative; null: none (IND-116).",
+      "default": null,
+      "x-awi-writer": "host"
     }
   }
 }

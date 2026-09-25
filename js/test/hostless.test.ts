@@ -885,6 +885,22 @@ describe("XY graph without a kernel", () => {
   });
 });
 
+describe("Setpoint pointer (IND-116)", () => {
+  test("gauge and meter draw a second, dashed pointer and state the setpoint", async () => {
+    for (const title of ["Gauge", "Meter"] as const) {
+      const { el, body } = mount({ ...defaults(title), value: 42, setpoint: 60, unit: "°C" });
+      await frame();
+      expect(el.querySelectorAll(".awi-sp-line")).toHaveLength(1);
+      expect(el.querySelectorAll(".awi-sp-mark")).toHaveLength(1);
+      expect(body.getAttribute("aria-valuetext")).toBe("42.0 °C, setpoint 60.0 °C");
+    }
+    const none = mount({ ...defaults("Gauge"), value: 42 });
+    await frame();
+    expect(none.el.querySelectorAll(".awi-sp-line")).toHaveLength(0);
+    expect(none.body.getAttribute("aria-valuetext")).toBe("42.0");
+  });
+});
+
 describe("Tank without a kernel", () => {
   test("indicator by default, markers read through the schema", async () => {
     const { root, body, el } = mount({ ...defaults("Tank"), value: 3.2, max: 4, unit: "m", markers: [0.5, "x", 3.5], hi: 3, hihi: 3.5 });

@@ -121,6 +121,12 @@ export class NumericView<T extends object = NumericTraits> extends BaseView<T> {
     return zones.filter((z) => z.to > z.from);
   }
 
+  /** ", setpoint <value>" where the widget has a setpoint (IND-116). */
+  setpointText(): string {
+    const sp = (this as BaseView<T>).get("setpoint") as number | null | undefined;
+    return typeof sp === "number" && Number.isFinite(sp) ? `, setpoint ${withUnit(formatValue(sp, this.get("format") as string), this.get("unit") as string)}` : "";
+  }
+
   // -- rendering ----------------------------------------------------------
   override renderCommon(): void {
     super.renderCommon();
@@ -153,7 +159,7 @@ export class NumericView<T extends object = NumericTraits> extends BaseView<T> {
       "aria-valuemin": String(this.min),
       "aria-valuemax": String(this.max),
       "aria-valuenow": Number.isFinite(v) ? String(v) : null,
-      "aria-valuetext": `${text}${parts.length ? ` (${parts.join(", ")})` : ""}`,
+      "aria-valuetext": `${text}${parts.length ? ` (${parts.join(", ")})` : ""}${this.setpointText()}`,
       "aria-label": this.get("label") ? null : this.kind,
       tabindex: this.get("mode") === "control" ? "0" : "-1",
     });

@@ -755,3 +755,7 @@
 .awi-root .awi-rt-sort { font: inherit; font-weight: 600; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
 .awi-root .awi-rt-foot { display: flex; gap: 8px; align-items: center; padding: 2px 4px; min-height: 18px; }
 .awi-root .awi-rt-add, .awi-root .awi-rt-del { font: inherit; font-size: 11px; padding: 1px 6px; border: 1px solid var(--awi-face-stroke); border-radius: 3px; background: var(--awi-plot-bg); color: var(--awi-fg); cursor: pointer; }
+
+/* Setpoint pointer of Gauge and Meter (IND-116): shape differs from the needle */
+.awi-root .awi-sp-line { stroke: var(--awi-accent); stroke-width: 2; stroke-dasharray: 5 3; stroke-linecap: round; }
+.awi-root .awi-sp-mark { fill: none; stroke: var(--awi-accent); stroke-width: 2; stroke-linejoin: round; }

@@ -33,8 +33,8 @@ claim conformity with them (see [Standards and references](standards.md)).
 |---|---|---|
 | `Knob` | control | `angle_range` |
 | `Dial` | control | `turns` for multi-turn operation |
-| `Gauge` | indicator | `variant="circular"/"semicircular"`, colored `ranges`, `peak_hold` |
-| `Meter` | indicator | sector scale, `peak_hold` |
+| `Gauge` | indicator | `variant="circular"/"semicircular"`, colored `ranges`, `peak_hold`, `setpoint` |
+| `Meter` | indicator | sector scale, `peak_hold`, `setpoint` |
 | `VUMeter` | indicator | `segments`, `peak_hold`, `peak_decay` |
 | `Tank` | indicator | `markers`, `fill_color` |
 | `Thermometer` | indicator | bulb and fluid column |
@@ -81,6 +81,18 @@ logic.set_data(bytes_read, n_bits=8)
 mixed = ai.MixedSignalGraph(dt=1e-6)
 mixed.set_analog(v)
 mixed.set_data(trigger)
+```
+
+### Setpoint pointer
+
+A `Gauge` or a `Meter` with a `setpoint` draws it as a second pointer: a
+dashed line ending in a hollow triangle outside the scale, distinct from the
+needle by shape as well as color. The text alternative states it too
+("…, setpoint 60 °C"). `None` (the default) hides it.
+
+```python
+temp = ai.Gauge(57.2, max=100, unit="°C", setpoint=60, label="TIC-101")
+temp.setpoint = 65  # the operator's new target, set by the kernel
 ```
 
 ## Specialized displays

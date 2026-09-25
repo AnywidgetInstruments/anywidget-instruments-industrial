@@ -7,7 +7,7 @@ import type { DialTraits, GaugeTraits, KnobTraits } from "../generated/contract.
 import { NumericView } from "./numeric.js";
 
 /** Traits of the rotary widgets (Knob, Dial, Gauge, Meter, Compass), from their schemas. */
-export type RotaryTraits = KnobTraits & Partial<Pick<DialTraits, "turns"> & Pick<GaugeTraits, "variant" | "ranges" | "peak" | "peak_hold">>;
+export type RotaryTraits = KnobTraits & Partial<Pick<DialTraits, "turns"> & Pick<GaugeTraits, "variant" | "ranges" | "peak" | "peak_hold" | "setpoint">>;
 
 interface Geometry {
   vb: [number, number];
@@ -50,6 +50,8 @@ export class RotaryView extends NumericView<RotaryTraits> {
   readonly svgEl: SVGElement;
   readonly staticLayer: SVGElement;
   readonly peakMark: SVGElement;
+  /** Second pointer of a setpoint (IND-116): dashed line and hollow marker. */
+  readonly spPointer: SVGElement;
   readonly needle: SVGElement;
   readonly turnText: SVGElement;
   protected _staticKey: string;
@@ -57,14 +59,15 @@ export class RotaryView extends NumericView<RotaryTraits> {
   g: Geometry | undefined;
 
   constructor(model: AnyModel<RotaryTraits>, el: HTMLElement) {
-    super(model, el, ["angle_range", "turns", "variant", "ranges", "peak", "peak_hold"]);
+    super(model, el, ["angle_range", "turns", "variant", "ranges", "peak", "peak_hold", "setpoint"]);
     this.svgEl = svg("svg", { class: "awi-svg", "aria-hidden": "true" });
     this.body.appendChild(this.svgEl);
     this.staticLayer = svg("g");
     this.peakMark = svg("path", { class: "awi-peak" });
+    this.spPointer = svg("g", { class: "awi-setpoint" });
     this.needle = svg("g", { class: "awi-needle" });
     this.turnText = svgText("", { class: "awi-turns", "text-anchor": "middle" });
-    this.svgEl.append(this.staticLayer, this.peakMark, this.needle, this.turnText);
+    this.svgEl.append(this.staticLayer, this.peakMark, this.spPointer, this.needle, this.turnText);
     this._staticKey = "";
     this._dragStart = null;
     this.drag(this.svgEl, {
@@ -229,6 +232,19 @@ export class RotaryView extends NumericView<RotaryTraits> {
       this.peakMark.style.display = "";
     } else {
       this.peakMark.style.display = "none";
+    }
+
+    // IND-116: the setpoint as a second pointer, dashed, with a hollow marker outside the scale
+    const sp = this.get("setpoint");
+    clear(this.spPointer);
+    if (sp !== null && sp !== undefined && Number.isFinite(sp) && g.tick) {
+      const a = this.angleOf(Math.min(1, Math.max(0, this.frac(sp))));
+      const [x1, y1] = polar(g.cx, g.cy, g.needle * 0.92, a);
+      this.spPointer.appendChild(svg("line", { class: "awi-sp-line", x1: g.cx, y1: g.cy, x2: x1, y2: y1 }));
+      const [m0x, m0y] = polar(g.cx, g.cy, g.tick[1] + 9, a - 4);
+      const [m1x, m1y] = polar(g.cx, g.cy, g.tick[1] + 9, a + 4);
+      const [m2x, m2y] = polar(g.cx, g.cy, g.tick[1] + 1, a);
+      this.spPointer.appendChild(svg("path", { class: "awi-sp-mark", d: `M${m0x} ${m0y}L${m1x} ${m1y}L${m2x} ${m2y}Z` }));
     }
   }
 }

@@ -125,7 +125,7 @@ JupyterLab / Notebook 7 / marimo (`e2e/`).
 | IND-111, IND-112 | S | ✅ | `BitField`: 8, 16 or 32 bits, labels and colors per bit, word in hexadecimal, bits toggled in control mode (py, js, e2e) |
 | IND-113, IND-114 | S/C | ✅ | `RecipeTable`: number, choice, Boolean and text columns, cells checked in the front end and again by the kernel (rejections shown), sort by column, rows added and deleted with `row_edit`; parity of the cell checks (py, js, e2e) |
 | IND-115 | S | ✅ | `XYGraph`: line, markers, both, step and bar styles, float64 buffers, cursors (readout shared with Python), annotations, zoom, axis ranges, export (py, js, e2e) |
-| IND-116 | S | ⬜ | `setpoint` pointer of `Gauge`, `Meter` |
+| IND-116 | S | ✅ | `setpoint` pointer of `Gauge`, `Meter` |
 | IND-117 | C | ⬜ | Logarithmic and secondary Y axes of `WaveformChart` |
 | IND-118 | C | ⬜ | `value_labels` |
 | IND-119 | C | ⬜ | `EquipmentTree` |
