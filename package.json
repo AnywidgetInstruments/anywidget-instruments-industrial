@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "description": "Front-end ES modules of anywidget-instruments (AFM compliant).",
-  "license": "MIT",
+  "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {
     "gen": "node js/scripts/gen-contract.mjs",

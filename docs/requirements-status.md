@@ -1,7 +1,7 @@
 # Requirements status
 
 Status of each requirement of the
-[specification](specification.md) (version 0.13).
+[specification](specification.md) (version 0.14).
 
 Legend: ✅ implemented and tested · 🟡 partial / not verifiable here · ⬜ not started
 
@@ -16,7 +16,7 @@ JupyterLab / Notebook 7 / marimo (`e2e/`).
 | GEN-003 | M | 🟡 | JupyterLab 4, Notebook 7, marimo: e2e. VS Code and Colab not covered by automated tests (see `docs/hosts.md`) |
 | GEN-004 | M | ✅ | Pre-bundled ESM in the wheel |
 | GEN-005 | M | ✅ | No runtime network access (py test on the bundle); skins sanitized of external references |
-| GEN-006 | M | ✅ | MIT |
+| GEN-006 | M | ✅ | BSD 3-Clause (`LICENSE`), `CITATION.cff`; py test keeps the license and version of the metadata files consistent |
 | GEN-007 | M | ✅ | Python ≥ 3.10, CI matrix 3.10–3.13 |
 | GEN-008 | S | ✅ | Single AFM module (`initialize` + `render`) using only the AFM model API (plus optional `widget_manager` for nested widgets) |
 | GEN-009 | S | ✅ | Runtime deps: `anywidget`, `traitlets`, `numpy` |

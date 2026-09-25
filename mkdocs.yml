@@ -33,6 +33,7 @@ nav:
       - Development guide: development.md
       - Front-end migration inventory: dev/frontend-migration-inventory.md
   - Requirements status: requirements-status.md
+  - License and citation: citing.md
 plugins:
   - search
   - mkdocstrings:

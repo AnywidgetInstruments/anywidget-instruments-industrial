@@ -7,7 +7,7 @@ name = "anywidget-instruments"
 version = "0.1.0.dev0"
 description = "Instrumentation widgets (knobs, gauges, LEDs, tanks, strip charts, alarms) for computational notebooks, built on anywidget."
 readme = "README.md"
-license = "MIT"
+license = "BSD-3-Clause"
 license-files = ["LICENSE"]
 requires-python = ">=3.10"
 authors = [{ name = "Sébastien Celles" }]

@@ -96,7 +96,7 @@ widgets to real equipment, you are responsible for:
 
 ## No warranty
 
-The library is distributed under the MIT license, "as is", without warranty of
+The library is distributed under the BSD 3-Clause license, "as is", without warranty of
 any kind (see the `LICENSE` file).
 
 The standards cited in this notice, and those that inspired the widgets, are

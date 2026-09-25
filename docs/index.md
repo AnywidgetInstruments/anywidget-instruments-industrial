@@ -52,3 +52,4 @@ ai.Panel([gain, level])
 * [Showcase](showcase.md) — a batch reactor operator station in marimo, JupyterLite and KaimonSlate.jl
 * [Examples](examples.md) — PID tuning, tank supervision, signal acquisition
 * [API reference](api.md) — generated from the docstrings
+* [License and citation](citing.md) — BSD 3-Clause; how to cite the library

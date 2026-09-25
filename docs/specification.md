@@ -8,7 +8,7 @@
 | Author | Sébastien Celles |
 | Document type | Software requirements specification |
 | Notation | EARS (Easy Approach to Requirements Syntax) |
-| Version | 0.13 |
+| Version | 0.14 |
 | Date | 2026-09-25 |
 | Status | Baseline for version 1.0 |
 
@@ -90,7 +90,7 @@ Requirements use identifiers `<GROUP>-<NNN>` with priorities:
 | GEN-003 | M | The library shall render correctly in JupyterLab, Jupyter Notebook 7, VS Code notebooks, Google Colab and marimo. |
 | GEN-004 | M | The library shall ship all front-end code as pre-bundled ES modules, so that the user needs no JavaScript toolchain. |
 | GEN-005 | M | The library shall load no resource from the network at runtime. |
-| GEN-006 | M | The library shall be released under the MIT license. |
+| GEN-006 | M | The library shall be released under the BSD 3-Clause license and shall ship citation metadata (`CITATION.cff`) with a request to cite it. |
 | GEN-007 | M | The library shall support CPython 3.10 and later. |
 | GEN-008 | S | The library shall keep each front-end module compliant with the anywidget Front-End Module (AFM) specification, so that the modules can be reused by other AFM host platforms (R, Deno, Julia bridges). |
 | GEN-009 | S | The library shall limit its runtime Python dependencies to `anywidget`, `traitlets` and `numpy`. |
@@ -619,3 +619,4 @@ authors in the documentation.
 | 0.11 | IND-064 .. IND-066: GEMMA and ISA-88 / IEC 61512-1 state models, state titles, groups and global commands, models published in the trait contract. |
 | 0.12 | IND-120 .. IND-126: SVG faceplates (SvgPanel, role convention, indicator and control roles, entry fields, problem report, templates). Authentication widgets added to the out-of-scope list. |
 | 0.13 | IND-067: state diagram with right-angle labelled arrows, acting and wait states told apart, dashed zones whose commands leave as one arrow, waypoints; IND-066 notes limited to the global commands no zone draws. |
+| 0.14 | GEN-006: BSD 3-Clause license (was MIT) with citation metadata and a request to cite. |

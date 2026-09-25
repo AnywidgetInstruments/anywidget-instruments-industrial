@@ -80,6 +80,9 @@ widget is not an emergency stop device: see the
 widgets are listed in [Standards and references](docs/standards.md); the
 library does not claim conformity with them.
 
-## License
+## License and citation
 
-MIT
+BSD 3-Clause (see `LICENSE`). If you use the library in teaching material, a
+publication or a product, please cite it: GitHub's *Cite this repository*
+button reads `CITATION.cff`, and [Citing](docs/citing.md) gives the
+references in several formats.
