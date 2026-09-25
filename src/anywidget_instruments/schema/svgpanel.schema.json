@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://s-celles.github.io/anywidget-instruments/schema/svgpanel.schema.json",
+  "title": "SvgPanel",
+  "description": "Front panel drawn in a vector editor: elements labelled awi:<role>=<name>;<option>=<value> are bound to value[<name>] (IND-120 .. IND-126).",
+  "type": "object",
+  "x-awi-class": "SvgPanel",
+  "allOf": [
+    {
+      "$ref": "instrument.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "svgpanel",
+      "default": "svgpanel",
+      "x-awi-writer": "host"
+    },
+    "mode": {
+      "default": "control"
+    },
+    "size": {
+      "default": [
+        400,
+        300
+      ]
+    },
+    "svg": {
+      "type": "string",
+      "description": "SVG document. Python sanitizes it; the front end sanitizes it again (no scripts, event handlers or external resources). A role is read from the data-awi attribute of an element, else from its inkscape:label attribute.",
+      "default": "",
+      "x-awi-writer": "host"
+    },
+    "value": {
+      "type": "object",
+      "description": "Values of the bound names: numbers, texts, Booleans or null (shown as a dash). Written by the host, and by the operator through control roles in control mode; the kernel refuses a step value outside its limits.",
+      "default": {},
+      "x-awi-writer": "both"
+    },
+    "problems": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Elements with an unknown role or an invalid option, as '<element>: <reason>' (IND-125). Computed by Python; without a kernel the front end shows its own list.",
+      "default": [],
+      "readOnly": true,
+      "x-awi-writer": "host"
+    },
+    "show_entries": {
+      "type": "boolean",
+      "description": "Show an entry field for each value of a step control (IND-124).",
+      "default": true,
+      "x-awi-writer": "host"
+    }
+  }
+}

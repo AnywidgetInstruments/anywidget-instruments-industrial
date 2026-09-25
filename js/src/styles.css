@@ -787,3 +787,15 @@
 .awi-root .awi-sm-zone-1 { fill: var(--awi-accent); fill-opacity: 0.06; }
 .awi-root .awi-sm-zone-2 { fill: var(--awi-danger); fill-opacity: 0.06; }
 .awi-root .awi-sm-zone-label { fill: var(--awi-muted); font-size: 9px; font-weight: 700; font-family: var(--awi-font); }
+
+/* SvgPanel (IND-120 .. IND-126): the drawing keeps its own colors */
+.awi-root.awi-svgpanel .awi-body { display: flex; flex-direction: column; gap: 4px; min-height: 0; }
+.awi-root .awi-svp-stage { min-height: 40px; }
+.awi-root .awi-svp-svg { display: block; width: 100%; height: 100%; }
+.awi-root.awi-control .awi-svp-control[tabindex="0"] { cursor: pointer; }
+.awi-root .awi-svp-control:focus { outline: none; }
+.awi-root .awi-svp-control:focus-visible { outline: 2px solid var(--awi-accent); outline-offset: 2px; }
+.awi-root .awi-svp-entries { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; }
+.awi-root .awi-svp-entry { display: inline-flex; align-items: center; gap: 4px; }
+.awi-root .awi-svp-entry .awi-entry { width: 6em; }
+.awi-root .awi-svp-msg { font-size: 11px; color: var(--awi-danger); }

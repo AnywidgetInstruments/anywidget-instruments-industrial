@@ -288,6 +288,18 @@ test.describe("every widget", () => {
     await expect.poll(() => py('print(W["EquipmentTree"].expanded)')).toBe("[]");
   });
 
+  test("SvgPanel: both directions (IND-120 .. IND-123)", async () => {
+    const w = widget(page, "SvgPanel");
+    await w.scrollIntoViewIfNeeded();
+    await py('W["SvgPanel"].update(value=True, caption="Pump P-101")');
+    const lens = w.getByRole("button", { name: "Lamp" });
+    await expect(lens).toHaveAttribute("aria-pressed", "true");
+    await expect(w.locator("text", { hasText: "Pump P-101" })).toBeVisible();
+    await lens.click();
+    await expect.poll(() => py('print(W["SvgPanel"]["value"])')).toBe("False");
+    await expect(w.locator("text", { hasText: "OFF" })).toBeVisible();
+  });
+
   test("StackLight: kernel -> front", async () => {
     await widget(page, "StackLight").scrollIntoViewIfNeeded();
     await py('W["StackLight"].set("green", "blink")');

@@ -23,6 +23,8 @@ import waveformCases from "../../tests/parity/waveform.json";
 import xyCases from "../../tests/parity/xy.json";
 import valueLabelCases from "../../tests/parity/value_labels.json";
 import treeCases from "../../tests/parity/tree.json";
+import svgpanelCases from "../../tests/parity/svgpanel.json";
+import { matches, optionValue, parseRole, rotateAngle, stepValue, truthy } from "../src/contract/svgpanel.js";
 import { flattenTree, rollupStatus, visibleIds } from "../src/contract/tree.js";
 import { type AlarmLevel, type AlarmLimits, computeAlarmLevel } from "../src/contract/alarm.js";
 import { acknowledgeRows, type AlarmRow, expireShelving, localIso, shelveRow, unshelveRow } from "../src/contract/alarms.js";
@@ -390,5 +392,22 @@ describe("equipment tree", () => {
     expect(flat.map((n) => n.id)).toEqual(c.ids);
     for (const [expanded, shown] of c.visible) expect(visibleIds(flat, expanded), expanded.join()).toEqual(shown);
     for (const [id, status] of c.rollup) expect(rollupStatus(flat, id), id).toBe(status);
+  });
+});
+
+describe("SVG panel", () => {
+  test.each(svgpanelCases.roles as Array<[string, unknown]>)("role %s", (label, expected) => {
+    expect(parseRole(label)).toEqual(expected);
+  });
+  test("value rules", () => {
+    for (const [value, expected] of svgpanelCases.truthy) expect(truthy(value), String(value)).toBe(expected);
+    for (const [raw, value, expected] of svgpanelCases.matches as Array<[string, unknown, boolean]>) expect(matches(raw, value), `${raw} ${value}`).toBe(expected);
+    for (const [raw, expected] of svgpanelCases.option_values as Array<[string, unknown]>) expect(optionValue(raw), raw).toBe(expected);
+    for (const [options, cases] of svgpanelCases.rotate as Array<[Record<string, number>, Array<[unknown, number | null]>]>) {
+      for (const [value, angle] of cases) expect(rotateAngle(value, options), String(value)).toBe(angle);
+    }
+    for (const [options, cases] of svgpanelCases.step as Array<[Record<string, number>, Array<[unknown, number, number]>]>) {
+      for (const [value, dir, expected] of cases) expect(stepValue(value, dir, options), String(value)).toBe(expected);
+    }
   });
 });

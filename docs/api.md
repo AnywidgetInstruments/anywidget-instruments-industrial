@@ -99,6 +99,10 @@ Generated from the docstrings (DOC-001).
 ::: anywidget_instruments.XYGraph
 ::: anywidget_instruments.EquipmentTree
 
+## SVG faceplates
+
+::: anywidget_instruments.SvgPanel
+
 ## Utilities
 
 ::: anywidget_instruments.sanitize_svg

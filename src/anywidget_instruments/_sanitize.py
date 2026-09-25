@@ -18,6 +18,9 @@ _IMPORT_IN_CSS = re.compile(r"@import[^;]*;?", re.IGNORECASE)
 
 ET.register_namespace("", _SVG_NS)
 ET.register_namespace("xlink", _XLINK_NS)
+# keep the prefixes of vector editor metadata (SvgPanel roles live in inkscape:label)
+ET.register_namespace("inkscape", "http://www.inkscape.org/namespaces/inkscape")
+ET.register_namespace("sodipodi", "http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd")
 
 
 def _local(name: str) -> str:

@@ -22,6 +22,7 @@ by default; every widget switches with `mode`.
 | Field instruments | `Transmitter` (I) | ISA-5.1, NAMUR NE 107 |
 | Supervisory objects | `PIDFaceplate` with `PID`, `StateMachine` | ISA-101, ISA-TR88.00.02 |
 | Recipes and plant structure | `RecipeTable` (I), `XYGraph` (I), `EquipmentTree` (C) | IEC 62264, IEC 61512 (`EquipmentTree` levels) |
+| Custom front panels | `SvgPanel` (C) and its templates | |
 | Layout and session | `Panel`, `SynopticCanvas`, `ThemeSwitch` | |
 
 There is no password or login widget: a widget cannot keep a secret and a
@@ -538,4 +539,69 @@ tree.on_change(lambda change: print("selected", change["new"]))
 tree.select("P-102")  # expands Plant and Mixing
 tree.rollup("Plant")  # 'alarm'
 tree.set_status("P-102", "normal")
+```
+
+## SVG faceplates
+
+`SvgPanel` shows a front panel drawn freely in a vector editor (Inkscape or
+any editor that writes SVG) and animates it from Python: a voltmeter, a
+machine panel, the front of an instrument, with exactly the look you drew.
+Elements become live by their label; everything else is decoration.
+
+### The role convention
+
+Give an element the label `awi:<role>=<name>`, followed by
+`;<option>=<value>` pairs. In Inkscape, set it in **Object ▸ Object
+Properties ▸ Label** (stored as `inkscape:label`); in a hand-written SVG, use
+a `data-awi` attribute. The element is then bound to `panel["<name>"]`.
+
+| Role | Element does | Options (default) |
+|---|---|---|
+| `text` | shows the value (numbers formatted, text as is, `—` when missing) | `format` (`%.1f`), `unit` |
+| `rotate` | turns between two angles, like a needle | `min` (0), `max` (100), `from` (-135), `to` (135) in degrees; pivot `cx`, `cy`, else the rotation center set in the editor, else the element center |
+| `scale` | grows from one edge, like a liquid level | `min`, `max`, `edge` (`bottom`, `top`, `left`, `right`) |
+| `show` | is visible when the value is true, or equals `eq` | `eq` |
+| `state` | a group whose children labelled `awi:case=<value>` are shown only for that value | |
+| `color` | fill color when the value is true (or equals `eq`), else the off color | `on` (green), `off` (grey), `eq` |
+| `button` | control: a click, Enter or Space toggles a Boolean | `label` |
+| `momentary` | control: true while pressed (pointer, Space or Enter held) | `label` |
+| `set` | control: writes `value` (a number, true / false, or a text) | `value`, `label` |
+| `step` | control: one `step` up per click or Up arrow, down with Shift+click or Down arrow, within `min`, `max`; also gets an entry field | `step` (1), `min`, `max`, `label`, `unit`, `format` |
+
+A value is true when it is `True`, a non-zero number, or a word other than
+`0`, `false`, `off`, `no`. Controls work in control mode (the default): they
+are focusable, operable with the keyboard, and carry an ARIA role and name
+(`label`, else the value name). The kernel refuses a `step` value outside its
+limits, as for the numeric widgets.
+
+The drawing is sanitized: scripts, event handlers and external resources are
+removed, so a panel can neither run code nor load anything from the network.
+Labels with an unknown role or an invalid option are listed in `problems`
+(and under the panel), and the rest of the panel still works.
+
+```python
+svg = open("power_supply.svg").read()  # drawn in a vector editor
+panel = ai.SvgPanel(svg, label="Power supply", size=(420, 300))
+panel.problems  # [] when every label is understood
+panel["vout"] = 12.0  # indicators follow
+panel.on_change(lambda change: print(change["new"]))  # controls report here
+```
+
+### Templates
+
+Five drawings ship with the package, with the same behavior and different
+looks. Load one with `SvgPanel.template(name)`, or copy it from
+`anywidget_instruments/templates/` as a starting point for your own:
+
+| Template | Values |
+|---|---|
+| `voltmeter` | `value` in volts (0 to 10) |
+| `pressure_gauge` | `value` in bar (0 to 10, red zone above 8) |
+| `pilot_lamp` | `value` (Boolean, also toggled by a click on the lens), `caption` |
+| `selector` | `value` 0, 1, 2 (OFF, HAND, AUTO: click a position), `mode` (text) |
+| `tank` | `value` level in %, `high` (alarm lamp), `fill` and `drain` (push buttons, true while pressed) |
+
+```python
+lamp = ai.SvgPanel.template("pilot_lamp", size=(140, 190))
+lamp.update(value=True, caption="Pump P-101")
 ```

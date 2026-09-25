@@ -70,6 +70,7 @@ from ._style import (
     set_theme,
     theme_switch,
 )
+from ._svgpanel import TEMPLATES, SvgPanel
 from ._themeswitch import THEME_SWITCH_POSITIONS, ThemeSwitch
 from ._transmitter import DEVICE_STATUSES, Transmitter
 from ._tree import NODE_STATUSES, EquipmentTree
@@ -105,6 +106,7 @@ __all__ = [
     "STACK_STATES",
     "STATE_MODELS",
     "STYLES",
+    "TEMPLATES",
     "THEMES",
     "THEME_SWITCH_POSITIONS",
     "WORD_SIZES",
@@ -154,6 +156,7 @@ __all__ = [
     "Sparkline",
     "StackLight",
     "StateMachine",
+    "SvgPanel",
     "SynopticCanvas",
     "Tank",
     "ThemeSwitch",

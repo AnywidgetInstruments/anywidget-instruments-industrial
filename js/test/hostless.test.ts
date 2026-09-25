@@ -1038,6 +1038,85 @@ describe("Equipment tree (IND-119)", () => {
   });
 });
 
+describe("SVG panel (IND-120 .. IND-125)", () => {
+  const SVG = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" viewBox="0 0 200 100">
+    <rect width="200" height="100" fill="#ddd" inkscape:label="bezel"/>
+    <text x="10" y="20" inkscape:label="awi:text=vout;format=%.2f;unit=V"><tspan>0</tspan></text>
+    <path id="needle" d="M100 90L100 20" transform="translate(1 0)" inkscape:label="awi:rotate=vout;min=0;max=10;from=-90;to=90;cx=100;cy=90"/>
+    <circle id="lamp" cx="20" cy="60" r="8" data-awi="awi:color=run;on=#00ff00;off=#333333"/>
+    <circle id="run" cx="50" cy="60" r="8" data-awi="awi:button=run;label=Run"/>
+    <rect id="jog" x="70" y="50" width="20" height="20" data-awi="awi:momentary=jog"/>
+    <text id="auto" x="100" y="60" data-awi="awi:set=mode;value=AUTO">AUTO</text>
+    <rect id="sp" x="140" y="50" width="20" height="20" data-awi="awi:step=sp;step=0.5;min=0;max=2;unit=bar"/>
+    <g data-awi="awi:state=mode"><text id="m-auto" data-awi="awi:case=AUTO">A</text><text id="m-off" data-awi="awi:case=OFF">O</text></g>
+    <circle id="bad" data-awi="awi:blink=x"/>
+    <script>alert(1)</script>
+    <circle id="evil" onclick="alert(1)" data-awi="awi:show=alarm"/>
+  </svg>`;
+  const q = (el: HTMLElement, id: string) => el.querySelector(`#${id}`) as SVGElement;
+
+  test("indicators follow the values; controls write them; problems are listed", async () => {
+    const { model, el, body } = mount({ ...defaults("SvgPanel"), svg: SVG, value: { vout: 5, mode: "OFF" }, label: "Supply" });
+    await frame();
+    expect(el.querySelector("script")).toBeNull();
+    expect(q(el, "evil").getAttribute("onclick")).toBeNull();
+    expect(el.querySelector("tspan")?.textContent).toBe("5.00 V");
+    expect(q(el, "needle").getAttribute("transform")).toBe("translate(1 0) rotate(0.00 100 90)");
+    expect(q(el, "lamp").style.fill).toBe("#333333");
+    expect(q(el, "evil").getAttribute("display")).toBe("none");
+    expect([q(el, "m-auto").getAttribute("display"), q(el, "m-off").getAttribute("display")]).toEqual(["none", null]);
+    expect(el.querySelector(".awi-svp-msg")?.textContent).toBe("⚠ 1 problem: bad: unknown role 'blink'");
+    expect(body.getAttribute("aria-label")).toBe("Supply: alarm —, jog —, mode OFF, run —, sp —, vout 5");
+    // button: toggles, with the keyboard too
+    const run = q(el, "run");
+    expect([run.getAttribute("role"), run.getAttribute("aria-label"), run.getAttribute("tabindex")]).toEqual(["button", "Run", "0"]);
+    run.dispatchEvent(new MouseEvent("click"));
+    expect(model.get("value")).toMatchObject({ run: true });
+    run.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+    expect(model.get("value")).toMatchObject({ run: false });
+    // set, step (Shift+click and arrows go down), momentary
+    q(el, "auto").dispatchEvent(new MouseEvent("click"));
+    const sp = q(el, "sp");
+    sp.dispatchEvent(new MouseEvent("click"));
+    sp.dispatchEvent(new MouseEvent("click"));
+    sp.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown" }));
+    expect(model.get("value")).toMatchObject({ mode: "AUTO", sp: 0.5 });
+    const jog = q(el, "jog");
+    jog.dispatchEvent(new KeyboardEvent("keydown", { key: " " }));
+    expect(model.get("value")).toMatchObject({ jog: true });
+    jog.dispatchEvent(new KeyboardEvent("keyup", { key: " " }));
+    expect(model.get("value")).toMatchObject({ jog: false });
+    await frame();
+    expect(q(el, "lamp").style.fill).toBe("#333333");
+    expect(q(el, "m-auto").getAttribute("display")).toBeNull();
+    expect(sp.getAttribute("aria-valuenow")).toBe("0.5");
+  });
+
+  test("entry field of a step value, checked against its limits (IND-124)", async () => {
+    const { model, el } = mount({ ...defaults("SvgPanel"), svg: SVG, value: { sp: 1 } });
+    await frame();
+    const input = el.querySelector('.awi-svp-entries input') as HTMLInputElement;
+    expect(input.getAttribute("aria-label")).toBe("sp (0.0 to 2.0)");
+    expect(input.value).toBe("1.0");
+    input.value = "5";
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+    expect(model.get("value")).toMatchObject({ sp: 1 });
+    expect(el.querySelector(".awi-svp-entries .awi-entry-msg")?.textContent).toMatch(/range/i);
+    input.value = "1.5";
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+    expect(model.get("value")).toMatchObject({ sp: 1.5 });
+  });
+
+  test("indicator mode: controls are not operable", async () => {
+    const { model, el } = mount({ ...defaults("SvgPanel"), mode: "indicator", svg: SVG });
+    await frame();
+    const run = q(el, "run");
+    expect(run.getAttribute("tabindex")).toBe("-1");
+    run.dispatchEvent(new MouseEvent("click"));
+    expect(model.get("value")).toEqual({});
+  });
+});
+
 describe("Tank without a kernel", () => {
   test("indicator by default, markers read through the schema", async () => {
     const { root, body, el } = mount({ ...defaults("Tank"), value: 3.2, max: 4, unit: "m", markers: [0.5, "x", 3.5], hi: 3, hihi: 3.5 });

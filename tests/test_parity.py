@@ -479,3 +479,38 @@ def test_equipment_tree(case: dict[str, Any]) -> None:
         assert tree.shown() == shown, expanded
     for node_id, status in case["rollup"]:
         assert tree.rollup(node_id) == status, node_id
+
+
+SVGP = _load("svgpanel.json")
+
+
+@pytest.mark.parametrize("label,expected", SVGP["roles"])
+def test_svgpanel_roles(label: str, expected: Any) -> None:
+    from anywidget_instruments._svgpanel import parse_role
+
+    assert parse_role(label) == expected
+
+
+def test_svgpanel_value_rules() -> None:
+    from anywidget_instruments._svgpanel import (
+        matches,
+        option_value,
+        rotate_angle,
+        step_value,
+        truthy,
+    )
+
+    for value, expected in SVGP["truthy"]:
+        assert truthy(value) is expected, value
+    for raw, value, expected in SVGP["matches"]:
+        assert matches(raw, value) is expected, (raw, value)
+    for raw, expected in SVGP["option_values"]:
+        got = option_value(raw)
+        assert got == expected and isinstance(got, str) == isinstance(expected, str), raw
+        assert isinstance(got, bool) == isinstance(expected, bool), raw
+    for options, cases in SVGP["rotate"]:
+        for value, angle in cases:
+            assert rotate_angle(value, options) == angle, value
+    for options, cases in SVGP["step"]:
+        for value, direction, expected in cases:
+            assert step_value(value, direction, options) == expected, value

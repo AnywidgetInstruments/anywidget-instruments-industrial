@@ -132,13 +132,13 @@ JupyterLab / Notebook 7 / marimo (`e2e/`).
 | IND-117 | C | ✅ | Logarithmic and secondary Y axes of `WaveformChart` |
 | IND-118 | C | ✅ | `value_labels` |
 | IND-119 | C | ✅ | `EquipmentTree` |
-| IND-120 | S | ⬜ | `SvgPanel` |
-| IND-121 | S | ⬜ | Role convention `awi:<role>=<name>;…` |
-| IND-122 | S | ⬜ | Indicator roles |
-| IND-123 | S | ⬜ | Control roles |
-| IND-124 | S | ⬜ | Entry fields of `step` controls |
-| IND-125 | S | ⬜ | `problems` |
-| IND-126 | C | ⬜ | SVG templates |
+| IND-120 | S | ✅ | `SvgPanel`; py, js, e2e |
+| IND-121 | S | ✅ | Role convention `awi:<role>=<name>;…` in `data-awi` or `inkscape:label`; py, js (parity) |
+| IND-122 | S | ✅ | `text`, `rotate`, `scale`, `show`, `state` / `case`, `color` |
+| IND-123 | S | ✅ | `button`, `momentary`, `set`, `step`; keyboard, ARIA |
+| IND-124 | S | ✅ | Entry fields of `step` values; kernel range check |
+| IND-125 | S | ✅ | `problems`, message under the panel |
+| IND-126 | C | ✅ | `SvgPanel.template()`: voltmeter, pressure gauge, pilot lamp, selector, tank |
 
 Tests: py (`tests/test_industrial.py`), js (`js/test/industrial.test.js`), e2e
 (`allwidgets.spec.js`, both directions for each object), visual baselines;

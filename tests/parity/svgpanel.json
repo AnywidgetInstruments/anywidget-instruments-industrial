@@ -1,0 +1,37 @@
+{
+  "description": "SvgPanel (IND-121 .. IND-123): parsing of role labels (the role with its options completed by defaults, a reason when invalid, null for decoration) and the value rules of the roles. Numbers in options are decimal only (no 0x10, no 1_000).",
+  "roles": [
+    ["bezel", null],
+    ["awi:text=vout;format=%.2f;unit=V", { "role": "text", "name": "vout", "options": { "format": "%.2f", "unit": "V" } }],
+    [" awi:rotate=freq ; min=0 ; max=10 ; from=-60 ; to=60 ", { "role": "rotate", "name": "freq", "options": { "min": 0, "max": 10, "from": -60, "to": 60, "cx": null, "cy": null } }],
+    ["awi:scale=level;edge=left", { "role": "scale", "name": "level", "options": { "min": 0, "max": 100, "edge": "left" } }],
+    ["awi:color=run;on=rgb(0, 200, 0);eq=RUN", { "role": "color", "name": "run", "options": { "on": "rgb(0, 200, 0)", "off": "#6b7280", "eq": "RUN" } }],
+    ["awi:set=mode;value=AUTO;label=Automatic", { "role": "set", "name": "mode", "options": { "value": "AUTO", "label": "Automatic" } }],
+    ["awi:step=sp;step=0.5;min=-10;max=10", { "role": "step", "name": "sp", "options": { "step": 0.5, "min": -10, "max": 10, "label": "", "unit": "", "format": "%.1f" } }],
+    ["awi:case=open", { "role": "case", "name": "open", "options": {} }],
+    ["awi:blink=x", "unknown role 'blink'"],
+    ["awi:text", "role 'text' needs a name (letters, digits, _ . - /)"],
+    ["awi:text=a b", "role 'text' needs a name (letters, digits, _ . - /)"],
+    ["awi:rotate=f;speed=2", "unknown option 'speed' for role 'rotate'"],
+    ["awi:rotate=f;min", "unknown option 'min' for role 'rotate'"],
+    ["awi:rotate=f;min=0x10", "option 'min' must be a number, got '0x10'"],
+    ["awi:rotate=f;min=1_000", "option 'min' must be a number, got '1_000'"],
+    ["awi:rotate=f;max=1e400", "option 'max' must be finite"],
+    ["awi:rotate=f;min=5;max=5", "option 'max' must be greater than 'min'"],
+    ["awi:scale=l;edge=middle", "option 'edge' must be one of bottom, top, left, right"],
+    ["awi:step=s;step=0", "option 'step' must be positive"],
+    ["awi:color=c;on=url(#x)", "option 'on' is not a color: 'url(#x)'"]
+  ],
+  "truthy": [[true, true], [false, false], [1, true], [0, false], [-0.5, true], ["on", true], ["OFF", false], [" no ", false], ["0", false], ["", false], ["x", true], [null, false]],
+  "matches": [
+    ["AUTO", "AUTO", true], ["AUTO", "auto", false], ["2", 2, true], ["2", 2.0, true], ["2.5", "2.5", true], ["2", "2", true],
+    ["true", true, true], ["true", "true", false], ["false", false, true], ["1", true, false], ["open", null, false], ["AUTO", 2, false]
+  ],
+  "option_values": [["AUTO", "AUTO"], ["2", 2], [" -1.5 ", -1.5], ["true", true], ["FALSE", false], ["0x10", "0x10"], ["1e400", "1e400"], ["", ""]],
+  "rotate": [
+    [{ "min": 0, "max": 10, "from": -60, "to": 60 }, [[0, -60], [5, 0], [10, 60], [20, 60], [-3, -60], [2.5, -30], ["x", null], [null, null]]]
+  ],
+  "step": [
+    [{ "step": 0.1, "min": 0, "max": 1 }, [[0.2, 1, 0.3], [0.95, 1, 1], [0.05, -1, 0], [null, 1, 0.1], ["x", -1, 0]]]
+  ]
+}
