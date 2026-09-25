@@ -3,7 +3,7 @@
 ## Installation
 
 ```bash
-pip install anywidget-instruments            # or: conda install -c conda-forge anywidget-instruments
+pip install anywidget-instruments            # when released (see below to install from source)
 pip install "anywidget-instruments[units]"   # + pint support
 ```
 
@@ -85,6 +85,8 @@ Every control can be operated in two ways (API-014): directly on its drawing
 | Graph cursors | drag the cursor | cursor position field |
 | Graph axis ranges (CHART-108) | zoom box, pan, wheel; double-click resets | **↕ Axes**: X and Y limits, Apply, Auto |
 | `PolarPlot` radial range | mouse wheel on the plot | **r max** field, Auto |
+| `RecipeTable` cells | | an entry field (number or text), a list or a check box per cell |
+| `SvgPanel` `step` controls | click (Shift+click down), arrow keys | an entry field per value |
 
 The value field accepts `12.5`, `12,5`, `1e3`, SI prefixes (`4.7 k`, `250 m`)
 and the widget unit (`250 mV` for a unit of `V`). A confirmed entry (Enter, or

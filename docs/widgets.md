@@ -21,7 +21,7 @@ by default; every widget switches with `mode`.
 | Process symbols | `Valve`, `Pump`, `Motor`, `Pipe` (faceplates) | ISA-5.1 (symbols) |
 | Field instruments | `Transmitter` (I) | ISA-5.1, NAMUR NE 107 |
 | Supervisory objects | `PIDFaceplate` with `PID`, `StateMachine` | ISA-101, ISA-TR88.00.02 |
-| Recipes and plant structure | `RecipeTable` (I), `XYGraph` (I), `EquipmentTree` (C) | IEC 62264, IEC 61512 (`EquipmentTree` levels) |
+| Recipes and plant structure | `RecipeTable` (C), `XYGraph` (I), `EquipmentTree` (C) | IEC 62264, IEC 61512 (`EquipmentTree` levels) |
 | Custom front panels | `SvgPanel` (C) and its templates | |
 | Layout and session | `Panel`, `SynopticCanvas`, `ThemeSwitch` | |
 
@@ -74,6 +74,14 @@ All graphs share cursors (`add_cursor`, `cursor_values`), annotations
 (CSV / PNG / SVG).
 
 ```python
+rng = np.random.default_rng(0)
+t = np.arange(2000) * 1e-3
+samples = np.column_stack([np.sin(2 * np.pi * 5 * t), np.cos(2 * np.pi * 5 * t)])
+fs, block = 1000.0, rng.normal(size=512)  # sampling rate (Hz), one block of samples
+bytes_read = rng.integers(0, 256, 64, dtype=np.uint8)  # bytes captured on a bus
+v = np.sin(2 * np.pi * 1e3 * np.arange(200) * 1e-6)  # analog signal
+trigger = (v > 0).astype(np.uint8)  # digital line
+
 chart = ai.WaveformChart(
     n_traces=2, history=2000, dt=1e-3, x_unit="s", update_mode="strip", autoscale_y=True
 )
@@ -142,6 +150,10 @@ temp.setpoint = 65  # the operator's new target, set by the kernel
 ## Specialized displays
 
 ```python
+angles_deg = np.arange(0, 360, 5)
+gain_db = 10 * np.log10(np.cos(np.radians(angles_deg) / 2) ** 2 + 1e-3)  # antenna pattern
+impedances = 50 * (1 + 0.5j * np.linspace(-2, 2, 21))  # series RL sweep, ohms
+
 polar = ai.PolarPlot(zero="N", direction="cw")
 polar.plot(gain_db, angles_deg, name="pattern")
 
@@ -171,7 +183,7 @@ animated pipe runs on a background image.
     These objects present and simulate operator functions; they do not
     implement safety functions. See the [safety notice](safety.md).
 
-Objects for control rooms and machine panels (IND-001 .. IND-063). They follow
+Objects for control rooms and machine panels (IND-001 .. IND-066). They follow
 ISA-101 (grey scale in normal operation, color for abnormal situations),
 ISA-18.1 (annunciator sequences), ISA-18.2 / IEC 62682 (alarm management),
 IEC 60073 (indicator colors) and ISA-TR88.00.02 (machine state model).
@@ -297,6 +309,8 @@ travel as binary float64; cursors and axis fields take local times
 (`HH:MM:SS` or `YYYY-MM-DD HH:MM:SS`).
 
 ```python
+import time
+
 trend = ai.TrendChart(
     pens=[
         {"name": "LT-101", "unit": "m", "min": 0, "max": 4, "hi": 3.0, "setpoint": 2.2},
@@ -306,7 +320,8 @@ trend = ai.TrendChart(
 )
 trend.add("LT-101", 2.31)  # now
 trend.add_many({"LT-101": 2.32, "FT-101": 24.0})
-trend.add("FT-101", values, time=timestamps)  # arrays
+timestamps = time.time() - np.arange(60, 0, -1)  # the last minute
+trend.add("FT-101", 20 + np.sin(timestamps / 10), time=timestamps)  # arrays
 times, values = trend.data("LT-101")
 ```
 
@@ -315,9 +330,8 @@ times, values = trend.data("LT-101")
 An instrument bubble in the manner of ISA-5.1 (function letters above the
 line, loop number below), with the value, and the device status after the
 NAMUR NE 107 categories, each with its own symbol and text: `ok`,
-`failure` (✕, the value shows **✕ BAD**), `check` (▲ function check),
-`out_of_spec` (? out of specification) and `maintenance` (◆ maintenance
-required). Alarm limits work as on the other numeric widgets.
+`failure` (✕ FAILURE, the value shows **✕ BAD**), `check` (▲ FUNCTION CHECK),
+`out_of_spec` (? OUT OF SPEC) and `maintenance` (◆ MAINTENANCE). Alarm limits work as on the other numeric widgets.
 
 ```python
 lt = ai.Transmitter(2.41, tag="LT-101", unit="m", max=4, hi=3.0, hihi=3.5)
@@ -336,6 +350,9 @@ operator filters it by category and text and downloads it as CSV. At most
 traits of other widgets: an audit trail of operator actions.
 
 ```python
+setpoint = ai.Knob(2.2, max=4, step=0.1, unit="m", label="Level setpoint")
+pump_mode = ai.SelectorSwitch("AUTO", positions=["HAND", "OFF", "AUTO"])
+
 log = ai.EventLog(max_events=1000)
 log.log("Pump P-101 started", source="P-101", category="state")
 log.connect(setpoint, category="operator")  # "value: 2.2 → 2.4"
@@ -364,7 +381,7 @@ dot) marked. Values travel as binary buffers.
 ```python
 spark = ai.Sparkline(history=60, unit="m", format="%.2f")
 spark.append(2.31)  # one value
-spark.append(level_array)  # or many
+spark.append(np.linspace(2.0, 2.4, 30))  # or many
 ```
 
 ### BarGraph
@@ -559,14 +576,14 @@ a `data-awi` attribute. The element is then bound to `panel["<name>"]`.
 |---|---|---|
 | `text` | shows the value (numbers formatted, text as is, `—` when missing) | `format` (`%.1f`), `unit` |
 | `rotate` | turns between two angles, like a needle | `min` (0), `max` (100), `from` (-135), `to` (135) in degrees; pivot `cx`, `cy`, else the rotation center set in the editor, else the element center |
-| `scale` | grows from one edge, like a liquid level | `min`, `max`, `edge` (`bottom`, `top`, `left`, `right`) |
+| `scale` | grows from one edge, like a liquid level | `min` (0), `max` (100), `edge` (`bottom`; or `top`, `left`, `right`) |
 | `show` | is visible when the value is true, or equals `eq` | `eq` |
 | `state` | a group whose children labelled `awi:case=<value>` are shown only for that value | |
 | `color` | fill color when the value is true (or equals `eq`), else the off color | `on` (green), `off` (grey), `eq` |
 | `button` | control: a click, Enter or Space toggles a Boolean | `label` |
 | `momentary` | control: true while pressed (pointer, Space or Enter held) | `label` |
 | `set` | control: writes `value` (a number, true / false, or a text) | `value`, `label` |
-| `step` | control: one `step` up per click or Up arrow, down with Shift+click or Down arrow, within `min`, `max`; also gets an entry field | `step` (1), `min`, `max`, `label`, `unit`, `format` |
+| `step` | control: one `step` up per click or Up arrow, down with Shift+click or Down arrow, within `min`, `max`; also gets an entry field | `step` (1), `min` (0), `max` (100), `label`, `unit`, `format` (`%.1f`) |
 
 A value is true when it is `True`, a non-zero number, or a word other than
 `0`, `false`, `off`, `no`. Controls work in control mode (the default): they
@@ -580,8 +597,17 @@ Labels with an unknown role or an invalid option are listed in `problems`
 (and under the panel), and the rest of the panel still works.
 
 ```python
-svg = open("power_supply.svg").read()  # drawn in a vector editor
-panel = ai.SvgPanel(svg, label="Power supply", size=(420, 300))
+svg = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 90">
+  <rect width="220" height="90" rx="8" fill="#d1d5db"/>
+  <rect x="12" y="14" width="110" height="34" rx="4" fill="#111827"/>
+  <text x="112" y="38" text-anchor="end" font-family="monospace" font-size="18" fill="#34d399"
+        data-awi="awi:text=vout;format=%.2f;unit=V">0.00 V</text>
+  <circle cx="170" cy="31" r="14" fill="#374151" data-awi="awi:color=output;on=#22c55e"/>
+  <rect x="12" y="58" width="50" height="22" rx="4" fill="#6b7280" data-awi="awi:button=output;label=Output"/>
+  <rect x="140" y="58" width="68" height="22" rx="4" fill="#6b7280"
+        data-awi="awi:step=vout;step=0.5;min=0;max=30;unit=V;label=Voltage"/>
+</svg>"""  # or open("power_supply.svg").read(), drawn in a vector editor
+panel = ai.SvgPanel(svg, label="Power supply", size=(420, 220))
 panel.problems  # [] when every label is understood
 panel["vout"] = 12.0  # indicators follow
 panel.on_change(lambda change: print(change["new"]))  # controls report here

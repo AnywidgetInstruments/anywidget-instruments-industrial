@@ -6,10 +6,21 @@ strip charts, spectrograms, logic analyzers, polar and Smith charts, and
 SCADA objects (valves, pumps, motors, pipes, alarm banner, synoptic).
 
 Built on [anywidget](https://anywidget.dev), the widgets run in **JupyterLab,
-Jupyter Notebook 7, VS Code, Google Colab and marimo**, with no JavaScript
-toolchain and no network access at runtime. Their front ends also run in
+Jupyter Notebook 7 and marimo** (tested) and in the other anywidget hosts
+such as VS Code and Google Colab, with no JavaScript toolchain and no network
+access at runtime. Their front ends also run in
 [KaimonSlate.jl](https://github.com/kahliburke/KaimonSlate.jl), a Julia
 notebook (see [Hosts](hosts.md)).
+
+!!! example "Showcase: a batch reactor operator station"
+    A complete operator station on a simulated batch reactor: PackML state
+    machine, recipe, PID faceplate, alarms, trends, event log and plant
+    model. The same system runs in **marimo**, in **JupyterLite** and, from
+    Julia, in **KaimonSlate.jl**.
+    <a class="md-button md-button--primary" href="marimo/batch_reactor/">▶ Open it in your browser</a>
+    [All three versions](showcase.md){ .md-button }
+
+    [![Batch reactor operator station](img/showcase-reactor-hero.png){ width="560" }](showcase.md)
 
 ![Widget gallery](img/gallery-modern.png)
 
@@ -38,5 +49,6 @@ ai.Panel([gain, level])
 
 * [Getting started](getting-started.md) — installation and the common API
 * [Widget catalog](widgets.md) — every widget with a short example
+* [Showcase](showcase.md) — a batch reactor operator station in marimo, JupyterLite and KaimonSlate.jl
 * [Examples](examples.md) — PID tuning, tank supervision, signal acquisition
 * [API reference](api.md) — generated from the docstrings

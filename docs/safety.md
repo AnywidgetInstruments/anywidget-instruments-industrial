@@ -28,9 +28,10 @@ A notebook is not a real-time control system:
   risk of acting on an old value but is not a guarantee;
 * timing is not deterministic (callbacks, charts and simulations run on a
   best-effort basis);
-* there is no authentication, authorization or audit trail of operator
-  actions: anyone who can use the notebook or the page can operate its
-  controls.
+* there is no authentication, no authorization and no tamper-proof audit
+  trail of operator actions: anyone who can use the notebook or the page
+  can operate its controls, and `EventLog` records actions in a way any
+  code of the kernel can change.
 
 ## Why there is no password field
 

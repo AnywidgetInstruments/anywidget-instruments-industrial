@@ -4,6 +4,12 @@
     The demos and examples simulate processes and machines; they are not
     meant to control real equipment (see the [safety notice](safety.md)).
 
+!!! example "Start with the showcase"
+    [**Batch reactor R-101**](showcase.md): a complete operator station on a
+    simulated reactor (PackML state machine, recipe, PID faceplate, alarms,
+    trends, event log, plant model), the same in marimo, in JupyterLite and,
+    from Julia, in KaimonSlate.jl. It opens the table below.
+
 ## Run them in your browser
 
 Start here: nothing to install. Each demo is a **reactive notebook**
@@ -18,6 +24,7 @@ They inspired the widgets; the library does not claim conformity with them
 
 | Sector | Reactive notebook (marimo) | What it shows | References | Also in JupyterLite |
 |---|---|---|---|---|
+| Chemical and process control (showcase) | <a href="../marimo/batch_reactor/">**Batch reactor R-101**</a> | A complete operator station: PackML state machine, editable recipe, PID faceplate, valves, pumps, agitator, alarms, trend, event log, plant model; a fault to simulate | ISA-TR88.00.02 (PackML), ISA-88 / IEC 61512-1 (recipe), ISA-101, ISA-18.2 / IEC 62682, IEC 60073, IEC 62264 | <a href="../lite/lab/index.html?path=batch_reactor.ipynb">notebook</a> |
 | All sectors (tour) | <a href="../marimo/gallery/">**Gallery**</a> | Every widget family: knobs and indicators, Boolean controls, charts, alarms, styles | IEC 60073 (lamp colors) | <a href="../lite/lab/index.html?path=gallery.ipynb">notebook</a> |
 | Water and wastewater | <a href="../marimo/lift_station/">**Lift station**</a> | Wet well with duty / standby pumps, alternation, level alarms, a pump trip and its reset | ISA-18.2 / IEC 62682 (alarm list), ISA-5.1 (tags, pump symbol), IEC 60073 | <a href="../lite/lab/index.html?path=lift_station.ipynb">notebook</a> |
 | Chemical and process control | <a href="../marimo/pid_tuning/">**PID tuning**</a> | Closed-loop step response of a process with dead time; overshoot and settling time follow the Kp, Ti, Td knobs | ISA-101 (analog indicator) | <a href="../lite/lab/index.html?path=pid_tuning.ipynb">notebook</a> |
@@ -31,7 +38,7 @@ They inspired the widgets; the library does not claim conformity with them
 
 ## Download and run locally
 
-The notebooks of the `examples/` folder run a live simulation in a
+Most notebooks of the `examples/` folder run a live simulation in a
 background thread, so they need a local Jupyter or marimo (set the
 environment variable `AWI_EXAMPLE_SECONDS` to limit their duration).
 Download them from the repository:
@@ -48,7 +55,7 @@ Download them from the repository:
 
 #### Gallery (`examples/gallery.ipynb`)
 
-Every widget in control and indicator modes.
+The numeric and Boolean widgets in control and indicator modes, a waveform chart and an alarm indicator. The [widget catalog](widgets.md) covers every widget.
 
 ![Gallery](img/gallery.png)
 

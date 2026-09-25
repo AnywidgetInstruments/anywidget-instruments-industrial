@@ -13,6 +13,7 @@ also available as a notebook in [JupyterLite](https://jupyterlite.readthedocs.io
 
 | Demo (marimo) | Sector | What it shows | Also in JupyterLite |
 |---|---|---|---|
+| <a href="../marimo/batch_reactor/">**Batch reactor R-101** (showcase)</a> | Chemical and process control | A complete operator station: PackML state machine, editable recipe, PID faceplate, alarms, trend, event log, plant model | <a href="../lite/lab/index.html?path=batch_reactor.ipynb">notebook</a> |
 | <a href="../marimo/gallery/">**Gallery**</a> | All sectors | Every widget family: knobs and indicators, Boolean controls, charts, alarms, styles | <a href="../lite/lab/index.html?path=gallery.ipynb">notebook</a> |
 | <a href="../marimo/pid_tuning/">**PID tuning**</a> | Chemical and process control | Closed-loop step response of a process with dead time; overshoot and settling time follow the Kp, Ti, Td knobs | <a href="../lite/lab/index.html?path=pid_tuning.ipynb">notebook</a> |
 | <a href="../marimo/operator_station/">**Operator station**</a> | Food, beverage and packaging | Filling line following the machine state model, with stack light, PID faceplate, annunciator and alarm list | <a href="../lite/lab/index.html?path=operator_station.ipynb">notebook</a> |

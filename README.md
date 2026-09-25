@@ -5,8 +5,9 @@ meters, tanks, thermometers, LEDs, switches, push buttons with mechanical
 actions, emergency stop, real-time strip charts and alarm annunciators.
 
 The widgets are built on [anywidget](https://anywidget.dev). They work in
-JupyterLab, Jupyter Notebook 7, VS Code, Google Colab and marimo, and you don't
-need a JavaScript toolchain to use them.
+JupyterLab, Jupyter Notebook 7 and marimo (tested), and in the other anywidget
+hosts such as VS Code and Google Colab; you don't need a JavaScript toolchain
+to use them.
 
 > **Status: pre-alpha (0.1.0.dev0).** The project follows the
 > [specification](docs/specification.md)
@@ -45,6 +46,16 @@ def _(change):
 
 ai.Panel([gain, level, run, stop], columns=4)
 ```
+
+## Showcase
+
+A complete operator station on a simulated batch reactor (PackML state
+machine, recipe, PID faceplate, alarms, trends, event log, plant model),
+the same in marimo, JupyterLite and, from Julia, KaimonSlate.jl:
+[open it in your browser](https://s-celles.github.io/anywidget-instruments/marimo/batch_reactor/)
+or see [all three versions](https://s-celles.github.io/anywidget-instruments/showcase/).
+
+![Batch reactor operator station](docs/img/showcase-reactor-hero.png)
 
 ## Documentation
 

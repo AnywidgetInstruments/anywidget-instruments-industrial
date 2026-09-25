@@ -92,7 +92,8 @@ class InstrumentWidget(anywidget.AnyWidget):
     style
         Visual style: ``"modern"``, ``"classic"`` or ``"system"``.
     theme
-        ``"auto"``, ``"light"`` or ``"dark"``; see :func:`anywidget_instruments.set_theme`.
+        ``"auto"``, ``"light"``, ``"dark"`` or ``"system"`` (follows the host or
+        operating system color scheme); see :func:`anywidget_instruments.set_theme`.
     """
 
     _esm = _STATIC / "index.js"

@@ -37,7 +37,7 @@ revision history).
 npm install && npm run build        # contract + bundle (required before Python tests/E2E)
 npm run typecheck                   # tsc --noEmit
 npm test                            # vitest
-npm run lint                        # eslint (js/ and e2e/)
+npm run lint                        # eslint (js/, e2e/ and e2e-site/)
 npm run check:reproducible          # byte-identical rebuild
 pip install -e ".[dev]"             # add ".[docs]" for the documentation
 pytest                              # Python tests + example notebooks
@@ -113,6 +113,11 @@ pushing changes to the front end or to the kernel/front-end protocol.
 
 ### Tests
 - Every bug fix comes with a test that fails without the fix.
+- The Python examples of the documentation run in `tests/test_docs.py` (with
+  `ai` and `np` imported); keep them runnable, or put
+  `<!-- illustration: not run -->` on the line before a block that only
+  illustrates. The same test checks that every widget appears in the catalog,
+  the API reference and the host coverage table.
 - E2E tests locate widgets by their label (`widget(page, label)` in `e2e/helpers.js`)
   and run kernel code with `kernelExec`; scroll widgets into view before
   checking drawn state (off-screen widgets skip drawing).
