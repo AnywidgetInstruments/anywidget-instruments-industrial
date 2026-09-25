@@ -740,3 +740,18 @@
 .awi-root .awi-bf-unused { opacity: 0.45; }
 .awi-root .awi-bf-bit:focus-visible { outline: 2px solid var(--awi-accent); outline-offset: 1px; }
 .awi-root .awi-bf-hex { font-family: ui-monospace, monospace; font-size: 12px; align-self: flex-end; }
+
+/* RecipeTable (IND-113, IND-114) */
+.awi-root.awi-recipetable .awi-body { display: flex; flex-direction: column; min-height: 0; }
+.awi-root .awi-rt-scroll { overflow: auto; flex: 1; min-height: 0; }
+.awi-root .awi-rt-table { border-collapse: collapse; width: 100%; font-size: 12px; }
+.awi-root .awi-rt-table th { text-align: left; font-weight: 600; color: var(--awi-muted); padding: 2px 6px; background: var(--awi-face); }
+.awi-root .awi-rt-table thead th { position: sticky; top: 0; }
+.awi-root .awi-rt-table td { padding: 1px 4px; border-top: 1px solid var(--awi-grid); white-space: nowrap; }
+.awi-root .awi-rt-table td.awi-rt-number { text-align: right; font-variant-numeric: tabular-nums; }
+.awi-root .awi-rt-table td .awi-entry { width: 7em; text-align: inherit; }
+.awi-root .awi-rt-table td.awi-rt-text .awi-entry { width: 12em; text-align: left; }
+.awi-root .awi-rt-table .awi-rt-invalid { color: var(--awi-danger); }
+.awi-root .awi-rt-sort { font: inherit; font-weight: 600; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+.awi-root .awi-rt-foot { display: flex; gap: 8px; align-items: center; padding: 2px 4px; min-height: 18px; }
+.awi-root .awi-rt-add, .awi-root .awi-rt-del { font: inherit; font-size: 11px; padding: 1px 6px; border: 1px solid var(--awi-face-stroke); border-radius: 3px; background: var(--awi-plot-bg); color: var(--awi-fg); cursor: pointer; }

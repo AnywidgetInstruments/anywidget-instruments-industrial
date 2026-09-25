@@ -95,6 +95,7 @@ Generated from the docstrings (DOC-001).
 ## Registers, recipes and plant structure
 
 ::: anywidget_instruments.BitField
+::: anywidget_instruments.RecipeTable
 
 ## Utilities
 

@@ -1,0 +1,21 @@
+{
+  "description": "RecipeTable (IND-113): columns as the host stores them (valid inputs), then cells checked against their column: [value, ok, stored value]. Numbers are snapped to min + k * step with halves rounded up.",
+  "normalize": [
+    { "raw": "temp", "expected": { "name": "temp", "title": "temp", "type": "number", "unit": "", "min": null, "max": null, "step": 0, "format": "%.4g", "choices": [], "readonly": false, "default": 0 } },
+    { "raw": { "name": "t", "title": "Temperature", "unit": "°C", "min": 20, "max": 90, "step": 0.5, "format": "%.1f" },
+      "expected": { "name": "t", "title": "Temperature", "type": "number", "unit": "°C", "min": 20, "max": 90, "step": 0.5, "format": "%.1f", "choices": [], "readonly": false, "default": 20 } },
+    { "raw": { "name": "mode", "type": "choice", "choices": ["off", "slow", "fast"], "default": "slow", "readonly": true },
+      "expected": { "name": "mode", "title": "mode", "type": "choice", "unit": "", "min": null, "max": null, "step": 0, "format": "%.4g", "choices": ["off", "slow", "fast"], "readonly": true, "default": "slow" } },
+    { "raw": { "name": "on", "type": "bool" },
+      "expected": { "name": "on", "title": "on", "type": "bool", "unit": "", "min": null, "max": null, "step": 0, "format": "%.4g", "choices": [], "readonly": false, "default": false } },
+    { "raw": { "name": "neg", "max": -5 },
+      "expected": { "name": "neg", "title": "neg", "type": "number", "unit": "", "min": null, "max": -5, "step": 0, "format": "%.4g", "choices": [], "readonly": false, "default": -5 } }
+  ],
+  "cells": [
+    { "column": { "name": "t", "min": 20, "max": 90, "step": 0.5 }, "checks": [[65, true, 65], [65.3, true, 65.5], [65.25, true, 65.5], [89.9, true, 90], [19.9, false], [95, false], ["65", false], [true, false], ["nan", false]] },
+    { "column": { "name": "n", "step": 0.1 }, "checks": [[0.30000000000000004, true, 0.3], [-1.05, true, -1], [1e9, true, 1000000000]] },
+    { "column": { "name": "mode", "type": "choice", "choices": ["off", "slow"] }, "checks": [["slow", true, "slow"], ["fast", false], [1, false]] },
+    { "column": { "name": "on", "type": "bool" }, "checks": [[true, true, true], [1, false], ["true", false]] },
+    { "column": { "name": "note", "type": "text" }, "checks": [["abc", true, "abc"], ["", true, ""], [3, false]] }
+  ]
+}

@@ -802,6 +802,70 @@ describe("Bit field without a kernel", () => {
   });
 });
 
+describe("Recipe table without a kernel", () => {
+  const columns = [
+    { name: "step", type: "text" },
+    { name: "temp", title: "Temperature", unit: "°C", min: 20, max: 90, step: 0.5, format: "%.1f" },
+    { name: "agitator", type: "choice", choices: ["off", "slow", "fast"] },
+    { name: "hold", type: "bool" },
+  ];
+  const value = [
+    { step: "Heat", temp: 65, agitator: "slow", hold: false },
+    { step: "Cool", temp: 30, agitator: "off", hold: true },
+  ];
+
+  test("indicator: rows as text, sorted by a column on demand (IND-114)", async () => {
+    const { el, body } = mount({ ...defaults("RecipeTable"), mode: "indicator", label: "Recipe", columns, value });
+    await frame();
+    const rows = () => [...el.querySelectorAll("tbody tr")].map((tr) => tr.textContent);
+    expect(rows()).toEqual(["1Heat65.0slow☐ no", "2Cool30.0off☑ yes"]);
+    expect(body.getAttribute("aria-label")).toBe("Recipe: 2 rows, 4 columns (step, Temperature °C, agitator, hold)");
+    (el.querySelectorAll(".awi-rt-sort")[1] as HTMLButtonElement).click(); // Temperature
+    await frame();
+    expect(rows()[0]).toContain("Cool");
+    expect(el.querySelectorAll("thead th")[2].getAttribute("aria-sort")).toBe("ascending");
+  });
+
+  test("control: cells checked, snapped and written back; rows added and deleted", async () => {
+    const { model, el } = mount({ ...defaults("RecipeTable"), columns, value, row_edit: true });
+    await frame();
+    const field = el.querySelector('input[aria-label="Row 1, Temperature"]') as HTMLInputElement;
+    field.value = "95";
+    field.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+    expect(el.querySelector(".awi-rt-msg")?.textContent).toBe("Row 1, Temperature: Out of range: enter a value between 20 and 90 °C");
+    expect(field.getAttribute("aria-invalid")).toBe("");
+    field.value = "72,3";
+    field.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+    expect((model.get("value") as Array<Record<string, unknown>>)[0].temp).toBe(72.5);
+    const sel = el.querySelector('select[aria-label="Row 2, agitator"]') as HTMLSelectElement;
+    sel.value = "fast";
+    sel.dispatchEvent(new Event("change"));
+    expect((model.get("value") as Array<Record<string, unknown>>)[1].agitator).toBe("fast");
+    field.dispatchEvent(new FocusEvent("focusout", { bubbles: true }));
+    await frame();
+    (el.querySelector(".awi-rt-add") as HTMLButtonElement).click();
+    expect(model.get("value")).toHaveLength(3);
+    expect((model.get("value") as Array<Record<string, unknown>>)[2]).toEqual({ step: "", temp: 20, agitator: "off", hold: false });
+    await frame();
+    (el.querySelector('button[aria-label="Delete row 1"]') as HTMLButtonElement).click();
+    expect((model.get("value") as Array<Record<string, unknown>>).map((r) => r.step)).toEqual(["Cool", ""]);
+  });
+
+  test("with a host owning the state, edits are sent and a rejection is shown", async () => {
+    const { model, el } = mount({ ...defaults("RecipeTable"), _session: "kernel", columns, value });
+    const sent: unknown[] = [];
+    model.send = (c: unknown) => void sent.push(c);
+    await frame();
+    const field = el.querySelector('input[aria-label="Row 2, Temperature"]') as HTMLInputElement;
+    field.value = "40";
+    field.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+    expect(sent).toEqual([{ type: "edit", row: 1, column: "temp", value: 40 }]);
+    expect((model.get("value") as Array<Record<string, unknown>>)[1].temp).toBe(30);
+    model.fireMsg({ type: "rejected", row: 1, column: "temp", reason: "interlocked" }, []);
+    expect(el.querySelector(".awi-rt-msg")?.textContent).toBe("Row 2, Temperature: interlocked");
+  });
+});
+
 describe("Tank without a kernel", () => {
   test("indicator by default, markers read through the schema", async () => {
     const { root, body, el } = mount({ ...defaults("Tank"), value: 3.2, max: 4, unit: "m", markers: [0.5, "x", 3.5], hi: 3, hihi: 3.5 });

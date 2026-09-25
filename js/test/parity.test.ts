@@ -13,6 +13,7 @@ import peakCases from "../../tests/parity/peak.json";
 import polarCases from "../../tests/parity/polar.json";
 import pidCases from "../../tests/parity/pid.json";
 import processCases from "../../tests/parity/process.json";
+import recipeCases from "../../tests/parity/recipe.json";
 import resolvedCases from "../../tests/parity/resolved.json";
 import machineCases from "../../tests/parity/statemachine.json";
 import stateCases from "../../tests/parity/states.json";
@@ -33,6 +34,7 @@ import { gammaToZ, radarRange, zToGamma } from "../src/contract/polar.js";
 import { pidState } from "../src/contract/derived.js";
 import { loopModeChange, operatorSet } from "../src/contract/pid.js";
 import { positionDemand, processCommand, type ProcessState } from "../src/contract/process.js";
+import { checkCell, normalizeColumn } from "../src/contract/recipe.js";
 import { availableCommands, type Machine, nextState, normalizeMachine, SC } from "../src/contract/statemachine.js";
 import { imageMime } from "../src/contract/synoptic.js";
 import { readTrait } from "../src/contract/traits.js";
@@ -335,4 +337,20 @@ describe("bit field", () => {
     expect(activeBits(c.value, c.bits)).toEqual(c.active);
     for (const [bit, expected] of c.toggle) expect(toggleBit(c.value, bit, c.bits)).toBe(expected);
   });
+});
+
+describe("recipe table", () => {
+  test.each(recipeCases.normalize)("column %#", (c) => {
+    expect(normalizeColumn(c.raw)).toEqual(c.expected);
+  });
+  for (const c of recipeCases.cells) {
+    test(`cells of ${c.column.name}`, () => {
+      const col = normalizeColumn(c.column);
+      for (const [value, ok, stored] of c.checks as Array<[unknown, boolean, unknown?]>) {
+        const r = checkCell(col, value === "nan" ? NaN : value);
+        expect(r.ok, String(value)).toBe(ok);
+        if (r.ok) expect(r.value).toBe(stored);
+      }
+    });
+  }
 });

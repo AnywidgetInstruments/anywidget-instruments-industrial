@@ -259,6 +259,20 @@ test.describe("every widget", () => {
     await expect.poll(() => py('print(hex(W["BitField"].value))')).toBe("0x83");
   });
 
+  test("RecipeTable: both directions (IND-113)", async () => {
+    const w = widget(page, "RecipeTable");
+    await w.scrollIntoViewIfNeeded();
+    await py('W["RecipeTable"].set_cell(0, "temp", 61)');
+    const cell = w.getByRole("textbox", { name: "Row 1, temp" });
+    await expect(cell).toHaveValue("61");
+    await cell.fill("72.3");
+    await cell.press("Enter");
+    await expect.poll(() => py('print(W["RecipeTable"].value[0]["temp"])')).toBe("72.5");
+    await cell.fill("200");
+    await cell.press("Enter");
+    await expect(w.locator(".awi-rt-msg")).toContainText("Out of range");
+  });
+
   test("StackLight: kernel -> front", async () => {
     await widget(page, "StackLight").scrollIntoViewIfNeeded();
     await py('W["StackLight"].set("green", "blink")');

@@ -413,3 +413,27 @@ def test_bitfield(case: dict[str, Any]) -> None:
         w.value = case["value"]
         w.toggle_bit(bit)
         assert w.value == expected, (case["value"], bit)
+
+
+RECIPE = _load("recipe.json")
+
+
+@pytest.mark.parametrize("case", RECIPE["normalize"])
+def test_recipe_columns_normalized(case: dict[str, Any]) -> None:
+    from anywidget_instruments._recipe import normalize_column
+
+    assert normalize_column(case["raw"]) == case["expected"]
+
+
+@pytest.mark.parametrize(
+    "case", RECIPE["cells"], ids=[c["column"]["name"] for c in RECIPE["cells"]]
+)
+def test_recipe_cells(case: dict[str, Any]) -> None:
+    from anywidget_instruments._recipe import check_cell, normalize_column
+
+    col = normalize_column(case["column"])
+    for value, ok, *stored in case["checks"]:
+        got_ok, got = check_cell(col, _num(value) if value == "nan" else value)
+        assert got_ok == ok, (value, got)
+        if ok:
+            assert got == stored[0], (value, got)

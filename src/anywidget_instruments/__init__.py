@@ -50,6 +50,7 @@ from ._picture import PictureControl
 from ._pid import PID, PID_MODES, PIDFaceplate
 from ._polar import PolarPlot, RadarChart, SmithChart
 from ._process import PIPE_SHAPES, Motor, Pipe, ProcessObject, Pump, SynopticCanvas, Valve
+from ._recipe import COLUMN_TYPES, RecipeTable
 from ._sanitize import sanitize_svg
 from ._scada import ALARM_PRIORITIES, ALARM_STATES, AlarmBanner, AlarmIndicator, alarm_transition
 from ._statemachine import PACKML_COMMANDS, PACKML_MODEL, StateMachine
@@ -77,6 +78,7 @@ __all__ = [
     "ANN_STATES",
     "BUTTON_COLORS",
     "COLORMAPS",
+    "COLUMN_TYPES",
     "DEVICE_STATUSES",
     "EVENT_CATEGORIES",
     "LAMP_COLORS",
@@ -128,6 +130,7 @@ __all__ = [
     "Pump",
     "PushButton",
     "RadarChart",
+    "RecipeTable",
     "RockerSwitch",
     "SelectorSwitch",
     "SevenSegment",

@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://s-celles.github.io/anywidget-instruments/schema/recipetable.schema.json",
+  "title": "RecipeTable",
+  "description": "Table of typed columns whose rows the operator edits: recipes, setpoint tables (IND-113, IND-114).",
+  "type": "object",
+  "x-awi-class": "RecipeTable",
+  "allOf": [
+    {
+      "$ref": "instrument.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "recipetable",
+      "default": "recipetable",
+      "x-awi-writer": "host"
+    },
+    "size": {
+      "default": [
+        560,
+        220
+      ]
+    },
+    "columns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Key of the column in each row; unique."
+          },
+          "title": {
+            "type": "string",
+            "description": "Header text (default: name)."
+          },
+          "type": {
+            "enum": [
+              "number",
+              "choice",
+              "bool",
+              "text"
+            ]
+          },
+          "unit": {
+            "type": "string"
+          },
+          "min": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "max": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "step": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Numbers are snapped to min + k * step (0: not snapped)."
+          },
+          "format": {
+            "type": "string",
+            "description": "Display format of numbers (NUM-004, IND-110)."
+          },
+          "choices": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "readonly": {
+            "type": "boolean"
+          },
+          "default": {
+            "type": [
+              "number",
+              "string",
+              "boolean"
+            ],
+            "description": "Value of the column in a new row."
+          }
+        }
+      },
+      "description": "Columns {name, title, type, unit, min, max, step, format, choices, readonly, default}. Python normalizes them (a string is a number column of that name, missing keys get their defaults) and rejects duplicate names, unknown keys, max < min and choice columns without choices.",
+      "default": [],
+      "x-awi-writer": "host"
+    },
+    "value": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": {
+          "type": [
+            "number",
+            "string",
+            "boolean"
+          ]
+        }
+      },
+      "description": "Rows, each a dict keyed by column name, every cell valid for its column. Written by the host (Python checks every row); operator edits arrive as messages and are applied by the host, or by the front end when no host owns the state (HOST-012).",
+      "default": [],
+      "x-awi-writer": "both"
+    },
+    "row_edit": {
+      "type": "boolean",
+      "description": "Let the operator add and delete rows (IND-114).",
+      "default": false,
+      "x-awi-writer": "host"
+    },
+    "max_rows": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Most rows the table may hold.",
+      "default": 100,
+      "x-awi-writer": "host"
+    }
+  },
+  "x-awi-messages": [
+    {
+      "type": "edit",
+      "direction": "front-to-host",
+      "description": "The operator confirmed a cell (control mode). The front end has checked it against its column; the host checks it again, applies it or answers rejected.",
+      "fields": {
+        "row": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "column": {
+          "type": "string"
+        },
+        "value": {
+          "type": [
+            "number",
+            "string",
+            "boolean"
+          ]
+        }
+      },
+      "buffers": []
+    },
+    {
+      "type": "add",
+      "direction": "front-to-host",
+      "description": "The operator added a row (row_edit): the host appends a row of column defaults.",
+      "fields": {},
+      "buffers": []
+    },
+    {
+      "type": "delete",
+      "direction": "front-to-host",
+      "description": "The operator deleted a row (row_edit).",
+      "fields": {
+        "row": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "buffers": []
+    },
+    {
+      "type": "rejected",
+      "direction": "host-to-front",
+      "description": "An edit the host did not apply, with the reason shown to the operator.",
+      "fields": {
+        "row": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "column": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "buffers": []
+    }
+  ]
+}

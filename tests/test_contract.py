@@ -321,6 +321,14 @@ def _trend_messages() -> Any:
     return w, sent
 
 
+def _recipe_messages() -> Any:
+    w = ai.RecipeTable([{"name": "t", "min": 0, "max": 10}], [{"t": 1}])
+    sent = _sent(w)
+    w._handle_front_msg(w, {"type": "edit", "row": 0, "column": "t", "value": 99}, [])
+    w._handle_front_msg(w, {"type": "edit", "row": 3, "column": "x", "value": 1}, [])
+    return w, sent
+
+
 @pytest.mark.parametrize(
     "make",
     [
@@ -329,6 +337,7 @@ def _trend_messages() -> Any:
         _intensity_messages,
         _digital_messages,
         _trend_messages,
+        _recipe_messages,
     ],
     ids=lambda f: f.__name__.strip("_"),
 )

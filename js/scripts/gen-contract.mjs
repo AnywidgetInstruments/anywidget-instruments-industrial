@@ -106,6 +106,9 @@ function traitSpec(name, p, where, nested = false) {
     spec.type = types[0];
   } else if (types.length === 0) {
     spec.type = "any";
+  } else if (types.every((t) => ["number", "integer", "string", "boolean"].includes(t))) {
+    // a scalar of several types (a table cell): checked by the widget itself
+    spec.type = "any";
   } else {
     throw new Error(`${where}.${name}: unsupported type ${JSON.stringify(p.type)}`);
   }

@@ -332,3 +332,35 @@ status.active_labels()  # ['Ready', 'Running', 'Fault']
 status.set_bit(2)  # sets the warning bit
 ```
 
+### RecipeTable
+
+A table of typed columns whose rows the operator edits: a batch recipe, a
+table of setpoints, test parameters. A column is a number (unit, limits, step,
+display format), a choice among values, a Boolean or a text; `readonly`
+columns are shown but not edited. In control mode each confirmed cell is
+checked against its column with the rules of the numeric entry fields (a
+value outside the limits is refused with a message naming them, a number is
+snapped to `step`), then checked again by the kernel; `on_edit` callbacks get
+each edit. With `row_edit` the operator also adds and deletes rows. Clicking a
+column title sorts the displayed rows; `value` keeps its order.
+
+```python
+recipe = ai.RecipeTable(
+    columns=[
+        {"name": "step", "type": "text"},
+        {"name": "temp", "title": "Temperature", "unit": "°C", "min": 20, "max": 90, "step": 0.5},
+        {"name": "time", "title": "Hold time", "unit": "min", "min": 0, "max": 240, "step": 1},
+        {"name": "agitator", "type": "choice", "choices": ["off", "slow", "fast"]},
+        {"name": "vacuum", "type": "bool"},
+    ],
+    value=[
+        {"step": "Heat", "temp": 65, "time": 30, "agitator": "slow"},
+        {"step": "React", "temp": 82.5, "time": 120, "agitator": "fast", "vacuum": True},
+    ],
+    row_edit=True,
+    label="Recipe PR-12",
+)
+recipe.on_edit(lambda e: print(e["action"], e["row"], e["column"], e["value"]))
+recipe.set_cell(0, "temp", 70)  # checked against the column, like an operator entry
+```
+
