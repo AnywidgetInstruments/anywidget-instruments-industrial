@@ -67,24 +67,37 @@ function cuts(p: Pt, q: Pt, r: Pt, t: Pt): boolean {
   return x > Math.min(hp[0], hq[0]) && x < Math.max(hp[0], hq[0]) && y > Math.min(vr[1], vt[1]) && y < Math.max(vr[1], vt[1]);
 }
 
-/** Cost of a path: crossed states first, then arrows run over, crossings, bends and length. */
-export function pathCost(points: Pt[], a: Box, b: Box, ctx: RouteContext): number {
-  let cost = 0;
+/** Length plus a price per bend: the least a path can cost. */
+function baseCost(points: Pt[]): number {
+  let cost = 25 * (points.length - 2);
   for (let i = 0; i + 1 < points.length; i++) {
     const [p, q] = [points[i], points[i + 1]];
+    cost += Math.abs(q[0] - p[0]) + Math.abs(q[1] - p[1]);
     if (p[0] !== q[0] && p[1] !== q[1]) cost += 5000; // never a diagonal
+  }
+  return cost;
+}
+
+/**
+ * Cost of a path: crossed states first, then arrows run over, crossings,
+ * bends and length. Stops counting once the cost reaches `limit`.
+ */
+export function pathCost(points: Pt[], a: Box, b: Box, ctx: RouteContext, limit = Infinity): number {
+  let cost = baseCost(points);
+  const last = points.length - 2;
+  for (let i = 0; i <= last && cost < limit; i++) {
+    const [p, q] = [points[i], points[i + 1]];
     for (const box of ctx.boxes) {
       // the end boxes may only be touched by the first and the last segment
-      if ((box === a && i === 0) || (box === b && i === points.length - 2)) continue;
+      if ((box === a && i === 0) || (box === b && i === last)) continue;
       if (crosses(p, q, box)) cost += 1000;
     }
     for (const [r, t] of ctx.used) {
       cost += 8 * overlap(p, q, r, t);
       if (cuts(p, q, r, t)) cost += 12;
     }
-    cost += Math.abs(q[0] - p[0]) + Math.abs(q[1] - p[1]);
   }
-  return cost + 25 * (points.length - 2);
+  return cost;
 }
 
 /** Point on the side of box b facing (x, y) along one axis. */
@@ -165,12 +178,17 @@ export function routePoints(a: Box, b: Box, waypoints: Pt[] | null, ctx: RouteCo
       }
     }
   }
-  let best = candidates[0];
+  // cheapest first by length and bends, so that most candidates stop early
+  const ranked = candidates
+    .map((pts) => pts.filter((p, i) => i === 0 || p[0] !== pts[i - 1][0] || p[1] !== pts[i - 1][1]))
+    .map((pts) => ({ pts, base: baseCost(pts) }))
+    .sort((p, q) => p.base - q.base);
+  let best = ranked[0].pts;
   let bestCost = Infinity;
-  for (const pts of candidates) {
-    const clean = pts.filter((p, i) => i === 0 || p[0] !== pts[i - 1][0] || p[1] !== pts[i - 1][1]);
-    const cost = pathCost(clean, a, b, c);
-    if (cost < bestCost) [best, bestCost] = [clean, cost];
+  for (const { pts, base } of ranked) {
+    if (base >= bestCost) break; // no later candidate can do better
+    const cost = pathCost(pts, a, b, c, bestCost);
+    if (cost < bestCost) [best, bestCost] = [pts, cost];
   }
   return best;
 }
