@@ -28,6 +28,18 @@ function readNumber(spec: ValueSpec, raw: unknown): number | undefined {
   return v;
 }
 
+/** Bytes of a buffer, a typed array or a DataView, or of base64 text; undefined otherwise. */
+function readBytes(raw: unknown): Uint8Array | undefined {
+  if (raw instanceof ArrayBuffer) return new Uint8Array(raw);
+  if (ArrayBuffer.isView(raw)) return new Uint8Array(raw.buffer, raw.byteOffset, raw.byteLength);
+  if (typeof raw !== "string") return undefined;
+  try {
+    return Uint8Array.from(atob(raw), (c) => c.charCodeAt(0));
+  } catch {
+    return undefined; // not base64
+  }
+}
+
 /**
  * Value conforming to `spec`, or `undefined` when `raw` cannot be used.
  * Arrays keep their valid items; a tuple needs every item valid.
@@ -63,6 +75,8 @@ export function readValue(spec: ValueSpec, raw: unknown): unknown {
       if (spec.uniqueItems && new Set(out.map((x) => JSON.stringify(x))).size !== out.length) return undefined;
       return out;
     }
+    case "bytes":
+      return readBytes(raw);
     case "object": {
       if (!isPlainObject(raw)) return undefined;
       if (!spec.keys) return raw;

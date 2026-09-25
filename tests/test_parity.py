@@ -387,3 +387,16 @@ def test_trend_values_at(case: dict[str, Any]) -> None:
     for x, expected in case["cursors"]:
         got = [None if math.isnan(v) else v for v in w.values_at(x)]
         assert got == [None if isinstance(v, str) else v for v in expected], (case["name"], x)
+
+
+SYNOPTIC = _load("synoptic.json")["cases"]
+
+
+@pytest.mark.parametrize("case", SYNOPTIC, ids=[c["name"] for c in SYNOPTIC])
+def test_synoptic_background_mime(case: dict[str, Any]) -> None:
+    data = bytes.fromhex(case["hex"])
+    if not case["mime"]:
+        with pytest.raises(t.TraitError):
+            ai.SynopticCanvas(background=data)
+        return
+    assert ai.SynopticCanvas(background=data).background_mime == case["mime"]

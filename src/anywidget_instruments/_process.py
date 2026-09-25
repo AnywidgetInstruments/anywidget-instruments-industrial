@@ -205,6 +205,8 @@ class SynopticCanvas(InstrumentWidget):
     _kind = t.Unicode("synoptic").tag(sync=True)
     _default_mode = "indicator"
     _default_size = (640, 360)
+    mode = mode_trait(_default_mode)
+    size = size_trait(*_default_size)
     #: ``[{"widget": w, "x": float, "y": float}, ...]``
     items = t.List(t.Dict()).tag(sync=True, **ipywidgets.widget_serialization)
     pipes = t.List(t.Dict()).tag(sync=True)

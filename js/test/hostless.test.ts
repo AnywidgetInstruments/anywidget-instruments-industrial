@@ -720,6 +720,34 @@ describe("Trend chart without a kernel", () => {
   });
 });
 
+describe("Synoptic canvas without a kernel", () => {
+  test("base64 background typed from its bytes, pipes drawn, children as placeholders", async () => {
+    const blobs: Blob[] = [];
+    Object.assign(URL, { createObjectURL: (b: Blob) => (blobs.push(b), `blob:${blobs.length}`), revokeObjectURL: () => {} });
+    const png = btoa(String.fromCharCode(0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0));
+    const { el } = mount({
+      ...defaults("SynopticCanvas"),
+      background: png, // no background_mime: detected as Python does
+      items: [{ widget: "IPY_MODEL_abc", x: 10, y: 20 }],
+      pipes: [{ points: [[0, 0], [100, 0]], flow: true }, { points: [[5, 5]] }],
+    });
+    await frame();
+    const img = el.querySelector(".awi-synoptic-bg") as HTMLImageElement;
+    expect(img.hidden).toBe(false);
+    expect(blobs[0].type).toBe("image/png");
+    expect(blobs[0].size).toBe(10);
+    expect(el.querySelector(".awi-synoptic-item")?.textContent).toContain("need a Jupyter host");
+    expect((el.querySelector(".awi-synoptic-item") as HTMLElement).style.left).toBe("10px");
+    expect(el.querySelectorAll(".awi-synoptic-pipes path").length).toBeGreaterThan(0);
+  });
+
+  test("bytes that are not an image show no background", async () => {
+    const { el } = mount({ ...defaults("SynopticCanvas"), background: btoa("hello"), background_mime: "" });
+    await frame();
+    expect((el.querySelector(".awi-synoptic-bg") as HTMLImageElement).hidden).toBe(true);
+  });
+});
+
 describe("Tank without a kernel", () => {
   test("indicator by default, markers read through the schema", async () => {
     const { root, body, el } = mount({ ...defaults("Tank"), value: 3.2, max: 4, unit: "m", markers: [0.5, "x", 3.5], hi: 3, hihi: 3.5 });

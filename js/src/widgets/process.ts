@@ -2,11 +2,12 @@
 // Pipe (SCADA-004), SynopticCanvas (SCADA-010).
 import { hostOwnsState } from "../contract/derived.js";
 import { type ProcessChanges, positionDemand, processCommand, type ProcessState } from "../contract/process.js";
+import { imageMime } from "../contract/synoptic.js";
 import { clear, html, safeColor, svg, svgText } from "../core/dom.js";
 import { checkEntry } from "../core/entry.js";
 import type { AnyModel, Traits } from "../core/model.js";
 import { BaseView } from "../core/view.js";
-import type { PipeTraits, ProcessTraits, PumpTraits, ValveTraits } from "../generated/contract.js";
+import type { PipeTraits, ProcessTraits, PumpTraits, SynopticCanvasTraits, ValveTraits } from "../generated/contract.js";
 
 /** Traits of Valve, Pump and Motor, from their schemas. */
 export type ProcessViewTraits = ProcessTraits & { value: string } & Partial<Pick<ValveTraits, "position" | "orientation"> & Pick<PumpTraits, "animate" | "direction">>;
@@ -307,14 +308,16 @@ interface WidgetManager {
 }
 
 /** SynopticCanvas: nested widgets need a Jupyter widget manager (migrated last). */
-export class SynopticView extends BaseView {
+const IMAGE_MIMES = ["image/png", "image/jpeg", "image/svg+xml"];
+
+export class SynopticView extends BaseView<SynopticCanvasTraits> {
   readonly bg: HTMLImageElement;
   readonly pipeLayer: SVGElement;
   readonly childLayer: HTMLDivElement;
   readonly views: Map<string, { el: HTMLElement; view: ChildView | null }>;
   bgUrl: string | null;
 
-  constructor(model: AnyModel, el: HTMLElement) {
+  constructor(model: AnyModel<SynopticCanvasTraits>, el: HTMLElement) {
     super(model, el, ["items", "pipes", "background", "background_mime"]);
     this.body.classList.add("awi-synoptic-body");
     this.bg = html("img", { cls: "awi-synoptic-bg", attrs: { alt: "" } });
@@ -338,12 +341,13 @@ export class SynopticView extends BaseView {
   updateBackground(): void {
     if (this.bgUrl) URL.revokeObjectURL(this.bgUrl);
     this.bgUrl = null;
-    const data = this.get("background") as (ArrayBufferView & { length?: number }) | null | undefined;
-    const mime = String(this.get("background_mime") ?? "");
-    const len = data?.byteLength ?? data?.length ?? 0;
-    if (data && len && ["image/png", "image/jpeg", "image/svg+xml"].includes(mime)) {
-      const bytes = data.buffer ? new Uint8Array(data.buffer, data.byteOffset, data.byteLength) : (data as unknown as Uint8Array);
-      this.bgUrl = URL.createObjectURL(new Blob([bytes as BlobPart], { type: mime }));
+    // bytes: a buffer from Jupyter, base64 text from a JSON-only host (read through the contract)
+    const bytes = this.get("background") as unknown as Uint8Array;
+    const given = this.get("background_mime");
+    // the type Python sets; a host that does not set it: detected from the bytes, as Python does
+    const mime = IMAGE_MIMES.includes(given) ? given : imageMime(bytes);
+    if (bytes.length && mime) {
+      this.bgUrl = URL.createObjectURL(new Blob([bytes.slice()], { type: mime }));
       this.bg.src = this.bgUrl;
       this.bg.hidden = false;
     } else {
@@ -353,7 +357,7 @@ export class SynopticView extends BaseView {
   }
 
   async syncChildren(): Promise<void> {
-    const items = (this.get("items") as Array<{ widget?: unknown; x?: unknown; y?: unknown }> | undefined) || [];
+    const items = this.get("items");
     const wm = this.model.widget_manager as Partial<WidgetManager> | undefined;
     const wanted = new Set<string>();
     for (const it of items) {
@@ -393,13 +397,13 @@ export class SynopticView extends BaseView {
   }
 
   override draw(): void {
-    const [w, h] = this.get("size") as [number, number];
+    const [w, h] = this.get("size");
     this.pipeLayer.setAttribute("viewBox", `0 0 ${w} ${h}`);
     clear(this.pipeLayer);
-    for (const p of (this.get("pipes") as Array<Record<string, any>> | undefined) || []) {
-      const pts = Array.isArray(p.points) ? p.points : [];
+    for (const p of this.get("pipes")) {
+      const pts = (Array.isArray(p.points) ? p.points : []).filter((q): q is [number, number] => Array.isArray(q));
       if (pts.length < 2) continue;
-      const d = pts.map((q: number[], i: number) => `${i ? "L" : "M"}${Number(q[0]) || 0} ${Number(q[1]) || 0}`).join("");
+      const d = pts.map((q, i) => `${i ? "L" : "M"}${Number(q[0]) || 0} ${Number(q[1]) || 0}`).join("");
       flowPath(this.pipeLayer, d, { flow: !!p.flow, reverse: p.direction === "reverse", width: Number(p.thickness) || 10, color: safeColor(p.color), animate: true });
     }
     this.body.setAttribute("aria-label", String(this.get("label") || "Synoptic"));

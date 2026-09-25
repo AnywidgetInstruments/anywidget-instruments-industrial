@@ -1,0 +1,10 @@
+{
+  "description": "SynopticCanvas background (SCADA-010): image type from the first bytes (hex). An empty mime means the bytes are not an image: Python rejects them, the front end shows no background.",
+  "cases": [
+    { "name": "PNG", "hex": "89504e470d0a1a0a0000000d49484452", "mime": "image/png" },
+    { "name": "JPEG", "hex": "ffd8ffe000104a464946", "mime": "image/jpeg" },
+    { "name": "SVG after an XML declaration", "hex": "3c3f786d6c2076657273696f6e3d22312e30223f3e3c7376672f3e", "mime": "image/svg+xml" },
+    { "name": "PNG signature cut short", "hex": "89504e47", "mime": "" },
+    { "name": "plain text", "hex": "68656c6c6f", "mime": "" }
+  ]
+}

@@ -93,6 +93,9 @@ function traitSpec(name, p, where, nested = false) {
   if (p.const !== undefined) {
     spec.type = "const";
     spec.values = [p.const];
+  } else if (p["x-awi-binary"]) {
+    // binary data: a buffer in Jupyter, base64 text in JSON-only hosts
+    spec.type = "bytes";
   } else if (p["x-awi-nonfinite"]) {
     spec.type = "number";
     spec.nonfinite = true;
@@ -179,6 +182,9 @@ function tsType(spec) {
       if (spec.prefixItems) t = `[${spec.prefixItems.map(tsType).join(", ")}]`;
       else if (spec.items) t = `Array<${tsType(spec.items)}>`;
       else t = "unknown[]";
+      break;
+    case "bytes":
+      t = "ArrayBuffer | ArrayBufferView | string";
       break;
     case "object":
       if (spec.keys) t = `Partial<Record<${spec.keys.map((k) => JSON.stringify(k)).join(" | ")}, string>>`;

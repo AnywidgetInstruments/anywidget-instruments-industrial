@@ -15,6 +15,7 @@ import processCases from "../../tests/parity/process.json";
 import resolvedCases from "../../tests/parity/resolved.json";
 import machineCases from "../../tests/parity/statemachine.json";
 import stateCases from "../../tests/parity/states.json";
+import synopticCases from "../../tests/parity/synoptic.json";
 import trendCases from "../../tests/parity/trend.json";
 import waveformCases from "../../tests/parity/waveform.json";
 import { type AlarmLevel, type AlarmLimits, computeAlarmLevel } from "../src/contract/alarm.js";
@@ -31,6 +32,7 @@ import { pidState } from "../src/contract/derived.js";
 import { loopModeChange, operatorSet } from "../src/contract/pid.js";
 import { positionDemand, processCommand, type ProcessState } from "../src/contract/process.js";
 import { availableCommands, type Machine, nextState, normalizeMachine, SC } from "../src/contract/statemachine.js";
+import { imageMime } from "../src/contract/synoptic.js";
 import { readTrait } from "../src/contract/traits.js";
 import { normalizePen, PenRing } from "../src/contract/trend.js";
 import { Ring, valuesAt } from "../src/contract/waveform.js";
@@ -317,4 +319,11 @@ describe("trend chart", () => {
       }
     });
   }
+});
+
+describe("synoptic background", () => {
+  test.each(synopticCases.cases)("$name", (c) => {
+    const bytes = Uint8Array.from(c.hex.match(/../g) ?? [], (h) => parseInt(h, 16));
+    expect(imageMime(bytes)).toBe(c.mime);
+  });
 });

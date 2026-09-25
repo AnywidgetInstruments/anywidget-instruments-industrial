@@ -9,6 +9,7 @@ a class default or an instance state diverges from the schemas.
 
 from __future__ import annotations
 
+import base64
 import json
 import math
 import pathlib
@@ -47,9 +48,21 @@ WIDGETS = sorted(CONTRACT["widgets"].items())
 IDS = [title for title, _ in WIDGETS]
 
 
+def _binary(o: Any) -> str:
+    """Binary data as a JSON-only host sends it: base64 text."""
+    if isinstance(o, (bytes, bytearray, memoryview)):
+        return base64.b64encode(bytes(o)).decode()
+    raise TypeError(type(o).__name__)
+
+
 def _json(value: Any) -> Any:
-    """Value as it travels in JSON (non-finite floats as strings, tuples as lists)."""
-    return json.loads(json.dumps(_base._float_to_json(value)))
+    """Value as it travels in JSON (non-finite floats as text, tuples as lists, bytes as base64)."""
+    return json.loads(json.dumps(_base._float_to_json(value), default=_binary))
+
+
+def _state(w: Any) -> dict[str, Any]:
+    """Synced state of a widget as JSON, without the framework traits."""
+    return {k: v for k, v in _json(w.get_state()).items() if k not in FRAMEWORK}
 
 
 def _class_default(trait: t.TraitType) -> Any:
@@ -108,6 +121,7 @@ MIGRATED = {
     "DigitalWaveformGraph",
     "MixedSignalGraph",
     "TrendChart",
+    "SynopticCanvas",
 }
 
 
@@ -149,6 +163,8 @@ def _check_type(name: str, trait: t.TraitType, s: dict[str, Any]) -> None:
         assert kind == "array", name
     elif isinstance(trait, t.Dict):
         assert kind == "object", name
+    elif isinstance(trait, t.Bytes):
+        assert kind == "bytes", name
     else:  # pragma: no cover - a new trait type needs a mapping
         raise AssertionError(f"{name}: no schema mapping for {type(trait).__name__}")
 
@@ -218,7 +234,7 @@ def test_instance_state_validates(title: str, spec: dict[str, Any]) -> None:
     """The state a Python widget sends conforms to its JSON Schema."""
     validator = _validator(pathlib.Path(spec["schema"]).name)
     w = CLASSES[spec["class"]]()
-    state = {k: v for k, v in json.loads(json.dumps(w.get_state())).items() if k not in FRAMEWORK}
+    state = _state(w)
     errors = sorted(validator.iter_errors(state), key=str)
     assert not errors, [e.message for e in errors]
 
@@ -261,7 +277,7 @@ def test_plotted_state_validates(w: Any) -> None:
     """Data sets written by plot() conform to the item schemas of `value`."""
     spec = next(s for s in CONTRACT["widgets"].values() if s["class"] == type(w).__name__)
     validator = _validator(pathlib.Path(spec["schema"]).name)
-    state = {k: v for k, v in json.loads(json.dumps(w.get_state())).items() if k not in FRAMEWORK}
+    state = _state(w)
     errors = sorted(validator.iter_errors(state), key=str)
     assert not errors, [e.message for e in errors]
     fields = set(spec["traits"]["value"]["items"]["properties"])
@@ -382,3 +398,15 @@ def test_sent_messages_conform(make: Any) -> None:
             assert len(buffers) == len(m["buffers"])
             for b, bspec in zip(buffers, m["buffers"], strict=True):
                 assert len(b) == _buffer_bytes(w, content, bspec), (content, bspec)
+
+
+def test_synoptic_state_validates() -> None:
+    """Background bytes (as base64), child references and pipes conform to the schema."""
+    syn = ai.SynopticCanvas(background=b"\x89PNG\r\n\x1a\n" + bytes(8))
+    syn.add(ai.LED(), x=10, y=20)
+    syn.add_pipe([(0, 0), (100, 0), (100, 50)], flow=True, direction="reverse", color="blue")
+    state = _state(syn)
+    errors = sorted(_validator("synoptic.schema.json").iter_errors(state), key=str)
+    assert not errors, [e.message for e in errors]
+    assert state["items"][0]["widget"].startswith("IPY_MODEL_")
+    assert base64.b64decode(state["background"])[:4] == b"\x89PNG"

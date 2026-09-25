@@ -14,7 +14,8 @@ export type Writer = "host" | "both" | "front" | "derived";
 
 /** Type and bounds of a value (a trait, or an item of an array trait). */
 export interface ValueSpec {
-  type: "number" | "integer" | "string" | "boolean" | "enum" | "const" | "array" | "object" | "any";
+  /** "bytes": binary data, a buffer (Jupyter) or base64 text (JSON-only hosts), read as a Uint8Array. */
+  type: "number" | "integer" | "string" | "boolean" | "enum" | "const" | "array" | "object" | "bytes" | "any";
   /** `null` is a valid value. */
   nullable?: boolean;
   /** NaN and infinities travel as "nan", "inf", "-inf". */
