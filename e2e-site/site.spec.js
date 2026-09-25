@@ -58,6 +58,16 @@ const DEMOS = {
     await expect(gemma.locator(".awi-sm-label-current")).toHaveText("▶ D1", { timeout: 30_000 });
     await expect(widget(page, "PackML machine states").locator(".awi-sm-label-current")).toHaveText("▶ Aborted");
   },
+  svg_faceplates: async (page) => {
+    const lamp = widget(page, "Pump");
+    await expect(lamp.getByText("OFF", { exact: true })).toBeVisible(LOAD);
+    const fill = widget(page, "Tank T-101").getByRole("button", { name: "Fill" });
+    await fill.focus();
+    await page.keyboard.down(" "); // FILL held: the pump runs at the next clock tick
+    await expect(lamp.getByText("ON", { exact: true })).toBeVisible({ timeout: 30_000 });
+    await page.keyboard.up(" ");
+    await expect(lamp.getByText("OFF", { exact: true })).toBeVisible({ timeout: 30_000 });
+  },
   lift_station: async (page) => {
     await expect(body(page, "Wet well level")).toHaveAttribute("aria-valuenow", /\d/, LOAD);
     await body(page, "Simulate a pump fault").click();
