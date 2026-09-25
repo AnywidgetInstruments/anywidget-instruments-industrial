@@ -105,6 +105,8 @@ MIGRATED = {
     "PictureControl",
     "WaveformChart",
     "IntensityChart",
+    "DigitalWaveformGraph",
+    "MixedSignalGraph",
 }
 
 
@@ -325,9 +327,18 @@ def _intensity_messages() -> Any:
     return w, sent
 
 
+def _digital_messages() -> Any:
+    w = ai.MixedSignalGraph(buses=[{"name": "B", "lines": [1, 0]}])
+    sent = _sent(w)
+    w.set_data([1, 2, 3], n_bits=2)
+    w.set_analog(np.arange(6.0).reshape(3, 2))
+    w._handle_front_msg(w, {"type": "sync_request"}, [])
+    return w, sent
+
+
 @pytest.mark.parametrize(
     "make",
-    [_picture_messages, _waveform_messages, _intensity_messages],
+    [_picture_messages, _waveform_messages, _intensity_messages, _digital_messages],
     ids=lambda f: f.__name__.strip("_"),
 )
 def test_sent_messages_conform(make: Any) -> None:

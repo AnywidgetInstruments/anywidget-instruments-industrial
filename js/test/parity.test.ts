@@ -5,6 +5,7 @@ import alarmCases from "../../tests/parity/alarm_level.json";
 import alarmTables from "../../tests/parity/alarms.json";
 import annCases from "../../tests/parity/annunciator.json";
 import barCases from "../../tests/parity/bars.json";
+import digitalCases from "../../tests/parity/digital.json";
 import intensityCases from "../../tests/parity/intensity.json";
 import numericCases from "../../tests/parity/numeric.json";
 import peakCases from "../../tests/parity/peak.json";
@@ -19,6 +20,7 @@ import { type AlarmLevel, type AlarmLimits, computeAlarmLevel } from "../src/con
 import { acknowledgeRows, type AlarmRow, expireShelving, localIso, shelveRow, unshelveRow } from "../src/contract/alarms.js";
 import { type AnnEvent, annunciatorTransition, hornOn, type Panel, panelAction, type Sequence, setProcess } from "../src/contract/annunciator.js";
 import { barLevels, normalizeBars } from "../src/contract/bars.js";
+import { decodeDigital, digitalValuesAt } from "../src/contract/digital.js";
 import { selectorValue, stackStates } from "../src/contract/industrial.js";
 import { RowRing, rowIndexAt } from "../src/contract/intensity.js";
 import { coerceValue, validScale } from "../src/contract/numeric.js";
@@ -277,6 +279,23 @@ describe("intensity chart", () => {
       }
       for (const [x, expected] of c.cursors as Array<[number, number[]]>) {
         expect(Array.from(ring.row(rowIndexAt(x, c.dt)) ?? []), `${c.name} x=${x}`).toEqual(expected);
+      }
+    });
+  }
+});
+
+describe("digital and mixed-signal graphs", () => {
+  for (const c of digitalCases.cases) {
+    test(c.name, () => {
+      // integers unpacked LSB first, as the host sends them: one byte per line
+      const bits = Uint8Array.from(c.values.flatMap((v) => Array.from({ length: c.n_bits }, (_, k) => (v >> k) & 1)));
+      const analog = c.analog ?? [];
+      const data = decodeDigital(
+        { n_samples: c.values.length, n_lines: c.n_bits, n_analog: analog.length, n_traces: analog[0]?.length ?? 0 },
+        [bits.buffer, Float32Array.from(analog.flat()).buffer],
+      );
+      for (const [x, expected] of c.cursors as Array<[number, Array<number | string>]>) {
+        expect(digitalValuesAt(data, x, { x0: c.x0, dt: c.dt, buses: c.buses }), `${c.name} x=${x}`).toEqual(expected);
       }
     });
   }

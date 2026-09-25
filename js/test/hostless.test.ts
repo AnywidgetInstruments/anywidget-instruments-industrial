@@ -55,6 +55,24 @@ function mount(state: State) {
 
 const frame = () => vi.advanceTimersByTimeAsync(40);
 
+/** Text of the CSV export of a graph (CHART-107). */
+async function csvOf(el: HTMLElement): Promise<string> {
+  const blobs: Blob[] = [];
+  Object.assign(URL, { createObjectURL: (b: Blob) => (blobs.push(b), "blob:x"), revokeObjectURL: () => {} });
+  vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
+  (el.querySelector('button[aria-label="Download data as CSV"]') as HTMLButtonElement).click();
+  vi.useRealTimers(); // FileReader completes on real timers
+  try {
+    return await new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result));
+      reader.readAsText(blobs[0]);
+    });
+  } finally {
+    vi.useFakeTimers();
+  }
+}
+
 beforeEach(() => {
   vi.useFakeTimers();
   vi.spyOn(console, "warn").mockImplementation(() => {});
@@ -650,23 +668,29 @@ describe("Intensity chart without a kernel", () => {
     model.fireMsg({ type: "append", n_rows: 3, total: 5 }, [new Float32Array([5, 6]).buffer]); // short buffer
     await frame();
     expect(body.getAttribute("aria-label")).toBe("Spectrum: 5 rows, color range 0 to 10 dB");
-    const csv = el.querySelector('button[aria-label="Download data as CSV"]') as HTMLButtonElement;
-    const blobs: Blob[] = [];
-    Object.assign(URL, { createObjectURL: (b: Blob) => (blobs.push(b), "blob:x"), revokeObjectURL: () => {} });
-    vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
-    csv.click();
     // rows 2 to 4 kept; 3 and 4 were missing from the buffer: empty, not stale data
-    vi.useRealTimers(); // FileReader completes on real timers
-    const text = await new Promise<string>((resolve) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result));
-      reader.readAsText(blobs[0]);
-    });
-    expect(text).toBe("x,0.5,1.5\n2,5,6\n3,,\n4,,");
-    vi.useFakeTimers();
+    expect(await csvOf(el)).toBe("x,0.5,1.5\n2,5,6\n3,,\n4,,");
     model.fireMsg({ type: "clear" }, []);
     await frame();
     expect(body.getAttribute("aria-label")).toBe("Spectrum: 0 rows, color range 0 to 10 dB");
+  });
+});
+
+describe("Digital and mixed-signal graphs without a kernel", () => {
+  test("data message with ArrayBuffers; a bus naming a missing line keeps the others", async () => {
+    const { model, el, body } = mount({ ...defaults("DigitalWaveformGraph"), label: "Bus", lines: ["CLK"], buses: [{ name: "B", lines: [1, 0, 9] }], show_lines_in_bus: false, dt: 2 });
+    const bits = new Uint8Array([1, 0, 0, 1, 1, 1]).buffer; // 3 samples × 2 lines
+    model.fireMsg({ type: "data", n_samples: 4, n_lines: 2, n_analog: 0, n_traces: 0 }, [bits, new ArrayBuffer(0)]); // one sample too many
+    await frame();
+    expect(body.getAttribute("aria-label")).toBe("Bus: 2 lines, 3 samples");
+    expect(await csvOf(el)).toBe("x,B\n0,0x1\n2,0x2\n4,0x3");
+  });
+
+  test("mixed signal: analog traces after the logic lines", async () => {
+    const { model, el } = mount({ ...defaults("MixedSignalGraph"), traces: [{ name: "V" }] });
+    model.fireMsg({ type: "data", n_samples: 2, n_lines: 1, n_analog: 2, n_traces: 1 }, [new Uint8Array([0, 1]).buffer, new Float32Array([0.5, 1.5]).buffer]);
+    await frame();
+    expect(await csvOf(el)).toBe("x,D0,V\n0,0,0.5\n1,1,1.5");
   });
 });
 

@@ -7,7 +7,7 @@ from typing import Any
 import numpy as np
 import traitlets as t
 
-from ._base import float_serializers
+from ._base import float_serializers, size_trait
 from ._graph import GraphWidget
 
 COLORMAPS: tuple[str, ...] = ("viridis", "inferno", "magma", "plasma", "gray", "jet")
@@ -237,6 +237,7 @@ class MixedSignalGraph(DigitalWaveformGraph):
 
     _kind = t.Unicode("mixedgraph").tag(sync=True)
     _default_size = (520, 320)
+    size = size_trait(*_default_size)
     traces = t.List(t.Dict()).tag(sync=True)
     y_min = t.Float(None, allow_none=True).tag(sync=True)
     y_max = t.Float(None, allow_none=True).tag(sync=True)

@@ -1,0 +1,11 @@
+{
+  "description": "Digital and mixed-signal graphs (CHART-102, CHART-103): data as integers unpacked LSB first (line k = bit k), buses (first listed line = MSB), then the values under cursors: line levels, buses in hexadecimal, analog traces.",
+  "cases": [
+    { "name": "lines and a bus", "values": [5, 2, 7, 0], "n_bits": 3, "analog": null, "x0": 10, "dt": 2,
+      "buses": [{ "name": "B", "lines": [2, 1, 0] }, { "name": "L", "lines": [0, 2] }],
+      "cursors": [[10, [1, 0, 1, "0x5", "0x3"]], [11.9, [1, 0, 1, "0x5", "0x3"]], [12, [0, 1, 0, "0x2", "0x0"]], [16, [0, 0, 0, "0x0", "0x0"]], [9, []], [18, []]] },
+    { "name": "mixed signal: analog after the digital values", "values": [1, 0], "n_bits": 1, "analog": [[0.5, -1], [1.5, 2], [2.5, 4]], "x0": 0, "dt": 1,
+      "buses": [],
+      "cursors": [[0, [1, 0.5, -1]], [1, [0, 1.5, 2]], [2, [2.5, 4]], [3, []]] }
+  ]
+}

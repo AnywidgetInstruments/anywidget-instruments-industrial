@@ -355,3 +355,17 @@ def test_intensity_values_at(case: dict[str, Any]) -> None:
         w.append(np.array(rows, dtype=float))
     for x, expected in case["cursors"]:
         assert w.values_at(x) == expected, (case["name"], x)
+
+
+DIGITAL = _load("digital.json")["cases"]
+
+
+@pytest.mark.parametrize("case", DIGITAL, ids=[c["name"] for c in DIGITAL])
+def test_digital_values_at(case: dict[str, Any]) -> None:
+    w = ai.MixedSignalGraph(x0=case["x0"], dt=case["dt"])
+    w.set_data(case["values"], n_bits=case["n_bits"])
+    w.buses = case["buses"]
+    if case["analog"] is not None:
+        w.set_analog(case["analog"])
+    for x, expected in case["cursors"]:
+        assert w.values_at(x) == expected, (case["name"], x)

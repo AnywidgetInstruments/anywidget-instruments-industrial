@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://s-celles.github.io/anywidget-instruments/schema/mixedgraph.schema.json",
+  "title": "MixedSignalGraph",
+  "description": "Analog traces and digital lines on a shared time axis (CHART-103). Same traits and messages as DigitalWaveformGraph, plus the analog part.",
+  "type": "object",
+  "x-awi-class": "MixedSignalGraph",
+  "allOf": [
+    {
+      "$ref": "graph.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "mixedgraph",
+      "default": "mixedgraph",
+      "x-awi-writer": "host"
+    },
+    "size": {
+      "default": [
+        520,
+        320
+      ]
+    },
+    "value": {
+      "$ref": "digitalgraph.schema.json#/properties/value"
+    },
+    "lines": {
+      "$ref": "digitalgraph.schema.json#/properties/lines"
+    },
+    "buses": {
+      "$ref": "digitalgraph.schema.json#/properties/buses"
+    },
+    "dt": {
+      "$ref": "digitalgraph.schema.json#/properties/dt"
+    },
+    "x0": {
+      "$ref": "digitalgraph.schema.json#/properties/x0"
+    },
+    "show_lines_in_bus": {
+      "$ref": "digitalgraph.schema.json#/properties/show_lines_in_bus"
+    },
+    "traces": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string"
+          },
+          "width": {
+            "type": "number"
+          },
+          "visible": {
+            "type": "boolean"
+          }
+        }
+      },
+      "description": "Optional style of each analog trace {name, color, width, visible}.",
+      "default": [],
+      "x-awi-writer": "host"
+    },
+    "y_min": {
+      "$ref": "instrument.schema.json#/$defs/optionalNumber",
+      "description": "Analog y range; null (either limit): scaled to the data.",
+      "default": null,
+      "x-awi-writer": "host"
+    },
+    "y_max": {
+      "$ref": "instrument.schema.json#/$defs/optionalNumber",
+      "default": null,
+      "x-awi-writer": "host"
+    },
+    "analog_fraction": {
+      "type": "number",
+      "minimum": 0.1,
+      "maximum": 0.9,
+      "description": "Share of the height given to the analog traces.",
+      "default": 0.55,
+      "x-awi-writer": "host"
+    }
+  },
+  "x-awi-messages": [
+    {
+      "$ref": "digitalgraph.schema.json#/x-awi-messages/0"
+    },
+    {
+      "$ref": "digitalgraph.schema.json#/x-awi-messages/1"
+    }
+  ]
+}

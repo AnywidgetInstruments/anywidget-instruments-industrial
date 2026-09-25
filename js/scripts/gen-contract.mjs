@@ -70,7 +70,8 @@ function flatten(load, file) {
   for (const [name, prop] of Object.entries(schema.properties || {})) {
     properties[name] = { ...(properties[name] || {}), ...resolveProperty(load, prop, file) };
   }
-  messages.push(...(schema["x-awi-messages"] || []));
+  // a message may be a $ref to a message of another schema (shared protocol)
+  messages.push(...(schema["x-awi-messages"] || []).map((m) => (m.$ref ? resolveRef(load, m.$ref, file)[0] : m)));
   framework = framework.concat(schema["x-awi-framework-traits"] || []);
   return { schema, properties, messages, framework };
 }
