@@ -1,0 +1,15 @@
+{
+  "description": "WaveformChart (CHART-001, CHART-104): samples appended to the history, then the value of each trace under cursors at x-axis positions (linear interpolation, NaN outside the kept history). Values are exact in float32, the type the front end receives.",
+  "cases": [
+    { "name": "strip, one trace, interpolation", "history": 8, "n_traces": 1, "update_mode": "strip", "dt": 0.5,
+      "appends": [[[0], [1], [2], [4]]], "cursors": [[0, [0]], [0.25, [0.5]], [1.25, [3]], [1.5, [4]], [2, ["nan"]], [-1, ["nan"]]] },
+    { "name": "strip, two traces, oldest samples dropped", "history": 3, "n_traces": 2, "update_mode": "strip", "dt": 1,
+      "appends": [[[1, 10], [2, 20]], [[3, 30], [4, 40], [5, 50]]], "cursors": [[1, ["nan", "nan"]], [2, [3, 30]], [3.5, [4.5, 45]], [4, [5, 50]]] },
+    { "name": "sweep: x wraps around the history", "history": 4, "n_traces": 1, "update_mode": "sweep", "dt": 1,
+      "appends": [[[0], [1], [2], [3], [4], [5]]], "cursors": [[0, [4]], [1, [5]], [2, [2]], [3, [3]], [2.5, [2.5]]] },
+    { "name": "scope: absolute index", "history": 4, "n_traces": 1, "update_mode": "scope", "dt": 2,
+      "appends": [[[0], [1], [2], [3], [4]]], "cursors": [[8, [4]], [6, [3]], [2, [1]], [0, ["nan"]]] },
+    { "name": "a NaN sample propagates to its neighbours' interpolation", "history": 4, "n_traces": 1, "update_mode": "strip", "dt": 1,
+      "appends": [[[1], ["nan"], [3]]], "cursors": [[0, [1]], [0.5, ["nan"]], [2, [3]]] }
+  ]
+}

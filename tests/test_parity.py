@@ -13,6 +13,7 @@ import math
 import pathlib
 from typing import Any
 
+import numpy as np
 import pytest
 import traitlets as t
 
@@ -322,3 +323,23 @@ def test_radar_ranges(case: dict[str, Any]) -> None:
             assert given[k] == expected
         else:
             assert [0, max(s["values"][k] for s in r.value)] == expected
+
+
+WAVEFORM = _load("waveform.json")["cases"]
+
+
+@pytest.mark.parametrize("case", WAVEFORM, ids=[c["name"] for c in WAVEFORM])
+def test_waveform_values_at(case: dict[str, Any]) -> None:
+    w = ai.WaveformChart(
+        history=case["history"],
+        n_traces=case["n_traces"],
+        update_mode=case["update_mode"],
+        dt=case["dt"],
+    )
+    for rows in case["appends"]:
+        w.append(np.array([[_num(v) for v in r] for r in rows], dtype=float))
+    for x, expected in case["cursors"]:
+        got = w.values_at(x)
+        assert [None if math.isnan(v) else v for v in got] == [
+            None if isinstance(v, str) else v for v in expected
+        ], (case["name"], x)

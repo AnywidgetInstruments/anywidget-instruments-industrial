@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://s-celles.github.io/anywidget-instruments/schema/graph.schema.json",
+  "title": "GraphWidget",
+  "description": "Features shared by every graph: cursors, annotations, zoom and export (CHART-104 .. CHART-107).",
+  "type": "object",
+  "x-awi-abstract": true,
+  "x-awi-class": "GraphWidget",
+  "allOf": [
+    {
+      "$ref": "instrument.schema.json"
+    }
+  ],
+  "properties": {
+    "mode": {
+      "default": "indicator"
+    },
+    "size": {
+      "default": [
+        480,
+        240
+      ]
+    },
+    "cursors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "x"
+        ],
+        "properties": {
+          "x": {
+            "type": "number",
+            "description": "Position in x-axis units."
+          },
+          "name": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Cursors {x, name, color} (CHART-104). Dragged or typed by the operator, also on indicators; a host may complete a missing name as C<n> (Python does).",
+      "default": [],
+      "x-awi-writer": "both"
+    },
+    "cursor_values": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "x": {
+            "type": "number"
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "$ref": "instrument.schema.json#/$defs/float"
+            },
+            "description": "Value of each trace or line under the cursor."
+          }
+        }
+      },
+      "description": "Readout of the cursors for the host program, {name, x, values}, computed by the host from its data. The front end draws its own readout and does not read this trait.",
+      "default": [],
+      "readOnly": true,
+      "x-awi-writer": "host"
+    },
+    "annotations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "number"
+          },
+          "y": {
+            "type": "number"
+          },
+          "text": {
+            "type": "string",
+            "description": "Plain text, drawn as canvas text."
+          },
+          "color": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Text annotations {x, y, text, color} in data coordinates (CHART-105).",
+      "default": [],
+      "x-awi-writer": "host"
+    },
+    "export": {
+      "type": "boolean",
+      "description": "Offer CSV, PNG and SVG downloads in the toolbar (CHART-107).",
+      "default": true,
+      "x-awi-writer": "host"
+    },
+    "x_unit": {
+      "type": "string",
+      "default": "",
+      "x-awi-writer": "host"
+    },
+    "unit": {
+      "type": "string",
+      "default": "",
+      "x-awi-writer": "host"
+    }
+  }
+}

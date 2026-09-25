@@ -19,7 +19,7 @@ import pytest
 import traitlets as t
 
 import anywidget_instruments as ai
-from anywidget_instruments import _base, _boolean, _numeric, _polar, _process
+from anywidget_instruments import _base, _boolean, _graph, _numeric, _polar, _process
 
 PKG = pathlib.Path(ai.__file__).parent
 SCHEMA_DIR = PKG / "schema"
@@ -41,6 +41,7 @@ CLASSES: dict[str, type] = {
     "BooleanWidget": _boolean.BooleanWidget,
     "ProcessObject": _process.ProcessObject,
     "_SeriesWidget": _polar._SeriesWidget,
+    "GraphWidget": _graph.GraphWidget,
 }
 WIDGETS = sorted(CONTRACT["widgets"].items())
 IDS = [title for title, _ in WIDGETS]
@@ -102,6 +103,7 @@ MIGRATED = {
     "SmithChart",
     "RadarChart",
     "PictureControl",
+    "WaveformChart",
 }
 
 
@@ -294,7 +296,27 @@ def _picture_messages() -> Any:
     return pic, sent
 
 
-@pytest.mark.parametrize("make", [_picture_messages], ids=lambda f: f.__name__.strip("_"))
+def _waveform_messages() -> Any:
+    w = ai.WaveformChart(history=4, n_traces=2)
+    sent = _sent(w)
+    w.append([1.0, 2.0])
+    w.append(np.arange(12.0).reshape(6, 2))  # more than history: the last 4 are sent
+    w._handle_front_msg(w, {"type": "sync_request"}, [])
+    w.clear()
+    return w, sent
+
+
+def _buffer_bytes(w: Any, content: dict[str, Any], spec: dict[str, Any]) -> int:
+    """Expected size of a buffer from its dtype and shape (message fields or widget traits)."""
+    n = int(np.dtype(spec["dtype"]).itemsize)
+    for dim in spec.get("shape", []):
+        n *= int(content[dim] if dim in content else getattr(w, dim))
+    return n
+
+
+@pytest.mark.parametrize(
+    "make", [_picture_messages, _waveform_messages], ids=lambda f: f.__name__.strip("_")
+)
 def test_sent_messages_conform(make: Any) -> None:
     """Messages sent by the host conform to x-awi-messages: fields and buffer count."""
     w, sent = make()
@@ -310,3 +332,5 @@ def test_sent_messages_conform(make: Any) -> None:
             assert refs == list(range(len(buffers)))
         else:
             assert len(buffers) == len(m["buffers"])
+            for b, bspec in zip(buffers, m["buffers"], strict=True):
+                assert len(b) == _buffer_bytes(w, content, bspec), (content, bspec)

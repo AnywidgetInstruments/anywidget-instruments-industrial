@@ -1,7 +1,6 @@
 // Event log (IND-090..093): newest first, filter by category and text, CSV.
 import { clear, html } from "../core/dom.js";
 import type { AnyModel } from "../core/model.js";
-// @ts-expect-error: JavaScript module, converted with the graphs
 import { download } from "../core/plot.js";
 import { BaseView } from "../core/view.js";
 import type { EventLogTraits } from "../generated/contract.js";

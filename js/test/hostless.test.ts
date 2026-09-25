@@ -611,6 +611,38 @@ describe("Picture control without a kernel", () => {
   });
 });
 
+describe("Waveform chart without a kernel", () => {
+  const f32 = (...v: number[]) => new Float32Array(v).buffer;
+
+  test("samples from ArrayBuffer messages; a short buffer is not over-read", async () => {
+    const { model, body } = mount({ ...defaults("WaveformChart"), label: "Scope", n_traces: 2, history: 4, unit: "V" });
+    model.fireMsg({ type: "snapshot", n_points: 2, total: 2 }, [f32(1, 10, 2, 20)]);
+    model.fireMsg({ type: "append", n_points: 3, total: 5 }, [f32(3, 30, 4, 40)]); // one row missing
+    await frame();
+    expect(body.getAttribute("aria-label")).toBe("Scope: latest 4, 40 V");
+    model.fireMsg({ type: "clear" }, []);
+    await frame();
+    expect(body.getAttribute("aria-label")).toBe("Scope: latest NaN, NaN V");
+  });
+
+  test("cursors and the Y range set by the operator are written back", async () => {
+    const { model, el } = mount({ ...defaults("WaveformChart"), history: 10, dt: 0.5, cursors: [{ x: 1 }] });
+    model.fireMsg({ type: "snapshot", n_points: 10, total: 10 }, [f32(...Array.from({ length: 10 }, (_, i) => i))]);
+    await frame();
+    const field = el.querySelector('input[aria-label="Position of cursor 1"]') as HTMLInputElement;
+    expect(field.value).toBe("1");
+    field.value = "2.5";
+    field.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+    expect(model.get("cursors")).toEqual([{ x: 2.5 }]);
+    const axes = el.querySelector('button[aria-label="Set the axis ranges"]') as HTMLButtonElement;
+    axes.click();
+    (el.querySelector('input[aria-label="Y minimum"]') as HTMLInputElement).value = "-5";
+    (el.querySelector('input[aria-label="Y maximum"]') as HTMLInputElement).value = "5";
+    (el.querySelector('input[aria-label="X maximum"]') as HTMLInputElement).dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+    expect(model.saved.at(-1)).toMatchObject({ autoscale_y: false, y_min: -5, y_max: 5 });
+  });
+});
+
 describe("Tank without a kernel", () => {
   test("indicator by default, markers read through the schema", async () => {
     const { root, body, el } = mount({ ...defaults("Tank"), value: 3.2, max: 4, unit: "m", markers: [0.5, "x", 3.5], hi: 3, hihi: 3.5 });

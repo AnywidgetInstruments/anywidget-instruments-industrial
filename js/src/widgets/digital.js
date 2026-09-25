@@ -136,7 +136,7 @@ export class DigitalView extends PlotView {
     if (this.mixed) this.drawAnalog(ctx, analogArea, r, colors);
     this.drawDigital(ctx, digitalArea, r, colors);
     this.drawOverlays(ctx, area, r, colors);
-    const traces = this.mixed ? Array.from({ length: this.nTraces }, (_, j) => traceStyle(this.model, j, colors)) : [];
+    const traces = this.mixed ? Array.from({ length: this.nTraces }, (_, j) => traceStyle(this.model.get("traces"), j, colors)) : [];
     drawLegend(this.legend, traces, true);
     this.body.setAttribute("aria-label", `${this.get("label") || "Digital waveform graph"}: ${this.nLines} lines, ${this.nSamples} samples`);
   }
@@ -158,7 +158,7 @@ export class DigitalView extends PlotView {
     const i0 = Math.max(0, Math.floor((r.x[0] - this.x0) / this.dt));
     const i1 = Math.min(this.nAnalog, Math.ceil((r.x[1] - this.x0) / this.dt) + 1);
     for (let j = 0; j < this.nTraces; j++) {
-      const t = traceStyle(this.model, j, colors);
+      const t = traceStyle(this.model.get("traces"), j, colors);
       if (!t.visible) continue;
       ctx.strokeStyle = t.color;
       ctx.lineWidth = t.width;
@@ -235,7 +235,7 @@ export class DigitalView extends PlotView {
   csvRows() {
     const rows = this.rows();
     const header = ["x", ...rows.map((r) => r.name.trim())];
-    for (let j = 0; j < this.nTraces; j++) header.push(traceStyle(this.model, j, this.colors()).name);
+    for (let j = 0; j < this.nTraces; j++) header.push(traceStyle(this.model.get("traces"), j, this.colors()).name);
     const out = [header];
     const r = this.ranges();
     const n = Math.max(this.nSamples, this.nAnalog);

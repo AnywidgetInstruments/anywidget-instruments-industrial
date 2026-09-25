@@ -13,6 +13,7 @@ import processCases from "../../tests/parity/process.json";
 import resolvedCases from "../../tests/parity/resolved.json";
 import machineCases from "../../tests/parity/statemachine.json";
 import stateCases from "../../tests/parity/states.json";
+import waveformCases from "../../tests/parity/waveform.json";
 import { type AlarmLevel, type AlarmLimits, computeAlarmLevel } from "../src/contract/alarm.js";
 import { acknowledgeRows, type AlarmRow, expireShelving, localIso, shelveRow, unshelveRow } from "../src/contract/alarms.js";
 import { type AnnEvent, annunciatorTransition, hornOn, type Panel, panelAction, type Sequence, setProcess } from "../src/contract/annunciator.js";
@@ -26,6 +27,7 @@ import { loopModeChange, operatorSet } from "../src/contract/pid.js";
 import { positionDemand, processCommand, type ProcessState } from "../src/contract/process.js";
 import { availableCommands, type Machine, nextState, normalizeMachine, SC } from "../src/contract/statemachine.js";
 import { readTrait } from "../src/contract/traits.js";
+import { Ring, valuesAt } from "../src/contract/waveform.js";
 import { parseNumber } from "../src/core/scale.js";
 import { CONTRACTS } from "../src/generated/contract.js";
 
@@ -245,6 +247,19 @@ describe("polar family", () => {
   for (const c of polarCases.radar_ranges) {
     test(c.name, () => {
       expect(c.expected.map((_, k) => radarRange(c.ranges, c.values, k))).toEqual(c.expected);
+    });
+  }
+});
+
+describe("waveform chart", () => {
+  for (const c of waveformCases.cases) {
+    test(c.name, () => {
+      const ring = new Ring(c.history, c.n_traces);
+      for (const rows of c.appends) ring.push(Float32Array.from(rows.flat().map((v) => parseNumber(v))), rows.length);
+      for (const [x, expected] of c.cursors as Array<[number, Array<number | string>]>) {
+        const got = valuesAt(ring, x, { mode: c.update_mode, dt: c.dt });
+        expect(got.map((v) => (Number.isNaN(v) ? null : v)), `${c.name} x=${x}`).toEqual(expected.map((v) => (typeof v === "string" ? null : v)));
+      }
     });
   }
 });

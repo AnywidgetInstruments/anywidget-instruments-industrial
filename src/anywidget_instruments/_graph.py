@@ -7,7 +7,7 @@ from typing import Any
 
 import traitlets as t
 
-from ._base import InstrumentWidget, float_serializers
+from ._base import InstrumentWidget, float_serializers, mode_trait, size_trait
 
 
 class GraphWidget(InstrumentWidget):
@@ -30,6 +30,8 @@ class GraphWidget(InstrumentWidget):
 
     _default_mode = "indicator"
     _default_size = (480, 240)
+    mode = mode_trait(_default_mode)
+    size = size_trait(*_default_size)
 
     cursors = t.List(t.Dict()).tag(sync=True)
     cursor_values = t.List(t.Dict(), read_only=True).tag(sync=True, **float_serializers)
