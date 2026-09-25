@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 import anywidget_instruments as ai
-from anywidget_instruments import _liveness
+from anywidget_instruments import _liveness, _picture
 
 
 def capture(w):
@@ -35,12 +35,19 @@ def test_commands_are_batched_into_one_message():
     assert len(sent) == 1  # nothing pending
 
 
-def test_auto_flush_outside_ipython():
+def test_auto_flush_outside_ipython(monkeypatch):
+    # a window long enough that a busy machine cannot split the two commands
+    # (with 20 ms, a pause between them sent two messages)
+    monkeypatch.setattr(_picture, "FLUSH_DELAY", 0.5)
+    _picture._flush_all()  # no timer of an earlier test still running
+    if _picture._timer is not None:
+        _picture._timer.join()
     pic = ai.PictureControl()
     sent = capture(pic)
     pic.polygon([(0, 0), (10, 0), (5, 8)], fill="green")
     pic.polyline([[0, 0], [1, 1], [2, 0]])
-    time.sleep(0.2)
+    assert sent == []  # coalesced, not sent yet
+    time.sleep(1.0)
     assert len(sent) == 1
     assert [c["op"] for c in sent[0][0]["commands"]] == ["polygon", "polygon"]
     assert sent[0][0]["commands"][1]["closed"] is False

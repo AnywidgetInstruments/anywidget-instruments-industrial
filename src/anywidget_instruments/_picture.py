@@ -16,6 +16,8 @@ _pending: weakref.WeakSet[PictureControl] = weakref.WeakSet()
 _hook_installed = False
 _timer: threading.Timer | None = None
 _timer_lock = threading.Lock()
+#: Seconds during which drawing commands issued outside IPython are coalesced.
+FLUSH_DELAY = 0.02
 
 
 def _flush_all(*_args: Any) -> None:
@@ -45,7 +47,7 @@ def _schedule_flush() -> None:
     global _timer
     with _timer_lock:
         if _timer is None or not _timer.is_alive():
-            _timer = threading.Timer(0.02, _flush_all)
+            _timer = threading.Timer(FLUSH_DELAY, _flush_all)
             _timer.daemon = True
             try:
                 _timer.start()
