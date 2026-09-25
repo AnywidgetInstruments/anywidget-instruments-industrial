@@ -20,10 +20,12 @@ test("saved widget state renders read-only without the kernel", async ({ page })
   const knob = widget(page, "Saved knob");
   await expect(knob.locator(".awi-value")).toHaveText("33.0");
   await page.keyboard.press("Control+s");
+  // while the file is being written the contents API may answer without
+  // content: poll until the saved notebook carries the widget state
   await expect.poll(async () => {
     const nb = await page.evaluate(async (NB) => (await fetch(`/api/contents/${NB}`)).json(), NB);
-    return JSON.stringify(nb.content.metadata.widgets ?? {}).includes("Saved knob");
-  }).toBe(true);
+    return JSON.stringify(nb?.content?.metadata?.widgets ?? {}).includes("Saved knob");
+  }, { timeout: 15_000 }).toBe(true);
 
   // shut the kernel down, then reopen the notebook
   await page.evaluate(async () => {
