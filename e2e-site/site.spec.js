@@ -51,6 +51,13 @@ const DEMOS = {
     // Resetting completes by itself on the simulation clock
     await expect(machine.locator(".awi-sm-label-current")).toHaveText("▶ Idle", { timeout: 30_000 });
   },
+  operating_modes: async (page) => {
+    const gemma = widget(page, "GEMMA");
+    await expect(gemma.locator(".awi-sm-label-current")).toHaveText("▶ A1", LOAD);
+    await widget(page, "Situation").getByRole("treeitem", { name: /^Emergency stop/ }).click();
+    await expect(gemma.locator(".awi-sm-label-current")).toHaveText("▶ D1", { timeout: 30_000 });
+    await expect(widget(page, "PackML machine states").locator(".awi-sm-label-current")).toHaveText("▶ Aborted");
+  },
   lift_station: async (page) => {
     await expect(body(page, "Wet well level")).toHaveAttribute("aria-valuenow", /\d/, LOAD);
     await body(page, "Simulate a pump fault").click();
