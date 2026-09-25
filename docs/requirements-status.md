@@ -1,7 +1,7 @@
 # Requirements status
 
 Status of each requirement of the
-[specification](specification.md) (version 0.11).
+[specification](specification.md) (version 0.12).
 
 Legend: ✅ implemented and tested · 🟡 partial / not verifiable here · ⬜ not started
 
@@ -132,6 +132,13 @@ JupyterLab / Notebook 7 / marimo (`e2e/`).
 | IND-117 | C | ✅ | Logarithmic and secondary Y axes of `WaveformChart` |
 | IND-118 | C | ✅ | `value_labels` |
 | IND-119 | C | ✅ | `EquipmentTree` |
+| IND-120 | S | ⬜ | `SvgPanel` |
+| IND-121 | S | ⬜ | Role convention `awi:<role>=<name>;…` |
+| IND-122 | S | ⬜ | Indicator roles |
+| IND-123 | S | ⬜ | Control roles |
+| IND-124 | S | ⬜ | Entry fields of `step` controls |
+| IND-125 | S | ⬜ | `problems` |
+| IND-126 | C | ⬜ | SVG templates |
 
 Tests: py (`tests/test_industrial.py`), js (`js/test/industrial.test.js`), e2e
 (`allwidgets.spec.js`, both directions for each object), visual baselines;

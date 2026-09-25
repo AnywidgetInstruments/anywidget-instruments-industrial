@@ -8,7 +8,7 @@
 | Author | Sébastien Celles |
 | Document type | Software requirements specification |
 | Notation | EARS (Easy Approach to Requirements Syntax) |
-| Version | 0.11 |
+| Version | 0.12 |
 | Date | 2026-09-25 |
 | Status | Baseline for version 1.0 |
 
@@ -38,6 +38,7 @@ provides them.
 - Hardware I/O drivers (DAQ, VISA, Modbus, OPC UA)
 - Graphical drag-and-drop panel editor
 - Historian or database logging
+- Authentication widgets (password, PIN or login fields): a widget cannot keep a secret and a notebook cannot enforce an access control; access control belongs to the host and to the control system (see the safety notice)
 
 ### 1.3 Intended Users
 
@@ -477,6 +478,18 @@ IEC 62682 (alarm management), IEC 60073 (indicator colors), ISA-TR88.00.02
 | IND-118 | C | Where a numeric widget has `value_labels`, it shall draw each label at its value on the scale instead of a number and show the label of the current value in its readout (a discrete selector such as OFF / LOW / HIGH on a slide or a knob). |
 | IND-119 | C | The library shall provide an **EquipmentTree** widget showing a hierarchy of equipment (site, area, unit, module, as in IEC 62264), each node optionally with a status, that the user can expand, collapse and select; the selected node shall be sent to the kernel. |
 
+### 18.13 SVG Faceplates
+
+| ID | Pri. | Requirement |
+|---|---|---|
+| IND-120 | S | The library shall provide an **SvgPanel** widget displaying an SVG drawing supplied by the user (for example a front panel drawn in a vector editor), sanitized as skins are (STYLE-006), scaled to the widget size. |
+| IND-121 | S | Where an element of the drawing carries a role, written `awi:<role>=<name>` followed by optional `;<option>=<value>` pairs in its editor label (`inkscape:label`) or in its `data-awi` attribute, the SvgPanel shall bind the element to the entry `<name>` of its value; elements without a role shall be drawn unchanged. |
+| IND-122 | S | The SvgPanel shall animate bound elements from their values: text (`text`, with format and unit), rotation between two angles about a pivot read from the drawing or given (`rotate`), scaling from an edge (`scale`), visibility (`show`), one drawing among several (`state` with `case` children) and fill color (`color`). |
+| IND-123 | S | While the SvgPanel is in control mode, the SvgPanel shall make elements with a control role operable with the pointer and the keyboard, with an ARIA role and name: toggle (`button`), pressed while held (`momentary`), set a value (`set`) and increment within limits (`step`); the new value shall be sent to the kernel. |
+| IND-124 | S | Where an SvgPanel has `step` controls, the SvgPanel shall also offer an entry field for each of their values, checked against their limits (API-014, NUM-010). |
+| IND-125 | S | If a role is unknown or an option is invalid, then the SvgPanel shall report the element and the reason (in the `problems` trait from Python, and as a visible message without a kernel) and still draw the rest of the panel. |
+| IND-126 | C | The library shall provide SVG templates (a voltmeter, a pressure gauge, a pilot lamp, a three-position selector, a tank) that give the same behaviour with different drawings, and document the role convention so that users draw their own. |
+
 ---
 
 ## 19. Host Independence (HOST)
@@ -576,6 +589,7 @@ authors in the documentation.
 | Logarithmic and secondary chart axes | `y_scale`, `y2_*` traits of WaveformChart | IND-117 |
 | Discrete positions on a slide or a knob | `value_labels` trait | IND-118 |
 | Plant hierarchy browser | EquipmentTree | IND-119 |
+| Custom front panel drawn in a vector editor | SvgPanel, templates | IND-120 to IND-126 |
 
 ---
 
@@ -602,3 +616,4 @@ authors in the documentation.
 | 0.9 | HOST-009 .. HOST-012: nested widgets through the host widget manager, binary traits as buffers or base64 text, continuous integration against divergence of Python, schemas and front end, operator actions sent and applied; 19.1 extended to operator actions and process events. |
 | 0.10 | IND-110 .. IND-119: hexadecimal, binary and octal formats, bit field, recipe table, XY graph, setpoint pointer, logarithmic and secondary chart axes, value labels, equipment tree. |
 | 0.11 | IND-064 .. IND-066: GEMMA and ISA-88 / IEC 61512-1 state models, state titles, groups and global commands, models published in the trait contract. |
+| 0.12 | IND-120 .. IND-126: SVG faceplates (SvgPanel, role convention, indicator and control roles, entry fields, problem report, templates). Authentication widgets added to the out-of-scope list. |
