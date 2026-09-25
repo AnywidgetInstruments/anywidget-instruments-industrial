@@ -57,15 +57,21 @@ export function zoomedRanges(full: Ranges, zoom: Zoom | null): Ranges {
   return { x, y: zoom.y || full.y };
 }
 
-/** Rectangle (pixels in the plot area) → zoom state. */
-export function zoomFromRect(full: Ranges, current: Zoom | null, area: Area, r: Rect): Zoom {
+/** y at fraction `f` of a linear Y range. */
+export const linearYAt = (y: Range, f: number): number => y[0] + f * (y[1] - y[0]);
+
+/**
+ * Rectangle (pixels in the plot area) → zoom state. `yAt` gives the y at a
+ * fraction of the Y range (not linear on a logarithmic axis).
+ */
+export function zoomFromRect(full: Ranges, current: Zoom | null, area: Area, r: Rect, yAt: (y: Range, f: number) => number = linearYAt): Zoom {
   const cur = zoomedRanges(full, current);
   const fx = (px: number): number => (px - area.x) / area.w;
   const fy = (py: number): number => 1 - (py - area.y) / area.h;
   const xa = cur.x[0] + Math.min(fx(r.x0), fx(r.x1)) * (cur.x[1] - cur.x[0]);
   const xb = cur.x[0] + Math.max(fx(r.x0), fx(r.x1)) * (cur.x[1] - cur.x[0]);
-  const ya = cur.y[0] + Math.min(fy(r.y0), fy(r.y1)) * (cur.y[1] - cur.y[0]);
-  const yb = cur.y[0] + Math.max(fy(r.y0), fy(r.y1)) * (cur.y[1] - cur.y[0]);
+  const ya = yAt(cur.y, Math.min(fy(r.y0), fy(r.y1)));
+  const yb = yAt(cur.y, Math.max(fy(r.y0), fy(r.y1)));
   const span = full.x[1] - full.x[0] || 1;
   return { fx: [(xa - full.x[0]) / span, (xb - full.x[0]) / span], y: [ya, yb] };
 }
@@ -339,9 +345,24 @@ export class PlotView<T extends GraphWidgetTraits = GraphWidgetTraits> extends B
     return zoomedRanges(this.fullRange(), this.zoom);
   }
 
+  /** Fraction of the Y range at value `y` (subclasses: logarithmic axes). */
+  yFrac(y: number, range: Range): number {
+    return (y - range[0]) / (range[1] - range[0] || 1);
+  }
+
+  /** Value at fraction `f` of the Y range (inverse of yFrac). */
+  yAt(range: Range, f: number): number {
+    return linearYAt(range, f);
+  }
+
+  /** Tick positions of the Y axis. */
+  yTicks(a: number, b: number): number[] {
+    return niceTicks(a, b, 4);
+  }
+
   mappers(area: Area, r: Ranges): Mappers {
     const X = (x: number): number => area.x + ((x - r.x[0]) / (r.x[1] - r.x[0] || 1)) * area.w;
-    const Y = (y: number): number => area.y + area.h - ((y - r.y[0]) / (r.y[1] - r.y[0] || 1)) * area.h;
+    const Y = (y: number): number => area.y + area.h - this.yFrac(y, r.y) * area.h;
     const invX = (px: number): number => r.x[0] + ((px - area.x) / area.w) * (r.x[1] - r.x[0]);
     return { X, Y, invX };
   }
@@ -419,7 +440,7 @@ export class PlotView<T extends GraphWidgetTraits = GraphWidgetTraits> extends B
         this.zoomRect = null;
         this.zoomBox.hidden = true;
         if (Math.abs(rect.x1 - rect.x0) > 4 && Math.abs(rect.y1 - rect.y0) > 4) {
-          this.zoom = zoomFromRect(this.fullRange(), this.zoom, area, rect);
+          this.zoom = zoomFromRect(this.fullRange(), this.zoom, area, rect, (y, f) => this.yAt(y, f));
           this.schedule();
         }
       };
@@ -526,7 +547,7 @@ export class PlotView<T extends GraphWidgetTraits = GraphWidgetTraits> extends B
     if (yTicks) {
       ctx.textAlign = "right";
       ctx.textBaseline = "middle";
-      for (const v of niceTicks(r.y[0], r.y[1], 4)) {
+      for (const v of this.yTicks(r.y[0], r.y[1])) {
         const y = Math.round(Y(v)) + 0.5;
         ctx.beginPath();
         ctx.moveTo(area.x, y);
@@ -654,7 +675,7 @@ export class PlotView<T extends GraphWidgetTraits = GraphWidgetTraits> extends B
     const { X, Y } = this.mappers(area, r);
     const root = el("svg", { xmlns: NS, width: w, height: h, viewBox: `0 0 ${w} ${h}`, "font-family": "sans-serif", "font-size": 10 });
     root.appendChild(el("rect", { x: area.x, y: area.y, width: area.w, height: area.h, fill: colors.bg, stroke: colors.fg }));
-    for (const v of niceTicks(r.y[0], r.y[1], 4)) {
+    for (const v of this.yTicks(r.y[0], r.y[1])) {
       root.appendChild(el("line", { x1: area.x, x2: area.x + area.w, y1: Y(v), y2: Y(v), stroke: colors.grid }));
       root.appendChild(el("text", { x: area.x - 4, y: Y(v), "text-anchor": "end", "dominant-baseline": "middle", fill: colors.fg }, formatValue(v, "%.3g")));
     }

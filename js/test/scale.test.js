@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  angleOf, autoscale, clamp, fromFraction, keyStep, linearHit, niceTicks, parseNumber, polar, position,
+  angleOf, autoscale, clamp, logAt, logFrac, logRange, logTicks, fromFraction, keyStep, linearHit, niceTicks, parseNumber, polar, position,
   rotaryHit, snap, ticks, toFraction,
 } from "../src/core/scale.js";
 
@@ -110,5 +110,27 @@ describe("niceTicks", () => {
     expect(niceTicks(-1.1, 1.1, 4)).toEqual([-1, -0.5, 0, 0.5, 1]);
     expect(niceTicks(2, 6, 5)).toEqual([2, 3, 4, 5, 6]);
     expect(niceTicks(0, 0.0001, 2)).toEqual([0, 0.00005, 0.0001]);
+  });
+});
+
+describe("logarithmic axes (IND-117)", () => {
+  it("fraction and its inverse", () => {
+    expect(logFrac(10, [1, 100])).toBeCloseTo(0.5);
+    expect(logAt([1, 100], 0.5)).toBeCloseTo(10);
+    expect(logFrac(0, [1, 100])).toBeNaN();
+    expect(logFrac(-3, [1, 100])).toBeNaN();
+  });
+  it("range: fixed, lower end at or below 0, autoscaled to decades", () => {
+    expect(logRange(0.5, 200)).toEqual([0.5, 200]);
+    expect(logRange(0, 1000)).toEqual([1, 1000]);
+    expect(logRange(-1, -0.5)).toEqual([1, 10]);
+    expect(logRange(0.03, 420, true)).toEqual([0.01, 1000]);
+    expect(logRange(5, 5, true)).toEqual([0.1, 10]); // constant data: a decade below it
+  });
+  it("ticks: decades, or 1-2-5 inside one decade", () => {
+    expect(logTicks(1, 1000)).toEqual([1, 10, 100, 1000]);
+    expect(logTicks(2, 40)).toEqual([2, 5, 10, 20]);
+    expect(logTicks(1e-6, 1e12).length).toBeLessThanOrEqual(9);
+    expect(logTicks(0, 10)).toEqual([]);
   });
 });

@@ -83,6 +83,21 @@ mixed.set_analog(v)
 mixed.set_data(trigger)
 ```
 
+A `WaveformChart` also takes a logarithmic Y axis (`y_scale="log"`: decade
+ticks, values at or below 0 are not drawn, a `y_min` at or below 0 starts the
+axis at `y_max / 1000`) and a secondary axis on the right for the traces
+marked `"axis": "right"`, with its own range (`y2_min`, `y2_max`, or
+`autoscale_y2`) and unit (`y2_unit`). The legend marks those traces
+"(right axis)" and the cursor readout gives each value in its own unit.
+
+```python
+vac = ai.WaveformChart(
+    n_traces=2, dt=1.0, x_unit="s", unit="mbar", y_scale="log", y_min=1e-4, y_max=1e3,
+    y2_max=100, y2_unit="%",
+    traces=[{"name": "Chamber pressure"}, {"name": "Valve opening", "axis": "right"}],
+)
+```
+
 ### Setpoint pointer
 
 A `Gauge` or a `Meter` with a `setpoint` draws it as a second pointer: a

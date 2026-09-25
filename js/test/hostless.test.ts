@@ -55,12 +55,12 @@ function mount(state: State) {
 
 const frame = () => vi.advanceTimersByTimeAsync(40);
 
-/** Text of the CSV export of a graph (CHART-107). */
-async function csvOf(el: HTMLElement): Promise<string> {
+/** Text of the CSV (or another) export of a graph (CHART-107). */
+async function csvOf(el: HTMLElement, button = "Download data as CSV"): Promise<string> {
   const blobs: Blob[] = [];
   Object.assign(URL, { createObjectURL: (b: Blob) => (blobs.push(b), "blob:x"), revokeObjectURL: () => {} });
   vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
-  (el.querySelector('button[aria-label="Download data as CSV"]') as HTMLButtonElement).click();
+  (el.querySelector(`button[aria-label="${button}"]`) as HTMLButtonElement).click();
   vi.useRealTimers(); // FileReader completes on real timers
   try {
     return await new Promise<string>((resolve) => {
@@ -658,6 +658,30 @@ describe("Waveform chart without a kernel", () => {
     (el.querySelector('input[aria-label="Y maximum"]') as HTMLInputElement).value = "5";
     (el.querySelector('input[aria-label="X maximum"]') as HTMLInputElement).dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
     expect(model.saved.at(-1)).toMatchObject({ autoscale_y: false, y_min: -5, y_max: 5 });
+  });
+
+  test("logarithmic Y scale and secondary right axis (IND-117)", async () => {
+    const { model, el } = mount({
+      ...defaults("WaveformChart"), history: 4, n_traces: 2, size: [320, 200],
+      y_scale: "log", y_min: 0, y_max: 1000, y2_min: 0, y2_max: 100, y2_unit: "%",
+      traces: [{ name: "Pressure" }, { name: "Valve", axis: "right" }],
+    });
+    model.fireMsg({ type: "snapshot", n_points: 4, total: 4 }, [f32(1, 0, 10, 50, 0, 100, 1000, 25)]);
+    await frame();
+    const svg = await csvOf(el, "Download image as SVG");
+    const texts = [...svg.matchAll(/<text[^>]*>([^<]*)</g)].map((m) => m[1]);
+    // y_min <= 0 on a log axis: the range starts at y_max / 1000, decade ticks
+    expect(texts.slice(0, 4)).toEqual(["1", "10", "100", "1000"]);
+    expect(texts.slice(-6)).toEqual(["0", "20", "40", "60", "80", "100"]); // right axis
+    const [left, right] = [...svg.matchAll(/<path d="([^"]*)"/g)].map((m) => m[1]);
+    // 0 is not drawn on the log axis: the line breaks there
+    expect(left.match(/M/g)).toHaveLength(2);
+    // the area is 8..176 in y; 1 is at the bottom, 1000 at the top, 10 one third up
+    const ys = (d: string) => [...d.matchAll(/[ML][\d.]+ ([\d.]+)/g)].map((m) => Number(m[1]));
+    expect(ys(left)).toEqual([176, 120, 8]);
+    // the right trace uses the linear 0..100 axis
+    expect(ys(right)).toEqual([176, 92, 8, 134]);
+    expect(el.querySelector(".awi-legend")?.textContent).toContain("Valve (right axis)");
   });
 });
 

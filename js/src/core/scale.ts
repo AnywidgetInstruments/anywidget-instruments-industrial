@@ -206,3 +206,50 @@ export function niceTicks(min: number, max: number, count = 5): number[] {
   }
   return out;
 }
+
+/** Fraction of a logarithmic range [a, b] (a > 0) at y; NaN for y <= 0 (IND-117). */
+export function logFrac(y: number, [a, b]: [number, number]): number {
+  if (!(y > 0) || !(a > 0) || !(b > a)) return NaN;
+  return Math.log10(y / a) / Math.log10(b / a);
+}
+
+/** Value at fraction f of a logarithmic range [a, b] (inverse of logFrac). */
+export function logAt([a, b]: [number, number], f: number): number {
+  return a * (b / a) ** f;
+}
+
+/**
+ * Range of a logarithmic axis (IND-117): the fixed range [lo, hi], or with
+ * `auto` the decades enclosing the positive data [lo, hi]. A lower end at or
+ * below 0 becomes hi / 1000; a range without a positive end becomes [1, 10].
+ */
+export function logRange(lo: number, hi: number, auto = false): [number, number] {
+  if (!(hi > 0) || !Number.isFinite(hi)) return [1, 10];
+  if (!(lo > 0) || !Number.isFinite(lo) || lo >= hi) lo = auto && lo > 0 ? lo / 10 : hi / 1000;
+  if (!auto) return [lo, hi];
+  const a = 10 ** Math.floor(Math.log10(lo) + 1e-9);
+  let b = 10 ** Math.ceil(Math.log10(hi) - 1e-9);
+  if (b <= a) b = a * 10;
+  return [Number(a.toPrecision(12)), Number(b.toPrecision(12))];
+}
+
+/**
+ * Ticks of a logarithmic axis: the powers of ten in [a, b], with 2 and 5
+ * times them when fewer than two decades are shown, or linear ticks inside
+ * a narrow range.
+ */
+export function logTicks(a: number, b: number): number[] {
+  if (!(a > 0) || !(b > a)) return [];
+  const inRange = (v: number): boolean => v >= a * (1 - 1e-9) && v <= b * (1 + 1e-9);
+  const decades: number[] = [];
+  for (let k = Math.ceil(Math.log10(a) - 1e-9); k <= Math.floor(Math.log10(b) + 1e-9); k++) decades.push(Number((10 ** k).toPrecision(12)));
+  if (decades.length >= 2) return decades.length > 8 ? decades.filter((_, i) => i % Math.ceil(decades.length / 8) === 0) : decades;
+  const out: number[] = [];
+  for (let k = Math.floor(Math.log10(a)); k <= Math.ceil(Math.log10(b)); k++) {
+    for (const m of [1, 2, 5]) {
+      const v = Number((m * 10 ** k).toPrecision(12));
+      if (inRange(v)) out.push(v);
+    }
+  }
+  return out.length >= 2 ? out : niceTicks(a, b, 4).filter((v) => v > 0);
+}

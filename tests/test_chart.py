@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+from traitlets import TraitError
 
 import anywidget_instruments as ai
 
@@ -77,3 +78,19 @@ def test_shape_change_resets():
 
 def test_chart_is_indicator():
     assert ai.WaveformChart(mode="control").mode == "indicator"
+
+
+def test_log_scale_and_secondary_axis_traits():
+    # IND-117: logarithmic Y scale, traces assigned to a secondary right axis.
+    chart = ai.WaveformChart(
+        n_traces=2,
+        y_scale="log",
+        y_min=1,
+        y_max=1e4,
+        y2_max=100,
+        y2_unit="%",
+        traces=[{"name": "Pressure"}, {"name": "Valve", "axis": "right"}],
+    )
+    assert (chart.y_scale, chart.y2_min, chart.y2_max) == ("log", 0.0, 100.0)
+    with pytest.raises(TraitError):
+        chart.y_scale = "ln"

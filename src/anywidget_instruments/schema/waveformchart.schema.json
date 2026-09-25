@@ -65,6 +65,37 @@
       "default": false,
       "x-awi-writer": "both"
     },
+    "y_scale": {
+      "enum": [
+        "linear",
+        "log"
+      ],
+      "description": "Scale of the left Y axis; on a logarithmic axis values <= 0 are not drawn, and a range reaching 0 or below starts at y_max / 1000 (IND-117).",
+      "default": "linear",
+      "x-awi-writer": "host"
+    },
+    "y2_min": {
+      "type": "number",
+      "description": "Range of the secondary axis on the right, for the traces with axis right, when autoscale_y2 is off (IND-117).",
+      "default": 0.0,
+      "x-awi-writer": "host"
+    },
+    "y2_max": {
+      "type": "number",
+      "default": 1.0,
+      "x-awi-writer": "host"
+    },
+    "autoscale_y2": {
+      "type": "boolean",
+      "default": false,
+      "x-awi-writer": "host"
+    },
+    "y2_unit": {
+      "type": "string",
+      "description": "Unit of the secondary axis, shown under it and after the values of its traces under a cursor.",
+      "default": "",
+      "x-awi-writer": "host"
+    },
     "paused": {
       "type": "boolean",
       "description": "Freeze the display; samples keep arriving (CHART-009).",
@@ -93,10 +124,17 @@
           },
           "visible": {
             "type": "boolean"
+          },
+          "axis": {
+            "enum": [
+              "left",
+              "right"
+            ],
+            "description": "Y axis of the trace (default left)."
           }
         }
       },
-      "description": "Optional style of each trace {name, color, width, visible}.",
+      "description": "Optional style of each trace {name, color, width, visible, axis}.",
       "default": [],
       "x-awi-writer": "host"
     },

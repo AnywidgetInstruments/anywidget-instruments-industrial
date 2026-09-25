@@ -23,7 +23,13 @@ class WaveformChart(GraphWidget):
       * ``"sweep"``: a moving cursor overwrites the oldest data.
 
     ``traces`` optionally describes each trace:
-    ``{"name": str, "color": css_color, "width": float, "visible": bool}``.
+    ``{"name": str, "color": css_color, "width": float, "visible": bool,
+    "axis": "left" | "right"}``.
+
+    Axes (IND-117): ``y_scale="log"`` makes the Y axis logarithmic (values
+    <= 0 are not drawn); traces with ``"axis": "right"`` are drawn against a
+    secondary axis on the right, ranged by ``y2_min`` / ``y2_max`` or by
+    their data with ``autoscale_y2``, in ``y2_unit``.
     """
 
     _kind = t.Unicode("waveformchart").tag(sync=True)
@@ -38,6 +44,11 @@ class WaveformChart(GraphWidget):
     y_min = t.Float(-1.0).tag(sync=True)
     y_max = t.Float(1.0).tag(sync=True)
     autoscale_y = t.Bool(False).tag(sync=True)
+    y_scale = t.Enum(["linear", "log"], default_value="linear").tag(sync=True)
+    y2_min = t.Float(0.0).tag(sync=True)
+    y2_max = t.Float(1.0).tag(sync=True)
+    autoscale_y2 = t.Bool(False).tag(sync=True)
+    y2_unit = t.Unicode("").tag(sync=True)
     paused = t.Bool(False).tag(sync=True)
     dt = t.Float(1.0).tag(sync=True)
     traces = t.List(t.Dict()).tag(sync=True)

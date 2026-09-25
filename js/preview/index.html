@@ -149,6 +149,7 @@ const specs = [
     { step: "React", temp: 82.5, time: 120, agitator: "fast", vacuum: true },
     { step: "Cool", temp: 30, time: 45, agitator: "slow", vacuum: false }], size: [560, 150] },
   { ...base, _kind: "xygraph", mode: "indicator", label: "XYGraph (pump curve)", series: [{ name: "Head", color: "", style: "line", width: 1.5 }, { name: "Measured", color: "", style: "markers", width: 1.5 }], x_min: 0, x_max: null, y_min: 0, y_max: null, show_legend: true, cursors: [{ x: 75, name: "C1", color: "" }], cursor_values: [], annotations: [], export: true, x_unit: "m³/h", unit: "m", value: {}, size: [420, 240] },
+  { ...base, _kind: "waveformchart", mode: "indicator", label: "WaveformChart (log, right axis)", history: 300, n_traces: 2, update_mode: "strip", y_scale: "log", y_min: 1e-4, y_max: 1e3, autoscale_y: false, y2_min: 0, y2_max: 100, autoscale_y2: false, y2_unit: "%", paused: false, dt: 1, x_unit: "s", unit: "mbar", traces: [{ name: "Chamber pressure" }, { name: "Valve opening", axis: "right" }], show_legend: true, cursors: [{ x: 150, name: "C1", color: "" }], cursor_values: [], annotations: [], export: true, size: [420, 240] },
 ];
 const grid = document.getElementById("grid");
 window.models = [];
@@ -192,7 +193,12 @@ for (const s of specs) {
     const dv = (a) => new DataView(a.buffer);
     m.emit("msg:custom", { type: "data", clear: true, sets: [["Head", n], ["Measured", 3]] }, [dv(q), dv(head), dv(new Float64Array([30, 60, 90])), dv(new Float64Array([40.5, 35.0, 26.3]))]);
   }
-  if (s._kind === "waveformchart") {
+  if (s._kind === "waveformchart" && s.y_scale === "log") {
+    const n = 300;
+    const rows = new Float32Array(n * 2);
+    for (let i = 0; i < n; i++) { rows[2 * i] = 1000 * Math.exp(-i / 25) + 2e-4; rows[2 * i + 1] = Math.min(80, i / 1.5); }
+    m.emit("msg:custom", { type: "append", n_points: n, total: n }, [new DataView(rows.buffer)]);
+  } else if (s._kind === "waveformchart") {
     const n = 600;
     const rows = new Float32Array(n * 2);
     for (let i = 0; i < n; i++) { rows[2 * i] = Math.sin(i / 20); rows[2 * i + 1] = Math.cos(i / 35) + (rand() - 0.5) * 0.2; }
