@@ -103,7 +103,9 @@ export class LinearView extends NumericView<LinearTraits> {
     }
 
     // scale
-    const tk = ticks(this.min, this.max, Number(this.get("ticks")), Number(this.get("minor_ticks")), this.scaleType);
+    const named = this.valueLabels.filter((l) => l.value >= this.min && l.value <= this.max);
+    // IND-118: named values replace the numeric ticks
+    const tk = named.length ? { major: named.map((l) => l.value), minor: [] } : ticks(this.min, this.max, Number(this.get("ticks")), Number(this.get("minor_ticks")), this.scaleType);
     const fmt = tickFormat(this.get("format"));
     const tickPath = (vals: number[], len: number): string =>
       vals
@@ -119,7 +121,7 @@ export class LinearView extends NumericView<LinearTraits> {
       const attrs = this.vertical
         ? { x: t.x0 - 17, y: p, "text-anchor": "end", "dominant-baseline": "central" }
         : { x: p, y: t.y1 + 24, "text-anchor": "middle" };
-      layer.appendChild(svgText(formatValue(v, fmt), { class: "awi-tick-label", ...attrs }));
+      layer.appendChild(svgText(named.find((l) => l.value === v)?.label ?? formatValue(v, fmt), { class: "awi-tick-label", ...attrs }));
     }
 
     // tank level markers
@@ -133,7 +135,7 @@ export class LinearView extends NumericView<LinearTraits> {
   }
 
   override draw(): void {
-    const key = JSON.stringify(["min", "max", "scale", "ticks", "minor_ticks", "format", "orientation", "markers", "fill_color", "show_limits", "lolo", "lo", "hi", "hihi", "size", "segments", "skin"].map((k) => this.get(k)));
+    const key = JSON.stringify(["min", "max", "scale", "ticks", "minor_ticks", "format", "orientation", "markers", "fill_color", "show_limits", "lolo", "lo", "hi", "hihi", "size", "segments", "skin", "value_labels"].map((k) => this.get(k)));
     if (key !== this._staticKey || !this.track) {
       this._staticKey = key;
       this.buildStatic();

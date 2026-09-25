@@ -925,6 +925,35 @@ describe("Setpoint pointer (IND-116)", () => {
   });
 });
 
+describe("Value labels (IND-118)", () => {
+  const LABELS = [{ value: 2, label: "HIGH" }, { value: 0, label: "OFF" }, { value: 1, label: "LOW" }];
+
+  test("a knob selector shows the labels on its scale and in its readout; a label can be typed", async () => {
+    const { model, el, body } = mount({ ...defaults("Knob"), value: 1, min: 0, max: 2, step: 1, value_labels: LABELS, label: "Fan" });
+    await frame();
+    expect([...el.querySelectorAll(".awi-tick-label")].map((t) => t.textContent)).toEqual(["OFF", "LOW", "HIGH"]);
+    expect(el.querySelector(".awi-tick-minor")?.getAttribute("d")).toBe("");
+    expect(body.getAttribute("aria-valuetext")).toBe("LOW");
+    const entry = el.querySelector(".awi-entry") as HTMLInputElement;
+    expect(entry.value).toBe("LOW");
+    expect(entry.getAttribute("aria-label")).toBe("Fan value (OFF, LOW, HIGH)");
+    entry.value = "high";
+    entry.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+    expect(model.get("value")).toBe(2);
+    await frame();
+    expect(body.getAttribute("aria-valuetext")).toBe("HIGH");
+    model.set("value", 1.5); // between two labels: the number
+    await frame();
+    expect(body.getAttribute("aria-valuetext")).toBe("1.5");
+  });
+
+  test("a tank names its levels; invalid items are dropped without a kernel", async () => {
+    const { el } = mount({ ...defaults("Tank"), value: 3, max: 4, value_labels: [{ value: 0.5, label: "Low" }, { value: 3.5, label: "Overflow" }, { value: "x", label: "bad" }, { value: 2 }] });
+    await frame();
+    expect([...el.querySelectorAll(".awi-tick-label")].map((t) => t.textContent)).toEqual(["Low", "Overflow"]);
+  });
+});
+
 describe("Tank without a kernel", () => {
   test("indicator by default, markers read through the schema", async () => {
     const { root, body, el } = mount({ ...defaults("Tank"), value: 3.2, max: 4, unit: "m", markers: [0.5, "x", 3.5], hi: 3, hihi: 3.5 });

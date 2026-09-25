@@ -50,3 +50,39 @@ export class ScaleGuard {
     return this.last;
   }
 }
+
+export interface ValueLabel {
+  value: number;
+  label: string;
+}
+
+/**
+ * Usable `value_labels` sorted by value (IND-118). The kernel refuses an
+ * invalid item; without a kernel an item lacking a finite value or a label
+ * is dropped, and of two items with the same value the first is kept.
+ */
+export function normalizeValueLabels(raw: unknown): ValueLabel[] {
+  const out: ValueLabel[] = [];
+  for (const item of Array.isArray(raw) ? raw : []) {
+    const it = (item && typeof item === "object" ? item : {}) as { value?: unknown; label?: unknown };
+    if (typeof it.value !== "number" || !Number.isFinite(it.value) || typeof it.label !== "string" || !it.label.trim()) continue;
+    if (out.some((o) => o.value === it.value)) continue;
+    out.push({ value: it.value, label: it.label });
+  }
+  return out.sort((a, b) => a.value - b.value);
+}
+
+/** Label of `value` (within 1e-9 of the scale span), or null. Python: value_label_of. */
+export function valueLabelOf(labels: ValueLabel[], value: number, lo: number, hi: number): string | null {
+  if (!Number.isFinite(value)) return null;
+  const tol = 1e-9 * Math.max(1, Math.abs(hi - lo));
+  for (const it of labels) if (Math.abs(it.value - value) <= tol) return it.label;
+  return null;
+}
+
+/** Value of the label `text` (case and surrounding spaces ignored), or null. Python: value_of_label. */
+export function valueOfLabel(labels: ValueLabel[], text: string): number | null {
+  const key = text.trim().toLowerCase();
+  for (const it of labels) if (it.label.trim().toLowerCase() === key) return it.value;
+  return null;
+}

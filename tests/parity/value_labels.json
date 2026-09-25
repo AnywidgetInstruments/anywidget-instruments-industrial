@@ -1,0 +1,19 @@
+{
+  "description": "value_labels (IND-118): the label shown for a value (null: the number is shown) and the value of a typed label (null: not a label). Labels are sorted by value.",
+  "cases": [
+    {
+      "labels": [{ "value": 2, "label": "HIGH" }, { "value": 0, "label": "OFF" }, { "value": 1, "label": "LOW" }],
+      "min": 0, "max": 2,
+      "sorted": ["OFF", "LOW", "HIGH"],
+      "label_of": [[0, "OFF"], [1, "LOW"], [2, "HIGH"], [1.5, null], [1.0000000001, "LOW"], [1.00001, null], ["nan", null]],
+      "value_of": [["low", 1], ["  High ", 2], ["MED", null], ["", null]]
+    },
+    {
+      "labels": [{ "value": 0.25, "label": "¼" }, { "value": 1000, "label": "Full" }],
+      "min": 0, "max": 1000,
+      "sorted": ["¼", "Full"],
+      "label_of": [[0.25, "¼"], [0.2500001, "¼"], [0.26, null], [1000, "Full"]],
+      "value_of": [["full", 1000], ["¼", 0.25]]
+    }
+  ]
+}

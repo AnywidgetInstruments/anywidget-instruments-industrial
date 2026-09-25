@@ -1,6 +1,6 @@
 // Shared behaviour of numeric widgets: value text, alarm and range badges,
 // keyboard / wheel interaction and ARIA attributes.
-import { coerceValue, type Scale, ScaleGuard } from "../contract/numeric.js";
+import { coerceValue, normalizeValueLabels, type Scale, ScaleGuard, type ValueLabel, valueLabelOf, valueOfLabel } from "../contract/numeric.js";
 import { html, parseSkin, setAttr, setAttrs, setHidden, setText, svg } from "../core/dom.js";
 import { checkEntry } from "../core/entry.js";
 import { formatValue, withUnit } from "../core/format.js";
@@ -14,7 +14,7 @@ export { checkEntry };
 export const NUMERIC_TRAITS = [
   "value", "min", "max", "step", "unit", "scale", "ticks", "minor_ticks", "format",
   "lolo", "lo", "hi", "hihi", "show_limits", "alarm_level", "animate", "animation_ms",
-  "entry", "coerce",
+  "entry", "coerce", "value_labels",
 ];
 
 const ALARM_TEXT: Record<string, string> = { lolo: "LOLO", lo: "LO", hi: "HI", hihi: "HIHI" };
@@ -94,6 +94,19 @@ export class NumericView<T extends object = NumericTraits> extends BaseView<T> {
     return coerceValue(v, s.min, s.max, !!this.get("coerce"));
   }
 
+  /** Named values of the scale, sorted (IND-118). */
+  get valueLabels(): ValueLabel[] {
+    return normalizeValueLabels(this.get("value_labels"));
+  }
+
+  /** Readout of a value: its label (IND-118), or the formatted number with its unit. */
+  displayText(v: number, withUnitText = true): string {
+    const label = valueLabelOf(this.valueLabels, v, this.min, this.max);
+    if (label !== null) return label;
+    const text = formatValue(v, this.get("format") as string);
+    return withUnitText ? withUnit(text, this.get("unit") as string) : text;
+  }
+
   /** Position of the current value; for invalid values the pointer stays put (NUM-007). */
   pos(): Position & { fraction: number } {
     const p = position(this.value, this.min, this.max, this.scaleType);
@@ -139,9 +152,7 @@ export class NumericView<T extends object = NumericTraits> extends BaseView<T> {
     r.classList.toggle("awi-animate", !!this.get("animate"));
     r.style.setProperty("--awi-anim", `${Math.min(300, Number(this.get("animation_ms")) || 0)}ms`);
 
-    const format = this.get("format") as string;
-    const unit = this.get("unit") as string;
-    const text = withUnit(formatValue(v, format), unit);
+    const text = this.displayText(v);
     setText(this.valueText, text);
     this.renderEntry(v);
     // A11Y-003: state conveyed by text, not only by color.
@@ -181,13 +192,14 @@ export class NumericView<T extends object = NumericTraits> extends BaseView<T> {
     if (this.entryEl.disabled !== !this.interactive) this.entryEl.disabled = !this.interactive;
     setText(this.entryUnit, unit);
     const label = (this.get("label") as string) || this.kind;
-    setAttr(this.entryEl, "aria-label", `${label} value (${formatValue(this.min, format)} to ${formatValue(this.max, format)})`);
+    const named = this.valueLabels;
+    const choices = named.length ? named.map((l) => l.label).join(", ") : `${formatValue(this.min, format)} to ${formatValue(this.max, format)}`;
+    setAttr(this.entryEl, "aria-label", `${label} value (${choices})`);
     if (document.activeElement !== this.entryEl) this.resetEntry(v);
   }
 
   resetEntry(v: number = this.value): void {
-    const format = this.get("format") as string;
-    this._entryShown = Number.isFinite(v) ? formatValue(v, format) : "";
+    this._entryShown = Number.isFinite(v) ? this.displayText(v, false) : "";
     this.entryEl.value = this._entryShown;
     setAttr(this.entryEl, "placeholder", Number.isFinite(v) ? null : formatValue(v));
     this.showEntryError("");
@@ -202,6 +214,12 @@ export class NumericView<T extends object = NumericTraits> extends BaseView<T> {
   /** Validate and send the typed value (NUM-010); rejected entries stay for correction. */
   commitEntry(): void {
     if (!this.interactive) return this.resetEntry();
+    const named = valueOfLabel(this.valueLabels, this.entryEl.value);
+    if (named !== null) {
+      this.showEntryError("");
+      this.commit(named, true);
+      return this.resetEntry(named);
+    }
     const r = checkEntry(this.entryEl.value, { min: this.min, max: this.max, step: this.step, unit: (this.get("unit") as string) || "", coerce: !!this.get("coerce"), format: this.get("format") as string });
     if (!r.ok) return this.showEntryError(r.reason);
     this.showEntryError("");

@@ -92,10 +92,32 @@ marked `"axis": "right"`, with its own range (`y2_min`, `y2_max`, or
 
 ```python
 vac = ai.WaveformChart(
-    n_traces=2, dt=1.0, x_unit="s", unit="mbar", y_scale="log", y_min=1e-4, y_max=1e3,
-    y2_max=100, y2_unit="%",
+    n_traces=2,
+    dt=1.0,
+    x_unit="s",
+    unit="mbar",
+    y_scale="log",
+    y_min=1e-4,
+    y_max=1e3,
+    y2_max=100,
+    y2_unit="%",
     traces=[{"name": "Chamber pressure"}, {"name": "Valve opening", "axis": "right"}],
 )
+```
+
+### Named values
+
+`value_labels` names values of a numeric scale: a discrete selector (OFF /
+LOW / HIGH on a knob or a slide), the levels of a tank. The scale shows the
+labels at their values instead of numbers, the readout shows the label of the
+current value (the number between two labels), and a label can be typed in
+the value field (case ignored). `value_label` gives the current label in
+Python.
+
+```python
+fan = ai.Knob(0, min=0, max=2, step=1, value_labels={0: "OFF", 1: "LOW", 2: "HIGH"}, label="Fan")
+fan.value = 2
+fan.value_label  # 'HIGH'
 ```
 
 ### Setpoint pointer

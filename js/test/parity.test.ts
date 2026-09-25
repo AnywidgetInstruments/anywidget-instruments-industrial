@@ -21,6 +21,7 @@ import synopticCases from "../../tests/parity/synoptic.json";
 import trendCases from "../../tests/parity/trend.json";
 import waveformCases from "../../tests/parity/waveform.json";
 import xyCases from "../../tests/parity/xy.json";
+import valueLabelCases from "../../tests/parity/value_labels.json";
 import { type AlarmLevel, type AlarmLimits, computeAlarmLevel } from "../src/contract/alarm.js";
 import { acknowledgeRows, type AlarmRow, expireShelving, localIso, shelveRow, unshelveRow } from "../src/contract/alarms.js";
 import { type AnnEvent, annunciatorTransition, hornOn, type Panel, panelAction, type Sequence, setProcess } from "../src/contract/annunciator.js";
@@ -29,7 +30,7 @@ import { activeBits, toggleBit } from "../src/contract/bitfield.js";
 import { decodeDigital, digitalValuesAt } from "../src/contract/digital.js";
 import { selectorValue, stackStates } from "../src/contract/industrial.js";
 import { RowRing, rowIndexAt } from "../src/contract/intensity.js";
-import { coerceValue, validScale } from "../src/contract/numeric.js";
+import { coerceValue, normalizeValueLabels, validScale, valueLabelOf, valueOfLabel } from "../src/contract/numeric.js";
 import { nextPeak, type PeakState } from "../src/contract/peak.js";
 import { gammaToZ, radarRange, zToGamma } from "../src/contract/polar.js";
 import { pidState } from "../src/contract/derived.js";
@@ -367,4 +368,13 @@ describe("XY graph", () => {
       }
     });
   }
+});
+
+describe("value labels", () => {
+  test.each(valueLabelCases.cases)("labels %#", (c) => {
+    const labels = normalizeValueLabels(c.labels);
+    expect(labels.map((l) => l.label)).toEqual(c.sorted);
+    for (const [value, expected] of c.label_of as Array<[number | string, string | null]>) expect(valueLabelOf(labels, parseNumber(value), c.min, c.max), String(value)).toBe(expected);
+    for (const [text, expected] of c.value_of as Array<[string, number | null]>) expect(valueOfLabel(labels, text), text).toBe(expected);
+  });
 });

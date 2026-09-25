@@ -450,3 +450,18 @@ def test_xy_values_at(case: dict[str, Any]) -> None:
     for x, expected in case["cursors"]:
         got = [None if math.isnan(v) else v for v in w.values_at(x)]
         assert got == [None if isinstance(v, str) else v for v in expected], (case["name"], x)
+
+
+VALUE_LABELS = _load("value_labels.json")["cases"]
+
+
+@pytest.mark.parametrize("case", VALUE_LABELS)
+def test_value_labels(case: dict[str, Any]) -> None:
+    from anywidget_instruments._numeric import value_label_of, value_of_label
+
+    k = ai.Knob(min=case["min"], max=case["max"], value_labels=case["labels"])
+    assert [it["label"] for it in k.value_labels] == case["sorted"]
+    for value, expected in case["label_of"]:
+        assert value_label_of(k.value_labels, _num(value), k.min, k.max) == expected, value
+    for text, expected in case["value_of"]:
+        assert value_of_label(k.value_labels, text) == expected, text

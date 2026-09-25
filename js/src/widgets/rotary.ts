@@ -158,7 +158,9 @@ export class RotaryView extends NumericView<RotaryTraits> {
     if (this.kind !== "compass" && !multiTurn) {
       layer.appendChild(svg("path", { class: "awi-scale-line", d: arcPath(g.cx, g.cy, g.tick[0], -g.range / 2, g.range / 2) }));
     }
-    const t = ticks(min, turnMax, Number(this.get("ticks")), Number(this.get("minor_ticks")), this.scaleType, { nice: this.kind !== "compass" });
+    const named = this.valueLabels.filter((l) => l.value >= min && l.value <= turnMax);
+    // IND-118: named values replace the numeric ticks
+    const t = named.length ? { major: named.map((l) => l.value), minor: [] } : ticks(min, turnMax, Number(this.get("ticks")), Number(this.get("minor_ticks")), this.scaleType, { nice: this.kind !== "compass" });
     const tickPath = (vals: number[], [r0, r1]: [number, number]): string =>
       vals
         .map((v) => {
@@ -178,7 +180,8 @@ export class RotaryView extends NumericView<RotaryTraits> {
       if (seen.has(key)) continue; // 0 and 360 on full-circle scales
       seen.add(key);
       const [x, y] = polar(g.cx, g.cy, g.label, a);
-      const text = this.kind === "compass" && CARDINALS[Math.round(v) % 360] ? CARDINALS[Math.round(v) % 360] : formatValue(v, tickFormat(fmt));
+      const name = named.find((l) => l.value === v)?.label;
+      const text = name ?? (this.kind === "compass" && CARDINALS[Math.round(v) % 360] ? CARDINALS[Math.round(v) % 360] : formatValue(v, tickFormat(fmt)));
       layer.appendChild(svgText(text, { class: "awi-tick-label", x: x.toFixed(1), y: y.toFixed(1), "text-anchor": "middle", "dominant-baseline": "central" }));
     }
 
@@ -209,7 +212,7 @@ export class RotaryView extends NumericView<RotaryTraits> {
   override draw(): void {
     const key = JSON.stringify([
       "min", "max", "scale", "ticks", "minor_ticks", "format", "angle_range", "turns", "variant",
-      "ranges", "show_limits", "lolo", "lo", "hi", "hihi", "size", "skin",
+      "ranges", "show_limits", "lolo", "lo", "hi", "hihi", "size", "skin", "value_labels",
     ].map((k) => this.get(k)));
     if (key !== this._staticKey || !this.g) {
       this._staticKey = key;

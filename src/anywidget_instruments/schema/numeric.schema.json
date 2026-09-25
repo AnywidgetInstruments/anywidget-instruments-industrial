@@ -6,7 +6,11 @@
   "type": "object",
   "x-awi-abstract": true,
   "x-awi-class": "NumericWidget",
-  "allOf": [{ "$ref": "instrument.schema.json" }],
+  "allOf": [
+    {
+      "$ref": "instrument.schema.json"
+    }
+  ],
   "properties": {
     "value": {
       "$ref": "instrument.schema.json#/$defs/float",
@@ -14,35 +18,179 @@
       "default": 0,
       "x-awi-writer": "both"
     },
-    "min": { "type": "number", "description": "Lower end of the scale; must be below max, and > 0 on a log scale.", "default": 0, "x-awi-writer": "host" },
-    "max": { "type": "number", "description": "Upper end of the scale.", "default": 100, "x-awi-writer": "host" },
-    "step": { "type": "number", "description": "Values entered by the user snap to min + k * step; 0: no snapping (NUM-005).", "default": 0, "x-awi-writer": "host" },
-    "unit": { "type": "string", "default": "", "x-awi-writer": "host" },
-    "scale": { "enum": ["linear", "log"], "default": "linear", "x-awi-writer": "host" },
-    "ticks": { "type": "integer", "minimum": 1, "description": "Major scale intervals.", "default": 5, "x-awi-writer": "host" },
-    "minor_ticks": { "type": "integer", "minimum": 0, "description": "Minor subdivisions per major interval.", "default": 4, "x-awi-writer": "host" },
-    "format": { "type": "string", "description": "printf-like spec: %.2f, %.3e, %.3g, %.3n (engineering), %.3s (SI prefix) (NUM-004); %X, %x, %b, %o show the value as a hexadecimal, binary or octal integer, with an optional width padded with zeros such as %04X (IND-110), and values are then typed in that base.", "default": "%.1f", "x-awi-writer": "host" },
-    "coerce": { "type": "boolean", "description": "Clamp values to [min, max] instead of rejecting typed values outside it (NUM-010).", "default": false, "x-awi-writer": "host" },
-    "update_rate": { "type": "number", "minimum": 1, "description": "Maximum rate of intermediate values sent while dragging, in Hz (NUM-009).", "default": 30, "x-awi-writer": "host" },
-    "entry": { "type": "boolean", "description": "Editable value field in control mode (API-014).", "default": true, "x-awi-writer": "host" },
-    "animate": { "type": "boolean", "default": false, "x-awi-writer": "host" },
-    "animation_ms": { "type": "integer", "minimum": 0, "maximum": 300, "default": 200, "x-awi-writer": "host" },
-    "lolo": { "$ref": "instrument.schema.json#/$defs/optionalNumber", "description": "Low-low alarm limit (ALARM-001).", "default": null, "x-awi-writer": "host" },
-    "lo": { "$ref": "instrument.schema.json#/$defs/optionalNumber", "description": "Low alarm limit.", "default": null, "x-awi-writer": "host" },
-    "hi": { "$ref": "instrument.schema.json#/$defs/optionalNumber", "description": "High alarm limit.", "default": null, "x-awi-writer": "host" },
-    "hihi": { "$ref": "instrument.schema.json#/$defs/optionalNumber", "description": "High-high alarm limit.", "default": null, "x-awi-writer": "host" },
-    "deadband": { "type": "number", "minimum": 0, "description": "Hysteresis: a level is left only when the value is back past its limit by at least deadband (ALARM-003).", "default": 0, "x-awi-writer": "host" },
-    "show_limits": { "type": "boolean", "description": "Draw the alarm limits on the scale.", "default": false, "x-awi-writer": "host" },
+    "min": {
+      "type": "number",
+      "description": "Lower end of the scale; must be below max, and > 0 on a log scale.",
+      "default": 0,
+      "x-awi-writer": "host"
+    },
+    "max": {
+      "type": "number",
+      "description": "Upper end of the scale.",
+      "default": 100,
+      "x-awi-writer": "host"
+    },
+    "step": {
+      "type": "number",
+      "description": "Values entered by the user snap to min + k * step; 0: no snapping (NUM-005).",
+      "default": 0,
+      "x-awi-writer": "host"
+    },
+    "unit": {
+      "type": "string",
+      "default": "",
+      "x-awi-writer": "host"
+    },
+    "scale": {
+      "enum": [
+        "linear",
+        "log"
+      ],
+      "default": "linear",
+      "x-awi-writer": "host"
+    },
+    "ticks": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Major scale intervals.",
+      "default": 5,
+      "x-awi-writer": "host"
+    },
+    "minor_ticks": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Minor subdivisions per major interval.",
+      "default": 4,
+      "x-awi-writer": "host"
+    },
+    "format": {
+      "type": "string",
+      "description": "printf-like spec: %.2f, %.3e, %.3g, %.3n (engineering), %.3s (SI prefix) (NUM-004); %X, %x, %b, %o show the value as a hexadecimal, binary or octal integer, with an optional width padded with zeros such as %04X (IND-110), and values are then typed in that base.",
+      "default": "%.1f",
+      "x-awi-writer": "host"
+    },
+    "coerce": {
+      "type": "boolean",
+      "description": "Clamp values to [min, max] instead of rejecting typed values outside it (NUM-010).",
+      "default": false,
+      "x-awi-writer": "host"
+    },
+    "update_rate": {
+      "type": "number",
+      "minimum": 1,
+      "description": "Maximum rate of intermediate values sent while dragging, in Hz (NUM-009).",
+      "default": 30,
+      "x-awi-writer": "host"
+    },
+    "entry": {
+      "type": "boolean",
+      "description": "Editable value field in control mode (API-014).",
+      "default": true,
+      "x-awi-writer": "host"
+    },
+    "animate": {
+      "type": "boolean",
+      "default": false,
+      "x-awi-writer": "host"
+    },
+    "animation_ms": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 300,
+      "default": 200,
+      "x-awi-writer": "host"
+    },
+    "value_labels": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "number"
+          },
+          "label": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "label"
+        ]
+      },
+      "description": "Named values, sorted by value (IND-118): the scale shows the labels instead of numbers, the readout the label of the current value (within 1e-9 of the span), and the value field accepts a label (case ignored).",
+      "default": [],
+      "x-awi-writer": "host"
+    },
+    "lolo": {
+      "$ref": "instrument.schema.json#/$defs/optionalNumber",
+      "description": "Low-low alarm limit (ALARM-001).",
+      "default": null,
+      "x-awi-writer": "host"
+    },
+    "lo": {
+      "$ref": "instrument.schema.json#/$defs/optionalNumber",
+      "description": "Low alarm limit.",
+      "default": null,
+      "x-awi-writer": "host"
+    },
+    "hi": {
+      "$ref": "instrument.schema.json#/$defs/optionalNumber",
+      "description": "High alarm limit.",
+      "default": null,
+      "x-awi-writer": "host"
+    },
+    "hihi": {
+      "$ref": "instrument.schema.json#/$defs/optionalNumber",
+      "description": "High-high alarm limit.",
+      "default": null,
+      "x-awi-writer": "host"
+    },
+    "deadband": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Hysteresis: a level is left only when the value is back past its limit by at least deadband (ALARM-003).",
+      "default": 0,
+      "x-awi-writer": "host"
+    },
+    "show_limits": {
+      "type": "boolean",
+      "description": "Draw the alarm limits on the scale.",
+      "default": false,
+      "x-awi-writer": "host"
+    },
     "alarm_level": {
-      "enum": ["normal", "lo", "lolo", "hi", "hihi"],
+      "enum": [
+        "normal",
+        "lo",
+        "lolo",
+        "hi",
+        "hihi"
+      ],
       "description": "Alarm level of value (ALARM-002, ALARM-003). Derived: computed by the host when it owns the state (_session non-empty), otherwise by the front end, which writes it back (HOST-004).",
       "default": "normal",
       "readOnly": true,
       "x-awi-writer": "derived"
     },
-    "raw_min": { "$ref": "instrument.schema.json#/$defs/optionalNumber", "description": "Engineering scaling: raw reading at eng_min (UNIT-003). Used by the host API only.", "default": null, "x-awi-writer": "host" },
-    "raw_max": { "$ref": "instrument.schema.json#/$defs/optionalNumber", "default": null, "x-awi-writer": "host" },
-    "eng_min": { "$ref": "instrument.schema.json#/$defs/optionalNumber", "default": null, "x-awi-writer": "host" },
-    "eng_max": { "$ref": "instrument.schema.json#/$defs/optionalNumber", "default": null, "x-awi-writer": "host" }
+    "raw_min": {
+      "$ref": "instrument.schema.json#/$defs/optionalNumber",
+      "description": "Engineering scaling: raw reading at eng_min (UNIT-003). Used by the host API only.",
+      "default": null,
+      "x-awi-writer": "host"
+    },
+    "raw_max": {
+      "$ref": "instrument.schema.json#/$defs/optionalNumber",
+      "default": null,
+      "x-awi-writer": "host"
+    },
+    "eng_min": {
+      "$ref": "instrument.schema.json#/$defs/optionalNumber",
+      "default": null,
+      "x-awi-writer": "host"
+    },
+    "eng_max": {
+      "$ref": "instrument.schema.json#/$defs/optionalNumber",
+      "default": null,
+      "x-awi-writer": "host"
+    }
   }
 }

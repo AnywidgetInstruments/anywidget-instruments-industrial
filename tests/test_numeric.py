@@ -191,3 +191,15 @@ def test_kernel_values_outside_the_range_are_kept():
     k.value = 50  # NUM-006: shown with an out-of-range marker
     assert k.value == 50.0
     assert k.entry is True
+
+
+def test_value_labels_name_discrete_positions():
+    # IND-118: a dict or a list of {value, label}, sorted; the current label.
+    fan = ai.Knob(1, min=0, max=2, step=1, value_labels={2: "HIGH", 0: "OFF", 1: "LOW"})
+    assert [it["label"] for it in fan.value_labels] == ["OFF", "LOW", "HIGH"]
+    assert fan.value_label == "LOW"
+    fan.value = 1.5
+    assert fan.value_label is None
+    for bad in ([{"value": "x", "label": "A"}], [{"value": 1}], [{"value": 1, "label": "A"}] * 2):
+        with pytest.raises(t.TraitError):
+            fan.value_labels = bad

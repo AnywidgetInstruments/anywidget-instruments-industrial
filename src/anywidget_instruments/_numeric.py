@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import itertools
 import math
 import time
 from typing import Any
@@ -34,6 +35,59 @@ class NumericValue(t.Float):
         return super().validate(obj, value)
 
 
+class ValueLabels(t.List):
+    """``[{"value": number, "label": str}, ...]``; a ``{value: label}`` dict is accepted."""
+
+    def validate(self, obj: Any, value: Any) -> Any:
+        if isinstance(value, dict):
+            value = [{"value": k, "label": v} for k, v in value.items()]
+        return super().validate(obj, value)
+
+
+def normalize_value_labels(raw: list[Any], owner: str = "widget") -> list[dict[str, Any]]:
+    """Checked ``value_labels`` sorted by value (IND-118).
+
+    Each item needs a finite numeric ``value`` and a non-empty string ``label``;
+    two items cannot share a value.
+    """
+    out: list[dict[str, Any]] = []
+    for item in raw:
+        v = item.get("value") if isinstance(item, dict) else None
+        label = item.get("label") if isinstance(item, dict) else None
+        if isinstance(v, bool) or not isinstance(v, (int, float, np.integer, np.floating)):
+            raise t.TraitError(f"{owner}: each value label needs a numeric 'value', got {item!r}")
+        if not math.isfinite(float(v)) or not isinstance(label, str) or not label.strip():
+            raise t.TraitError(
+                f"{owner}: each value label needs a finite 'value' and a 'label', got {item!r}"
+            )
+        out.append({"value": float(v), "label": label})
+    out.sort(key=lambda it: it["value"])
+    for a, b in itertools.pairwise(out):
+        if a["value"] == b["value"]:
+            raise t.TraitError(f"{owner}: two value labels for the value {a['value']:g}")
+    return out
+
+
+def value_label_of(labels: list[dict[str, Any]], value: float, lo: float, hi: float) -> str | None:
+    """Label of ``value`` (within 1e-9 of the scale span), or None (IND-118)."""
+    if not math.isfinite(value):
+        return None
+    tol = 1e-9 * max(1.0, abs(hi - lo))
+    for item in labels:
+        if abs(item["value"] - value) <= tol:
+            return str(item["label"])
+    return None
+
+
+def value_of_label(labels: list[dict[str, Any]], text: str) -> float | None:
+    """Value of the label ``text`` (case and surrounding spaces ignored), or None."""
+    key = text.strip().lower()
+    for item in labels:
+        if str(item["label"]).strip().lower() == key:
+            return float(item["value"])
+    return None
+
+
 def _opt_float() -> Any:
     return t.Float(None, allow_none=True).tag(sync=True)
 
@@ -58,6 +112,11 @@ class NumericWidget(InstrumentWidget):
     Alarms: ``lolo``, ``lo``, ``hi``, ``hihi``, ``deadband``; the resulting level
     is published in ``alarm_level``. ``show_limits`` draws them on the scale.
 
+    Discrete positions (IND-118): ``value_labels`` names values, as
+    ``[{"value": 0, "label": "OFF"}, ...]`` or ``{0: "OFF", 1: "LOW", 2: "HIGH"}``.
+    The scale then shows the labels instead of numbers, the readout shows the
+    label of the current value, and the label can be typed in the value field.
+
     Engineering scaling: set ``raw_min``, ``raw_max``, ``eng_min``, ``eng_max`` and
     call :meth:`set_raw` with the raw reading.
     """
@@ -77,6 +136,8 @@ class NumericWidget(InstrumentWidget):
     entry = t.Bool(True).tag(sync=True)
     animate = t.Bool(False).tag(sync=True)
     animation_ms = t.Int(200, min=0, max=300).tag(sync=True)
+    #: Named values drawn on the scale and shown in the readout (IND-118).
+    value_labels = ValueLabels(t.Dict()).tag(sync=True)
 
     lolo = _opt_float()
     lo = _opt_float()
@@ -111,6 +172,15 @@ class NumericWidget(InstrumentWidget):
             )
         if self.scale == "log" and self.min <= 0:
             raise t.TraitError(f"{type(self).__name__}: a logarithmic scale requires 'min' > 0")
+
+    @t.validate("value_labels")
+    def _check_value_labels(self, proposal: Any) -> list[dict[str, Any]]:
+        return normalize_value_labels(proposal["value"], type(self).__name__)
+
+    @property
+    def value_label(self) -> str | None:
+        """Label of the current value in ``value_labels``, or None (IND-118)."""
+        return value_label_of(self.value_labels, self.value, self.min, self.max)
 
     @t.observe("min", "max", "scale")
     def _on_scale_change(self, _change: Any) -> None:

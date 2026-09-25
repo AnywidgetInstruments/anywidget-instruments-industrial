@@ -127,7 +127,7 @@ JupyterLab / Notebook 7 / marimo (`e2e/`).
 | IND-115 | S | ✅ | `XYGraph`: line, markers, both, step and bar styles, float64 buffers, cursors (readout shared with Python), annotations, zoom, axis ranges, export (py, js, e2e) |
 | IND-116 | S | ✅ | `setpoint` pointer of `Gauge`, `Meter` |
 | IND-117 | C | ✅ | Logarithmic and secondary Y axes of `WaveformChart` |
-| IND-118 | C | ⬜ | `value_labels` |
+| IND-118 | C | ✅ | `value_labels` |
 | IND-119 | C | ⬜ | `EquipmentTree` |
 
 Tests: py (`tests/test_industrial.py`), js (`js/test/industrial.test.js`), e2e
