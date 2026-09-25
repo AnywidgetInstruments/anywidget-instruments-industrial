@@ -24,6 +24,11 @@ by default; every widget switches with `mode`.
 | Recipes and plant structure | `RecipeTable` (I), `XYGraph` (I), `EquipmentTree` (C) | IEC 62264, IEC 61512 (`EquipmentTree` levels) |
 | Layout and session | `Panel`, `SynopticCanvas`, `ThemeSwitch` | |
 
+There is no password or login widget: a widget cannot keep a secret and a
+notebook cannot enforce an access control. See
+[why there is no password field](safety.md#why-there-is-no-password-field)
+for the reasons and what to use instead.
+
 The sections below follow the families of the [specification](specification.md).
 The standards named in this page inspired the widgets; the library does not
 claim conformity with them (see [Standards and references](standards.md)).

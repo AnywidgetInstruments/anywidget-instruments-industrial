@@ -32,6 +32,41 @@ A notebook is not a real-time control system:
   actions: anyone who can use the notebook or the page can operate its
   controls.
 
+## Why there is no password field
+
+The library deliberately provides no password, PIN or login widget, for
+three reasons.
+
+* **A widget cannot keep a secret.** Every trait of a widget is synchronized
+  in clear text between the kernel and the browser. It can be read from the
+  kernel (`widget.value`) by any code running in the notebook, from the
+  widget model in the browser, and it is written into the notebook file when
+  the widget state is saved. Masking the characters on screen would hide the
+  secret from someone looking over the operator's shoulder, not from anyone
+  with access to the notebook.
+* **A check in a notebook protects nothing.** Whoever can use the notebook
+  can run code in its kernel, and therefore read the expected password, set
+  the values of the controls directly, or skip the check. A password prompt
+  would suggest an access control that does not exist.
+* **Access control belongs elsewhere.** Authentication and authorization are
+  the job of the host (the notebook server, JupyterHub, the marimo server
+  or the page that embeds the widgets, behind the organization's identity
+  provider) and of the control system itself (user management of the
+  controller or the supervisory system, zones and conduits of IEC 62443).
+
+What to use instead:
+
+* to type a secret needed by your code (the password of a database or an
+  instrument), use `getpass.getpass()` in Jupyter or a password input of
+  the notebook tool, or read it from an environment variable, a key ring or
+  a secrets manager; never store it in a widget trait;
+* to restrict who can open or run a notebook, use the authentication of the
+  notebook server;
+* to represent a local / remote or maintenance access right on a panel, use
+  a keyed `SelectorSwitch` (`keyed=True, locked=True`): the kernel refuses
+  the operator's changes while it is locked, but it is a simulation of a key
+  switch, not a security measure.
+
 ## Alarms, controllers and state models
 
 * `AlarmIndicator`, `AlarmBanner`, `Annunciator` and `AlarmList` present
