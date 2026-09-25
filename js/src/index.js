@@ -6,6 +6,7 @@ import { AlarmView } from "./widgets/alarm.js";
 import { AlarmListView } from "./widgets/alarmlist.js";
 import { AnnunciatorView } from "./widgets/annunciator.js";
 import { BooleanView } from "./widgets/boolean.js";
+import { BitFieldView } from "./widgets/bitfield.js";
 import { ChartView } from "./widgets/chart.js";
 import { DigitalView } from "./widgets/digital.js";
 import { AnalogIndicatorView, SelectorView, StackLightView } from "./widgets/industrial.js";
@@ -61,6 +62,7 @@ const VIEWS = {
   analogindicator: AnalogIndicatorView,
   selectorswitch: SelectorView,
   stacklight: StackLightView,
+  bitfield: BitFieldView,
   pidfaceplate: PIDView,
   annunciator: AnnunciatorView,
   alarmlist: AlarmListView,

@@ -773,6 +773,35 @@ describe("Hexadecimal and binary display (IND-110)", () => {
   });
 });
 
+describe("Bit field without a kernel", () => {
+  test("a status word as lamps, MSB first, with its hexadecimal value", async () => {
+    const { body, el } = mount({ ...defaults("BitField"), label: "Status", bits: 8, value: 0x13, labels: ["Ready", "Running", "", "", "Fault"], colors: ["", "", "", "", "red"] });
+    await frame();
+    const cells = [...el.querySelectorAll(".awi-bf-bit")] as HTMLButtonElement[];
+    expect(cells.map((c) => c.dataset.bit)).toEqual(["7", "6", "5", "4", "3", "2", "1", "0"]);
+    expect(cells.map((c) => c.getAttribute("aria-pressed"))).toEqual(["false", "false", "false", "true", "false", "false", "true", "true"]);
+    expect(cells[3].textContent).toBe("14Fault");
+    expect(cells[3].style.getPropertyValue("--awi-bf-on")).toBe("red");
+    expect(cells[0].classList.contains("awi-bf-unused")).toBe(true);
+    expect(el.querySelector(".awi-bf-hex")?.textContent).toBe("0x13");
+    expect(body.getAttribute("aria-label")).toBe("Status: 0x13, set: 0 Ready, 1 Running, 4 Fault");
+    // indicator by default: bits cannot be toggled
+    expect(cells[0].disabled).toBe(true);
+  });
+
+  test("control mode: a click toggles a bit and writes the word back (IND-112)", async () => {
+    const { model, el } = mount({ ...defaults("BitField"), mode: "control", bits: 32, value: 0x80000000 });
+    await frame();
+    const bit = (n: number) => el.querySelector(`.awi-bf-bit[data-bit="${n}"]`) as HTMLButtonElement;
+    bit(31).click();
+    expect(model.get("value")).toBe(0);
+    bit(0).click();
+    expect(model.saved.at(-1)).toMatchObject({ value: 1 });
+    await frame();
+    expect(el.querySelector(".awi-bf-hex")?.textContent).toBe("0x00000001");
+  });
+});
+
 describe("Tank without a kernel", () => {
   test("indicator by default, markers read through the schema", async () => {
     const { root, body, el } = mount({ ...defaults("Tank"), value: 3.2, max: 4, unit: "m", markers: [0.5, "x", 3.5], hi: 3, hihi: 3.5 });

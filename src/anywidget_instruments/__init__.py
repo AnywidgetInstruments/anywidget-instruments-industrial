@@ -4,6 +4,7 @@ from ._alarm_logic import ALARM_LEVELS, compute_alarm_level, eng_scale
 from ._alarmlist import AlarmList
 from ._annunciator import ANN_COLORS, ANN_SEQUENCES, ANN_STATES, Annunciator, annunciator_transition
 from ._base import InstrumentWidget
+from ._bitfield import WORD_SIZES, BitField
 from ._boolean import (
     BUTTON_COLORS,
     LAMP_COLORS,
@@ -91,12 +92,14 @@ __all__ = [
     "STYLES",
     "THEMES",
     "THEME_SWITCH_POSITIONS",
+    "WORD_SIZES",
     "AlarmBanner",
     "AlarmIndicator",
     "AlarmList",
     "AnalogIndicator",
     "Annunciator",
     "BarGraph",
+    "BitField",
     "BooleanWidget",
     "Compass",
     "DeviationIndicator",

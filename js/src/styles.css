@@ -718,3 +718,25 @@
 .awi-root .awi-kp-key:focus-visible { outline: 2px solid var(--awi-accent); outline-offset: 1px; }
 .awi-root .awi-kp-key:disabled { opacity: 0.5; cursor: not-allowed; }
 .awi-root .awi-kp-enter { background: var(--awi-fg); color: var(--awi-face); }
+
+/* BitField (IND-111): one lamp per bit, the state also given by 1 / 0 */
+.awi-root.awi-bitfield .awi-body { display: flex; flex-direction: column; gap: 4px; justify-content: center; }
+.awi-root .awi-bf-row { display: flex; gap: 2px; min-width: 0; }
+.awi-root .awi-bf-bit {
+  flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 1px;
+  padding: 2px 0; border: 0; background: none; color: var(--awi-fg); font: inherit; cursor: default;
+}
+.awi-root.awi-control .awi-bf-bit:not(:disabled) { cursor: pointer; }
+.awi-root .awi-bf-bit.awi-bf-nibble { margin-right: 6px; }
+.awi-root .awi-bf-lamp {
+  width: 16px; height: 16px; border-radius: 50%; display: grid; place-items: center;
+  font-size: 9px; line-height: 1; color: var(--awi-ink-on-dark);
+  background: var(--awi-lamp-off); border: 1px solid var(--awi-face-stroke);
+}
+.awi-root .awi-bf-on .awi-bf-lamp { background: var(--awi-bf-on); color: var(--awi-ink-on-light); }
+.awi-root.awi-style-modern .awi-bf-on .awi-bf-lamp { box-shadow: 0 0 4px var(--awi-bf-on); }
+.awi-root .awi-bf-num { font-size: 9px; color: var(--awi-muted); }
+.awi-root .awi-bf-label { font-size: 10px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.awi-root .awi-bf-unused { opacity: 0.45; }
+.awi-root .awi-bf-bit:focus-visible { outline: 2px solid var(--awi-accent); outline-offset: 1px; }
+.awi-root .awi-bf-hex { font-family: ui-monospace, monospace; font-size: 12px; align-self: flex-end; }

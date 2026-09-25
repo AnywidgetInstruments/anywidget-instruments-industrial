@@ -12,7 +12,7 @@ by default; every widget switches with `mode`.
 | Controls, continuous | `Knob` (C), `Dial` (C), `FillSlide` (C), `NumericEntry` (C, keypad); a numeric entry field on every numeric control | |
 | Controls, discrete | `PushButton` (C), `ToggleSwitch` (C), `RockerSwitch` (C), `SlideSwitch` (C), `SelectorSwitch` (C), `EmergencyStop` (C) | IEC 60073 (button and lamp colors) |
 | Indicators, analog | `Gauge`, `Meter`, `VUMeter`, `Tank`, `Thermometer`, `SevenSegment`, `Compass`, `AnalogIndicator` (I) | ISA-101 (`AnalogIndicator`) |
-| Indicators, discrete | `LED`, `StackLight` (I) | IEC 60073 |
+| Indicators, discrete | `LED`, `StackLight`, `BitField` (I) | IEC 60073 |
 | Graphs, time | `WaveformChart`, `IntensityChart`, `DigitalWaveformGraph`, `MixedSignalGraph` (I) | |
 | Graphs, trends | `TrendChart`, `Sparkline` (I) | ISA-101 |
 | Compact indicators | `DeviationIndicator`, `BarGraph`, `KPITile` (I) | ISA-101, ISO 22400 (`oee`) |
@@ -296,3 +296,39 @@ second Enter.
 ```python
 sp = ai.NumericEntry(2.2, min=0, max=4, unit="m", label="Level setpoint", confirm_delta=0.5)
 ```
+
+## Registers, recipes and plant structure
+
+### Hexadecimal, binary and octal display
+
+Every numeric widget takes `%X` / `%x` (hexadecimal), `%b` (binary) and `%o`
+(octal) formats, with a zero-padded width such as `%04X` or `%016b`: the value
+is shown as an integer in that base, on its readout and its scale. The entry
+field and the keypad then take values typed in that base (the keypad shows A
+to F in hexadecimal); `0x`, `0b` and `0o` prefixes are accepted everywhere.
+
+```python
+reg = ai.NumericEntry(0x1F, min=0, max=0xFFFF, format="%04X", label="Holding register 40001")
+```
+
+### BitField
+
+A status or fault word as a row of lamps, one per bit, most significant bit
+first, with the word in hexadecimal. Each bit has a label (bits without one are
+dimmed) and an optional on color; the lamp also shows `1` or `0`, so that the
+state does not rely on color. In control mode a click on a bit toggles it and
+sends the new word.
+
+```python
+status = ai.BitField(
+    0x0013,
+    bits=16,
+    label="Drive status word",
+    labels=["Ready", "Running", "Warning", "", "Fault"],
+    colors=["", "", "#f59e0b", "", "#dc2626"],
+)
+status.bit(4)  # True
+status.active_labels()  # ['Ready', 'Running', 'Fault']
+status.set_bit(2)  # sets the warning bit
+```
+

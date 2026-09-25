@@ -250,6 +250,15 @@ test.describe("every widget", () => {
     await expect.poll(() => py('print(W["SelectorSwitch"].value)')).toBe("OFF");
   });
 
+  test("BitField: both directions (IND-111, IND-112)", async () => {
+    await widget(page, "BitField").scrollIntoViewIfNeeded();
+    await py('W["BitField"].value = 0x81');
+    await expect(body("BitField")).toHaveAttribute("aria-label", "BitField: 0x81, set: 0 Ready, 7");
+    await py('W["BitField"].mode = "control"');
+    await widget(page, "BitField").getByRole("button", { name: "Running, bit 1" }).click();
+    await expect.poll(() => py('print(hex(W["BitField"].value))')).toBe("0x83");
+  });
+
   test("StackLight: kernel -> front", async () => {
     await widget(page, "StackLight").scrollIntoViewIfNeeded();
     await py('W["StackLight"].set("green", "blink")');

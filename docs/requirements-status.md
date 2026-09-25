@@ -122,7 +122,7 @@ JupyterLab / Notebook 7 / marimo (`e2e/`).
 | IND-090 … IND-093 | S/C | ✅ | `EventLog`: `log()`, `max_events`, category chips, filter by category and text, CSV, `connect()` / `disconnect()` audit trail (py, js, e2e) |
 | IND-100 … IND-104 | S | ✅ | `DeviationIndicator`, `Sparkline` (binary history), `BarGraph` (per-bar alarm levels), `KPITile` with `oee()`, `NumericEntry` keypad with range check and `confirm_delta` (py, js, e2e) |
 | IND-110 | S | ✅ | `%x`, `%X`, `%b`, `%o` with zero-padded width in every numeric widget and scale; entry field and keypad take values in that base (A..F keys in hexadecimal) (js) |
-| IND-111, IND-112 | S | ⬜ | `BitField` |
+| IND-111, IND-112 | S | ✅ | `BitField`: 8, 16 or 32 bits, labels and colors per bit, word in hexadecimal, bits toggled in control mode (py, js, e2e) |
 | IND-113, IND-114 | S/C | ⬜ | `RecipeTable` |
 | IND-115 | S | ⬜ | `XYGraph` |
 | IND-116 | S | ⬜ | `setpoint` pointer of `Gauge`, `Meter` |

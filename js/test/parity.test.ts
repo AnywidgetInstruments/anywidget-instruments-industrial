@@ -5,6 +5,7 @@ import alarmCases from "../../tests/parity/alarm_level.json";
 import alarmTables from "../../tests/parity/alarms.json";
 import annCases from "../../tests/parity/annunciator.json";
 import barCases from "../../tests/parity/bars.json";
+import bitfieldCases from "../../tests/parity/bitfield.json";
 import digitalCases from "../../tests/parity/digital.json";
 import intensityCases from "../../tests/parity/intensity.json";
 import numericCases from "../../tests/parity/numeric.json";
@@ -22,6 +23,7 @@ import { type AlarmLevel, type AlarmLimits, computeAlarmLevel } from "../src/con
 import { acknowledgeRows, type AlarmRow, expireShelving, localIso, shelveRow, unshelveRow } from "../src/contract/alarms.js";
 import { type AnnEvent, annunciatorTransition, hornOn, type Panel, panelAction, type Sequence, setProcess } from "../src/contract/annunciator.js";
 import { barLevels, normalizeBars } from "../src/contract/bars.js";
+import { activeBits, toggleBit } from "../src/contract/bitfield.js";
 import { decodeDigital, digitalValuesAt } from "../src/contract/digital.js";
 import { selectorValue, stackStates } from "../src/contract/industrial.js";
 import { RowRing, rowIndexAt } from "../src/contract/intensity.js";
@@ -325,5 +327,12 @@ describe("synoptic background", () => {
   test.each(synopticCases.cases)("$name", (c) => {
     const bytes = Uint8Array.from(c.hex.match(/../g) ?? [], (h) => parseInt(h, 16));
     expect(imageMime(bytes)).toBe(c.mime);
+  });
+});
+
+describe("bit field", () => {
+  test.each(bitfieldCases.cases)("word $value on $bits bits", (c) => {
+    expect(activeBits(c.value, c.bits)).toEqual(c.active);
+    for (const [bit, expected] of c.toggle) expect(toggleBit(c.value, bit, c.bits)).toBe(expected);
   });
 });

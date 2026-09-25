@@ -92,6 +92,10 @@ Generated from the docstrings (DOC-001).
 ::: anywidget_instruments.oee
 ::: anywidget_instruments.NumericEntry
 
+## Registers, recipes and plant structure
+
+::: anywidget_instruments.BitField
+
 ## Utilities
 
 ::: anywidget_instruments.sanitize_svg

@@ -400,3 +400,16 @@ def test_synoptic_background_mime(case: dict[str, Any]) -> None:
             ai.SynopticCanvas(background=data)
         return
     assert ai.SynopticCanvas(background=data).background_mime == case["mime"]
+
+
+BITFIELD = _load("bitfield.json")["cases"]
+
+
+@pytest.mark.parametrize("case", BITFIELD)
+def test_bitfield(case: dict[str, Any]) -> None:
+    w = ai.BitField(case["value"], bits=case["bits"])
+    assert w.active_bits() == case["active"]
+    for bit, expected in case["toggle"]:
+        w.value = case["value"]
+        w.toggle_bit(bit)
+        assert w.value == expected, (case["value"], bit)
