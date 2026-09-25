@@ -8,7 +8,7 @@
 | Author | Sébastien Celles |
 | Document type | Software requirements specification |
 | Notation | EARS (Easy Approach to Requirements Syntax) |
-| Version | 0.9 |
+| Version | 0.10 |
 | Date | 2026-09-25 |
 | Status | Baseline for version 1.0 |
 
@@ -459,6 +459,21 @@ IEC 62682 (alarm management), IEC 60073 (indicator colors), ISA-TR88.00.02
 | IND-103 | S | The library shall provide a **KPITile** widget showing a value, its unit, a target and the difference to the target with its direction, and an optional sparkline; an `oee(availability, performance, quality)` helper shall compute the overall equipment effectiveness. |
 | IND-104 | S | The library shall provide a **NumericEntry** widget: a touch-friendly numeric keypad with a display, which checks the entered value against the range (NUM-010), commits it with Enter and discards it with Escape, and, where `confirm_delta` is set, asks for confirmation of large changes. |
 
+### 18.12 Registers, Recipes and Plant Structure
+
+| ID | Pri. | Requirement |
+|---|---|---|
+| IND-110 | S | The numeric format strings (NUM-004) shall support hexadecimal (`%x`, `%X`), binary (`%b`) and octal (`%o`) display of integer values, with an optional width padded with zeros (`%04X`, `%016b`); where a numeric widget uses such a format, its entry field and keypad shall accept values typed in that base (with or without the `0x`, `0b`, `0o` prefix). |
+| IND-111 | S | The library shall provide a **BitField** widget showing an integer word (8, 16 or 32 bits) as a row of indicators, one per bit, each with its own label and on color, together with the word in hexadecimal; bits without a label shall be shown dimmed. |
+| IND-112 | S | Where a BitField is in control mode, when the user toggles a bit, the widget shall set that bit of the word and send the new word to the kernel. |
+| IND-113 | S | The library shall provide a **RecipeTable** widget: a table of typed columns (number with unit and limits, choice among values, Boolean, text) whose rows are edited by the user; when the user confirms a cell, the widget shall check the value against its column (NUM-010 rules for numbers) and reject it with a message otherwise; the kernel shall apply the same check to every value received. |
+| IND-114 | C | The RecipeTable shall let the user sort the rows by a column, and add or delete rows where the table allows it. |
+| IND-115 | S | The library shall provide an **XYGraph** widget plotting data sets of (x, y) pairs with arbitrary spacing, each drawn as a line, markers, steps or bars, with the graph features of CHART-104 .. CHART-108 (cursors, annotations, zoom, export, axis ranges); the pairs shall travel as binary buffers. |
+| IND-116 | S | Where a Gauge or a Meter has a `setpoint`, the widget shall draw it as a second, distinct pointer, and state it in its text alternative. |
+| IND-117 | C | The WaveformChart shall support a logarithmic Y scale and a secondary Y axis on the right, to which traces may be assigned. |
+| IND-118 | C | Where a numeric widget has `value_labels`, it shall draw each label at its value on the scale instead of a number and show the label of the current value in its readout (a discrete selector such as OFF / LOW / HIGH on a slide or a knob). |
+| IND-119 | C | The library shall provide an **EquipmentTree** widget showing a hierarchy of equipment (site, area, unit, module, as in IEC 62264), each node optionally with a status, that the user can expand, collapse and select; the selected node shall be sent to the kernel. |
+
 ---
 
 ## 19. Host Independence (HOST)
@@ -550,6 +565,14 @@ authors in the documentation.
 | Instrument bubble with device status | Transmitter | IND-080 to IND-083 |
 | Event journal | EventLog | IND-090 to IND-093 |
 | Deviation bar, sparkline, bar group, KPI tile, keypad | DeviationIndicator, Sparkline, BarGraph, KPITile, NumericEntry | IND-100 to IND-104 |
+| Hexadecimal / binary display of a register | `format` trait (`%X`, `%b`, `%o`) | IND-110 |
+| Status or fault word as a row of lamps | BitField | IND-111, IND-112 |
+| Recipe or setpoint table | RecipeTable | IND-113, IND-114 |
+| Characteristic curve, scatter plot | XYGraph | IND-115 |
+| Dual-pointer dial (measure and setpoint) | `setpoint` trait of Gauge, Meter | IND-116 |
+| Logarithmic and secondary chart axes | `y_scale`, `y2_*` traits of WaveformChart | IND-117 |
+| Discrete positions on a slide or a knob | `value_labels` trait | IND-118 |
+| Plant hierarchy browser | EquipmentTree | IND-119 |
 
 ---
 
@@ -574,3 +597,4 @@ authors in the documentation.
 | 0.7 | IND-070 .. IND-104: trend chart, transmitter with device status, event log, deviation indicator, sparkline, bar graph, KPI tile, numeric keypad. |
 | 0.8 | HOST-001 .. HOST-008: trait contract in JSON Schema, schema-driven reading in the front end, heartbeats only when announced, authority over the state (19.1), parity cases, readable front-end module, class defaults, buffer decoding. Author named in the metadata. |
 | 0.9 | HOST-009 .. HOST-012: nested widgets through the host widget manager, binary traits as buffers or base64 text, continuous integration against divergence of Python, schemas and front end, operator actions sent and applied; 19.1 extended to operator actions and process events. |
+| 0.10 | IND-110 .. IND-119: hexadecimal, binary and octal formats, bit field, recipe table, XY graph, setpoint pointer, logarithmic and secondary chart axes, value labels, equipment tree. |

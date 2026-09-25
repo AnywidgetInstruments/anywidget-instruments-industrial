@@ -1,7 +1,7 @@
 # Requirements status
 
 Status of each requirement of the
-[specification](specification.md) (version 0.9).
+[specification](specification.md) (version 0.10).
 
 Legend: ✅ implemented and tested · 🟡 partial / not verifiable here · ⬜ not started
 
@@ -121,6 +121,14 @@ JupyterLab / Notebook 7 / marimo (`e2e/`).
 | IND-080 … IND-083 | S/C | ✅ | `Transmitter`: ISA-5.1 style bubble, NE 107 status by shape and text, **✕ BAD** and no `aria-valuenow` on failure, alarm limits (py, js, e2e) |
 | IND-090 … IND-093 | S/C | ✅ | `EventLog`: `log()`, `max_events`, category chips, filter by category and text, CSV, `connect()` / `disconnect()` audit trail (py, js, e2e) |
 | IND-100 … IND-104 | S | ✅ | `DeviationIndicator`, `Sparkline` (binary history), `BarGraph` (per-bar alarm levels), `KPITile` with `oee()`, `NumericEntry` keypad with range check and `confirm_delta` (py, js, e2e) |
+| IND-110 | S | ⬜ | Hexadecimal, binary and octal formats |
+| IND-111, IND-112 | S | ⬜ | `BitField` |
+| IND-113, IND-114 | S/C | ⬜ | `RecipeTable` |
+| IND-115 | S | ⬜ | `XYGraph` |
+| IND-116 | S | ⬜ | `setpoint` pointer of `Gauge`, `Meter` |
+| IND-117 | C | ⬜ | Logarithmic and secondary Y axes of `WaveformChart` |
+| IND-118 | C | ⬜ | `value_labels` |
+| IND-119 | C | ⬜ | `EquipmentTree` |
 
 Tests: py (`tests/test_industrial.py`), js (`js/test/industrial.test.js`), e2e
 (`allwidgets.spec.js`, both directions for each object), visual baselines;
