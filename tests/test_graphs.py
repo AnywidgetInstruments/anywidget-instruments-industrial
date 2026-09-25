@@ -94,6 +94,22 @@ def test_intensity_snapshot_and_colormap():
     assert set(ai.COLORMAPS) >= {"viridis", "gray", "jet"}
 
 
+def test_intensity_summary_of_an_empty_row_is_strict_json():
+    """HOST-002: min/max of a row without finite values travel as "nan", not a bare NaN token."""
+    import json
+
+    ic = ai.IntensityChart(n_bins=2)
+    ic.append([float("nan"), float("nan")])
+    state = ic.get_state(["value"])
+    assert json.loads(json.dumps(state, allow_nan=False))["value"] == {
+        "rows": 1,
+        "min": "nan",
+        "max": "nan",
+        "argmax": -1,
+    }
+    assert math.isnan(ic.value["min"])
+
+
 # -- DigitalWaveformGraph (CHART-102) ---------------------------------------------------
 def test_unpack_bits():
     assert ai.unpack_bits([5, 2], 3).tolist() == [[1, 0, 1], [0, 1, 0]]

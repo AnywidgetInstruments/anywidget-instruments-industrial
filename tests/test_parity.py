@@ -343,3 +343,15 @@ def test_waveform_values_at(case: dict[str, Any]) -> None:
         assert [None if math.isnan(v) else v for v in got] == [
             None if isinstance(v, str) else v for v in expected
         ], (case["name"], x)
+
+
+INTENSITY = _load("intensity.json")["cases"]
+
+
+@pytest.mark.parametrize("case", INTENSITY, ids=[c["name"] for c in INTENSITY])
+def test_intensity_values_at(case: dict[str, Any]) -> None:
+    w = ai.IntensityChart(history=case["history"], n_bins=case["n_bins"], dt=case["dt"])
+    for rows in case["appends"]:
+        w.append(np.array(rows, dtype=float))
+    for x, expected in case["cursors"]:
+        assert w.values_at(x) == expected, (case["name"], x)

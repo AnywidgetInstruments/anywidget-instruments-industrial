@@ -104,6 +104,7 @@ MIGRATED = {
     "RadarChart",
     "PictureControl",
     "WaveformChart",
+    "IntensityChart",
 }
 
 
@@ -314,8 +315,20 @@ def _buffer_bytes(w: Any, content: dict[str, Any], spec: dict[str, Any]) -> int:
     return n
 
 
+def _intensity_messages() -> Any:
+    w = ai.IntensityChart(history=3, n_bins=2)
+    sent = _sent(w)
+    w.append([1.0, float("nan")])
+    w.append(np.arange(10.0).reshape(5, 2))
+    w._handle_front_msg(w, {"type": "sync_request"}, [])
+    w.clear()
+    return w, sent
+
+
 @pytest.mark.parametrize(
-    "make", [_picture_messages, _waveform_messages], ids=lambda f: f.__name__.strip("_")
+    "make",
+    [_picture_messages, _waveform_messages, _intensity_messages],
+    ids=lambda f: f.__name__.strip("_"),
 )
 def test_sent_messages_conform(make: Any) -> None:
     """Messages sent by the host conform to x-awi-messages: fields and buffer count."""

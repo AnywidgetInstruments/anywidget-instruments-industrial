@@ -643,6 +643,33 @@ describe("Waveform chart without a kernel", () => {
   });
 });
 
+describe("Intensity chart without a kernel", () => {
+  test("rows from ArrayBuffer messages, fixed color range", async () => {
+    const { model, body, el } = mount({ ...defaults("IntensityChart"), label: "Spectrum", history: 3, n_bins: 2, autoscale_z: false, z_max: 10, unit: "dB" });
+    model.fireMsg({ type: "append", n_rows: 2, total: 2 }, [new Float32Array([1, 2, 3, 4]).buffer]);
+    model.fireMsg({ type: "append", n_rows: 3, total: 5 }, [new Float32Array([5, 6]).buffer]); // short buffer
+    await frame();
+    expect(body.getAttribute("aria-label")).toBe("Spectrum: 5 rows, color range 0 to 10 dB");
+    const csv = el.querySelector('button[aria-label="Download data as CSV"]') as HTMLButtonElement;
+    const blobs: Blob[] = [];
+    Object.assign(URL, { createObjectURL: (b: Blob) => (blobs.push(b), "blob:x"), revokeObjectURL: () => {} });
+    vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
+    csv.click();
+    // rows 2 to 4 kept; 3 and 4 were missing from the buffer: empty, not stale data
+    vi.useRealTimers(); // FileReader completes on real timers
+    const text = await new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result));
+      reader.readAsText(blobs[0]);
+    });
+    expect(text).toBe("x,0.5,1.5\n2,5,6\n3,,\n4,,");
+    vi.useFakeTimers();
+    model.fireMsg({ type: "clear" }, []);
+    await frame();
+    expect(body.getAttribute("aria-label")).toBe("Spectrum: 0 rows, color range 0 to 10 dB");
+  });
+});
+
 describe("Tank without a kernel", () => {
   test("indicator by default, markers read through the schema", async () => {
     const { root, body, el } = mount({ ...defaults("Tank"), value: 3.2, max: 4, unit: "m", markers: [0.5, "x", 3.5], hi: 3, hihi: 3.5 });

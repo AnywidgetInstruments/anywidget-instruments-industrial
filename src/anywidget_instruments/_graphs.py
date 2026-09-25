@@ -7,6 +7,7 @@ from typing import Any
 import numpy as np
 import traitlets as t
 
+from ._base import float_serializers
 from ._graph import GraphWidget
 
 COLORMAPS: tuple[str, ...] = ("viridis", "inferno", "magma", "plasma", "gray", "jet")
@@ -24,7 +25,7 @@ class IntensityChart(GraphWidget):
     """
 
     _kind = t.Unicode("intensitychart").tag(sync=True)
-    value = t.Dict(read_only=True).tag(sync=True)
+    value = t.Dict(read_only=True).tag(sync=True, **float_serializers)
     history = t.Int(200, min=2).tag(sync=True)
     n_bins = t.Int(64, min=1).tag(sync=True)
     dt = t.Float(1.0).tag(sync=True)

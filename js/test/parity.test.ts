@@ -5,6 +5,7 @@ import alarmCases from "../../tests/parity/alarm_level.json";
 import alarmTables from "../../tests/parity/alarms.json";
 import annCases from "../../tests/parity/annunciator.json";
 import barCases from "../../tests/parity/bars.json";
+import intensityCases from "../../tests/parity/intensity.json";
 import numericCases from "../../tests/parity/numeric.json";
 import peakCases from "../../tests/parity/peak.json";
 import polarCases from "../../tests/parity/polar.json";
@@ -19,6 +20,7 @@ import { acknowledgeRows, type AlarmRow, expireShelving, localIso, shelveRow, un
 import { type AnnEvent, annunciatorTransition, hornOn, type Panel, panelAction, type Sequence, setProcess } from "../src/contract/annunciator.js";
 import { barLevels, normalizeBars } from "../src/contract/bars.js";
 import { selectorValue, stackStates } from "../src/contract/industrial.js";
+import { RowRing, rowIndexAt } from "../src/contract/intensity.js";
 import { coerceValue, validScale } from "../src/contract/numeric.js";
 import { nextPeak, type PeakState } from "../src/contract/peak.js";
 import { gammaToZ, radarRange, zToGamma } from "../src/contract/polar.js";
@@ -259,6 +261,22 @@ describe("waveform chart", () => {
       for (const [x, expected] of c.cursors as Array<[number, Array<number | string>]>) {
         const got = valuesAt(ring, x, { mode: c.update_mode, dt: c.dt });
         expect(got.map((v) => (Number.isNaN(v) ? null : v)), `${c.name} x=${x}`).toEqual(expected.map((v) => (typeof v === "string" ? null : v)));
+      }
+    });
+  }
+});
+
+describe("intensity chart", () => {
+  for (const c of intensityCases.cases) {
+    test(c.name, () => {
+      const ring = new RowRing(c.history, c.n_bins);
+      let total = 0;
+      for (const rows of c.appends) {
+        total += rows.length;
+        ring.store(Float32Array.from(rows.flat()), rows.length, total);
+      }
+      for (const [x, expected] of c.cursors as Array<[number, number[]]>) {
+        expect(Array.from(ring.row(rowIndexAt(x, c.dt)) ?? []), `${c.name} x=${x}`).toEqual(expected);
       }
     });
   }
