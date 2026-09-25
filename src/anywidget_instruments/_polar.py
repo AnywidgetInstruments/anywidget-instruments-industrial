@@ -7,7 +7,7 @@ from typing import Any
 import numpy as np
 import traitlets as t
 
-from ._base import InstrumentWidget, float_serializers
+from ._base import InstrumentWidget, float_serializers, mode_trait, size_trait
 
 
 def _finite_list(values: Any) -> list[float]:
@@ -17,6 +17,8 @@ def _finite_list(values: Any) -> list[float]:
 class _SeriesWidget(InstrumentWidget):
     _default_mode = "indicator"
     _default_size = (260, 260)
+    mode = mode_trait(_default_mode)
+    size = size_trait(*_default_size)
     #: list of data sets; the exact fields depend on the widget
     value = t.List(t.Dict()).tag(sync=True, **float_serializers)
     show_legend = t.Bool(True).tag(sync=True)

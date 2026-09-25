@@ -1,0 +1,23 @@
+{
+  "description": "Polar family (SPEC-003, SPEC-004): Smith chart impedance to reflection coefficient and back (normalized to z0), radar axis ranges.",
+  "gamma": [
+    { "z": [50, 0], "z0": 50, "gamma": [0, 0] },
+    { "z": [0, 0], "z0": 50, "gamma": [-1, 0] },
+    { "z": [100, 0], "z0": 50, "gamma": [0.3333333333333333, 0] },
+    { "z": [50, 50], "z0": 50, "gamma": [0.2, 0.4] },
+    { "z": [25, -75], "z0": 75, "gamma": [0.04, -0.72] },
+    { "z": [0, 50], "z0": 50, "gamma": [0, 1] }
+  ],
+  "impedance": [
+    { "gamma": [0, 0], "z": [1, 0] },
+    { "gamma": [-1, 0], "z": [0, 0] },
+    { "gamma": [0.2, 0.4], "z": [1, 1] },
+    { "gamma": [0, 1], "z": [0, 1] },
+    { "gamma": [0.5, -0.5], "z": [1, -2] }
+  ],
+  "radar_ranges": [
+    { "name": "given range", "ranges": [[0, 10], [2, 4]], "values": [[5, 3], [8, 1]], "expected": [[0, 10], [2, 4]] },
+    { "name": "no range: 0 to the largest value", "ranges": [], "values": [[5, 3], [8, 1]], "expected": [[0, 8], [0, 3]] },
+    { "name": "only some axes have a range", "ranges": [[-1, 1]], "values": [[0.5, 7]], "expected": [[-1, 1], [0, 7]] }
+  ]
+}

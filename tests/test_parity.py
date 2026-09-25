@@ -291,3 +291,34 @@ def test_alarm_list_actions(case: dict[str, Any]) -> None:
             clock["now"] += step[1]
             lst.refresh()
         assert _alarm_state(lst) == expected, (case["name"], step)
+
+
+POLAR = _load("polar.json")
+
+
+@pytest.mark.parametrize("case", POLAR["gamma"])
+def test_smith_gamma(case: dict[str, Any]) -> None:
+    g = ai.SmithChart(z0=case["z0"]).gamma(complex(*case["z"]))
+    assert (g.real, g.imag) == pytest.approx(tuple(case["gamma"]), abs=1e-12)
+
+
+@pytest.mark.parametrize("case", POLAR["impedance"])
+def test_smith_impedance(case: dict[str, Any]) -> None:
+    z = ai.SmithChart(z0=1).impedance(complex(*case["gamma"]))
+    assert (z.real, z.imag) == pytest.approx(tuple(case["z"]), abs=1e-12)
+
+
+@pytest.mark.parametrize(
+    "case", POLAR["radar_ranges"], ids=[c["name"] for c in POLAR["radar_ranges"]]
+)
+def test_radar_ranges(case: dict[str, Any]) -> None:
+    """A range given for an axis passes RadarChart's validation and is used as is."""
+    r = ai.RadarChart(ranges=case["ranges"])
+    for v in case["values"]:
+        r.plot(v, name=str(v))
+    given = {k: rng for k, rng in enumerate(r.ranges)}
+    for k, expected in enumerate(case["expected"]):
+        if k in given:
+            assert given[k] == expected
+        else:
+            assert [0, max(s["values"][k] for s in r.value)] == expected

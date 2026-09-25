@@ -557,6 +557,34 @@ describe("Alarm banner and alarm list without a kernel", () => {
   });
 });
 
+describe("Polar family without a kernel", () => {
+  test("polar plot: non-finite magnitudes skipped, radial range set by the operator", async () => {
+    const { model, el, body } = mount({ ...defaults("PolarPlot"), label: "Pattern", value: [{ name: "E", style: "markers", r: [1, "nan", 2], theta: [0, 90, "x"] }, "not a set"], rings: 0 });
+    await frame();
+    // one data set kept, points with a non-finite coordinate skipped
+    expect(el.querySelectorAll(".awi-series-marker")).toHaveLength(1);
+    expect(body.getAttribute("aria-label")).toBe("Pattern: 1 data set (E)");
+    const field = el.querySelector('input[aria-label="Radial range maximum"]') as HTMLInputElement;
+    field.value = "5";
+    field.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+    expect(model.get("r_max")).toBe(5);
+    expect(model.saved.at(-1)).toMatchObject({ r_max: 5 });
+  });
+
+  test("smith chart: an invalid z0 falls back to 50 ohms in the tooltips", async () => {
+    const { el } = mount({ ...defaults("SmithChart"), z0: 0, value: [{ name: "load", re: [0.2], im: [0.4] }] });
+    await frame();
+    expect(el.querySelector(".awi-series-marker title")?.textContent).toBe("load: Z = 50 + j50 Ω  |Γ| = 0.447");
+  });
+
+  test("radar chart: an axis without a valid range goes from 0 to the largest value", async () => {
+    const { el } = mount({ ...defaults("RadarChart"), axes: ["a", "b", "c"], ranges: [[0, 10], [5, 5], [0, 2]], value: [{ name: "x", values: [5, 4, "nan"] }, { name: "y", values: [1, 8, 1] }] });
+    await frame();
+    expect([...el.querySelectorAll(".awi-radar-max")].map((t) => t.textContent)).toEqual(["10", "8", "2"]);
+    expect(el.querySelectorAll(".awi-legend-item")).toHaveLength(2);
+  });
+});
+
 describe("Tank without a kernel", () => {
   test("indicator by default, markers read through the schema", async () => {
     const { root, body, el } = mount({ ...defaults("Tank"), value: 3.2, max: 4, unit: "m", markers: [0.5, "x", 3.5], hi: 3, hihi: 3.5 });

@@ -18,7 +18,7 @@ import pytest
 import traitlets as t
 
 import anywidget_instruments as ai
-from anywidget_instruments import _base, _boolean, _numeric, _process
+from anywidget_instruments import _base, _boolean, _numeric, _polar, _process
 
 PKG = pathlib.Path(ai.__file__).parent
 SCHEMA_DIR = PKG / "schema"
@@ -39,6 +39,7 @@ CLASSES: dict[str, type] = {
     "_PeakMixin": _numeric._PeakMixin,
     "BooleanWidget": _boolean.BooleanWidget,
     "ProcessObject": _process.ProcessObject,
+    "_SeriesWidget": _polar._SeriesWidget,
 }
 WIDGETS = sorted(CONTRACT["widgets"].items())
 IDS = [title for title, _ in WIDGETS]
@@ -96,6 +97,9 @@ MIGRATED = {
     "Annunciator",
     "AlarmBanner",
     "AlarmList",
+    "PolarPlot",
+    "SmithChart",
+    "RadarChart",
 }
 
 
@@ -231,3 +235,26 @@ def test_simulated_tables(name: str) -> None:
     spec = CONTRACT["widgets"][name]["traits"]["commands"]
     assert spec["simulated"] == getattr(ai, name)._simulated
     assert spec["default"] == list(getattr(ai, name)._commands)
+
+
+def _plotted() -> list[Any]:
+    polar = ai.PolarPlot()
+    polar.plot([1.0, float("nan"), 2.0], [0, 90, 180], name="a", style="both")
+    smith = ai.SmithChart(z0=75)
+    smith.plot([50 + 25j, 75, 100 - 50j], name="load")
+    smith.plot([0.1 + 0.2j], kind="reflection")
+    radar = ai.RadarChart(axes=["a", "b", "c"], ranges=[[0, 10], [0, 5], [-1, 1]])
+    radar.plot([5, 2.5, 0.5], name="x")
+    return [polar, smith, radar]
+
+
+@pytest.mark.parametrize("w", _plotted(), ids=lambda w: type(w).__name__)
+def test_plotted_state_validates(w: Any) -> None:
+    """Data sets written by plot() conform to the item schemas of `value`."""
+    spec = next(s for s in CONTRACT["widgets"].values() if s["class"] == type(w).__name__)
+    validator = _validator(pathlib.Path(spec["schema"]).name)
+    state = {k: v for k, v in json.loads(json.dumps(w.get_state())).items() if k not in FRAMEWORK}
+    errors = sorted(validator.iter_errors(state), key=str)
+    assert not errors, [e.message for e in errors]
+    fields = set(spec["traits"]["value"]["items"]["properties"])
+    assert all(set(s) <= fields for s in state["value"])

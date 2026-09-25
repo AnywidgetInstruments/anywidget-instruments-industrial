@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://s-celles.github.io/anywidget-instruments/schema/polar.schema.json",
+  "title": "PolarPlot",
+  "description": "Magnitude and angle data sets on polar axes (SPEC-002).",
+  "type": "object",
+  "x-awi-class": "PolarPlot",
+  "allOf": [
+    {
+      "$ref": "series.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "polar",
+      "default": "polar",
+      "x-awi-writer": "host"
+    },
+    "value": {
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string",
+            "description": "CSS color; empty: the trace palette."
+          },
+          "style": {
+            "enum": [
+              "line",
+              "markers",
+              "both"
+            ]
+          },
+          "r": {
+            "type": "array",
+            "items": {
+              "$ref": "instrument.schema.json#/$defs/float"
+            },
+            "description": "Magnitudes; a negative magnitude is drawn opposite its angle."
+          },
+          "theta": {
+            "type": "array",
+            "items": {
+              "$ref": "instrument.schema.json#/$defs/float"
+            },
+            "description": "Angles in angle_unit, one per magnitude."
+          }
+        }
+      },
+      "description": "Data sets {name, color, style, r, theta}; r and theta have the same length."
+    },
+    "angle_unit": {
+      "enum": [
+        "deg",
+        "rad"
+      ],
+      "default": "deg",
+      "x-awi-writer": "host"
+    },
+    "zero": {
+      "enum": [
+        "E",
+        "N"
+      ],
+      "description": "Where angle 0 is: east (mathematical) or north (compass).",
+      "default": "E",
+      "x-awi-writer": "host"
+    },
+    "direction": {
+      "enum": [
+        "ccw",
+        "cw"
+      ],
+      "description": "Positive sense of the angles.",
+      "default": "ccw",
+      "x-awi-writer": "host"
+    },
+    "r_max": {
+      "$ref": "instrument.schema.json#/$defs/optionalNumber",
+      "description": "Radial range; null or not positive: scaled to the data. Set by the operator with the mouse wheel or the r max field (CHART-108).",
+      "default": null,
+      "x-awi-writer": "both"
+    },
+    "rings": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Approximate number of grid rings.",
+      "default": 4,
+      "x-awi-writer": "host"
+    },
+    "unit": {
+      "type": "string",
+      "default": "",
+      "x-awi-writer": "host"
+    }
+  }
+}

@@ -7,6 +7,7 @@ import annCases from "../../tests/parity/annunciator.json";
 import barCases from "../../tests/parity/bars.json";
 import numericCases from "../../tests/parity/numeric.json";
 import peakCases from "../../tests/parity/peak.json";
+import polarCases from "../../tests/parity/polar.json";
 import pidCases from "../../tests/parity/pid.json";
 import processCases from "../../tests/parity/process.json";
 import resolvedCases from "../../tests/parity/resolved.json";
@@ -19,6 +20,7 @@ import { barLevels, normalizeBars } from "../src/contract/bars.js";
 import { selectorValue, stackStates } from "../src/contract/industrial.js";
 import { coerceValue, validScale } from "../src/contract/numeric.js";
 import { nextPeak, type PeakState } from "../src/contract/peak.js";
+import { gammaToZ, radarRange, zToGamma } from "../src/contract/polar.js";
 import { pidState } from "../src/contract/derived.js";
 import { loopModeChange, operatorSet } from "../src/contract/pid.js";
 import { positionDemand, processCommand, type ProcessState } from "../src/contract/process.js";
@@ -232,6 +234,17 @@ describe("alarm banner and alarm list", () => {
         }
         expect(stateOf(rows), JSON.stringify(step)).toEqual(expected);
       }
+    });
+  }
+});
+
+describe("polar family", () => {
+  const close = (a: number[], b: number[]) => a.forEach((v, i) => expect(v).toBeCloseTo(b[i], 12));
+  test.each(polarCases.gamma)("gamma %#", (c) => close(zToGamma(c.z[0], c.z[1], c.z0), c.gamma));
+  test.each(polarCases.impedance)("impedance %#", (c) => close(gammaToZ(c.gamma[0], c.gamma[1]), c.z));
+  for (const c of polarCases.radar_ranges) {
+    test(c.name, () => {
+      expect(c.expected.map((_, k) => radarRange(c.ranges, c.values, k))).toEqual(c.expected);
     });
   }
 });
