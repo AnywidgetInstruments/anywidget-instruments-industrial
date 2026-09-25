@@ -162,3 +162,39 @@ def test_digital_graph_buses_in_constructor():
     capture(g)
     g.set_data([0, 1, 2, 3], n_bits=2)
     assert g.bus_values(g.buses[0]).tolist() == [0, 1, 2, 3]
+
+
+# -- XYGraph (IND-115) -----------------------------------------------------------------
+def test_xygraph_plot_replace_remove():
+    g = ai.XYGraph()
+    sent = capture(g)
+    assert g.plot([3, 1, 2], [30, 10, 20], name="a") == 0
+    assert g.plot([0, 10], [0, 100], name="b", style="bar", color="red") == 1
+    assert [s["name"] for s in g.series] == ["a", "b"]
+    assert g.series[1] == {"name": "b", "color": "red", "style": "bar", "width": 1.5}
+    msg, buffers = sent[-1]
+    assert msg == {"type": "data", "clear": False, "sets": [["b", 2]]}
+    assert np.frombuffer(buffers[1], "<f8").tolist() == [0.0, 100.0]
+    assert g.values_at(1.5) == [15.0, 15.0]
+    assert math.isnan(g.values_at(5)[0])
+    assert g.plot([0], [1], name="a", style="markers") == 0  # replaced in place
+    with pytest.raises(ValueError):
+        g.plot([0], [1], name="a", replace=False)
+    with pytest.raises(ValueError):
+        g.plot([1, 2], [1], name="c")
+    with pytest.raises(ValueError):
+        g.plot([1], [1], style="pie")
+    g.remove("a")
+    assert [s["name"] for s in g.series] == ["b"]
+    assert sent[-1][0] == {"type": "data", "clear": True, "sets": [["b", 2]]}
+    g._handle_front_msg(g, {"type": "sync_request"}, [])
+    assert sent[-1][0]["sets"] == [["b", 2]]
+    g.clear()
+    assert g.series == [] and sent[-1][0] == {"type": "data", "clear": True, "sets": []}
+
+
+def test_xygraph_cursor_values():
+    g = ai.XYGraph()
+    g.plot([0, 10], [0, 100], name="line")
+    g.add_cursor(2.5)
+    assert g.cursor_values == [{"name": "C1", "x": 2.5, "values": [25.0]}]

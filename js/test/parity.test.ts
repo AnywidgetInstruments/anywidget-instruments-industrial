@@ -20,6 +20,7 @@ import stateCases from "../../tests/parity/states.json";
 import synopticCases from "../../tests/parity/synoptic.json";
 import trendCases from "../../tests/parity/trend.json";
 import waveformCases from "../../tests/parity/waveform.json";
+import xyCases from "../../tests/parity/xy.json";
 import { type AlarmLevel, type AlarmLimits, computeAlarmLevel } from "../src/contract/alarm.js";
 import { acknowledgeRows, type AlarmRow, expireShelving, localIso, shelveRow, unshelveRow } from "../src/contract/alarms.js";
 import { type AnnEvent, annunciatorTransition, hornOn, type Panel, panelAction, type Sequence, setProcess } from "../src/contract/annunciator.js";
@@ -40,6 +41,7 @@ import { imageMime } from "../src/contract/synoptic.js";
 import { readTrait } from "../src/contract/traits.js";
 import { normalizePen, PenRing } from "../src/contract/trend.js";
 import { Ring, valuesAt } from "../src/contract/waveform.js";
+import { xyValueAt } from "../src/contract/xy.js";
 import { parseNumber } from "../src/core/scale.js";
 import { CONTRACTS } from "../src/generated/contract.js";
 
@@ -350,6 +352,18 @@ describe("recipe table", () => {
         const r = checkCell(col, value === "nan" ? NaN : value);
         expect(r.ok, String(value)).toBe(ok);
         if (r.ok) expect(r.value).toBe(stored);
+      }
+    });
+  }
+});
+
+describe("XY graph", () => {
+  for (const c of xyCases.cases) {
+    test(c.name, () => {
+      const sets = (c.sets as Array<[Array<number | string>, Array<number | string>]>).map(([xs, ys]) => [xs.map(parseNumber), ys.map(parseNumber)]);
+      for (const [x, expected] of c.cursors as Array<[number, Array<number | string>]>) {
+        const got = sets.map(([xs, ys]) => xyValueAt(xs, ys, x));
+        expect(got.map((v) => (Number.isNaN(v) ? null : v)), `${c.name} x=${x}`).toEqual(expected.map((v) => (typeof v === "string" ? null : v)));
       }
     });
   }

@@ -437,3 +437,16 @@ def test_recipe_cells(case: dict[str, Any]) -> None:
         assert got_ok == ok, (value, got)
         if ok:
             assert got == stored[0], (value, got)
+
+
+XY = _load("xy.json")["cases"]
+
+
+@pytest.mark.parametrize("case", XY, ids=[c["name"] for c in XY])
+def test_xy_values_at(case: dict[str, Any]) -> None:
+    w = ai.XYGraph()
+    for k, (xs, ys) in enumerate(case["sets"]):
+        w.plot([_num(v) for v in xs], [_num(v) for v in ys], name=f"s{k}")
+    for x, expected in case["cursors"]:
+        got = [None if math.isnan(v) else v for v in w.values_at(x)]
+        assert got == [None if isinstance(v, str) else v for v in expected], (case["name"], x)

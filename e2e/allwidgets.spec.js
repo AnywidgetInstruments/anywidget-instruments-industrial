@@ -187,7 +187,7 @@ test.describe("every widget", () => {
     await expect(widget(page, "Pipe").locator(".awi-pipe-fluid.awi-flowing")).toHaveCount(1);
   });
 
-  for (const name of ["WaveformChart", "IntensityChart", "DigitalWaveformGraph", "MixedSignalGraph"]) {
+  for (const name of ["WaveformChart", "IntensityChart", "DigitalWaveformGraph", "MixedSignalGraph", "XYGraph"]) {
     test(`${name}: data in, cursor out`, async () => {
       const w = widget(page, name);
       await w.scrollIntoViewIfNeeded();
@@ -196,6 +196,7 @@ test.describe("every widget", () => {
         IntensityChart: 'W["IntensityChart"].append(np.ones((5, 8)))',
         DigitalWaveformGraph: 'W["DigitalWaveformGraph"].set_data([1, 2, 3], n_bits=2)',
         MixedSignalGraph: 'W["MixedSignalGraph"].set_analog(np.arange(4.0)); W["MixedSignalGraph"].set_data([1, 0, 1, 0], n_bits=1)',
+        XYGraph: 'W["XYGraph"].plot([3, 1, 2], [30, 10, 20], name="curve")',
       }[name];
       await py(feed);
       const expected = {
@@ -203,6 +204,7 @@ test.describe("every widget", () => {
         IntensityChart: /5 rows/,
         DigitalWaveformGraph: /2 lines, 3 samples/,
         MixedSignalGraph: /1 lines, 4 samples/,
+        XYGraph: /1 data set, 3 points \(curve\)/,
       }[name];
       await expect(w.locator(":scope > .awi-body")).toHaveAttribute("aria-label", expected);
       await w.getByRole("button", { name: "Add a cursor" }).click();

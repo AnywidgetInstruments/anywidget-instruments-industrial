@@ -66,6 +66,7 @@ from ._style import (
 from ._themeswitch import THEME_SWITCH_POSITIONS, ThemeSwitch
 from ._transmitter import DEVICE_STATUSES, Transmitter
 from ._trend import TrendChart
+from ._xygraph import XY_STYLES, XYGraph
 
 __version__ = "0.1.0.dev0"
 
@@ -95,6 +96,7 @@ __all__ = [
     "THEMES",
     "THEME_SWITCH_POSITIONS",
     "WORD_SIZES",
+    "XY_STYLES",
     "AlarmBanner",
     "AlarmIndicator",
     "AlarmList",
@@ -149,6 +151,7 @@ __all__ = [
     "VUMeter",
     "Valve",
     "WaveformChart",
+    "XYGraph",
     "alarm_transition",
     "annunciator_transition",
     "batch",

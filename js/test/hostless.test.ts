@@ -866,6 +866,24 @@ describe("Recipe table without a kernel", () => {
   });
 });
 
+describe("XY graph without a kernel", () => {
+  test("data sets from ArrayBuffer messages, listed sets only, CSV export", async () => {
+    const f64 = (...v: number[]) => new Float64Array(v).buffer;
+    const { model, el, body } = mount({ ...defaults("XYGraph"), label: "Pump curve", series: [{ name: "Head", style: "line" }, { name: "Measured", style: "markers" }], x_unit: "m³/h", unit: "m" });
+    model.fireMsg({ type: "data", clear: true, sets: [["Head", 3], ["Measured", 2], ["Other", 1]] }, [f64(0, 60, 120), f64(42, 34.8, 13.2), f64(30), f64(40.5, 99), f64(1), f64(2)]);
+    await frame();
+    // "Measured" announced 2 points but its x buffer holds 1; "Other" is not listed
+    expect(body.getAttribute("aria-label")).toBe("Pump curve: 2 data sets, 4 points (Head, Measured)");
+    expect(await csvOf(el)).toBe("set,x (m³/h),y (m)\nHead,0,42\nHead,60,34.8\nHead,120,13.2\nMeasured,30,40.5");
+    model.fireMsg({ type: "data", clear: false, sets: [["Measured", 1]] }, [f64(90), f64(26.3)]);
+    await frame();
+    expect(body.getAttribute("aria-label")).toBe("Pump curve: 2 data sets, 4 points (Head, Measured)");
+    model.fireMsg({ type: "data", clear: true, sets: [] }, []);
+    await frame();
+    expect(body.getAttribute("aria-label")).toBe("Pump curve: 0 data sets, 0 points");
+  });
+});
+
 describe("Tank without a kernel", () => {
   test("indicator by default, markers read through the schema", async () => {
     const { root, body, el } = mount({ ...defaults("Tank"), value: 3.2, max: 4, unit: "m", markers: [0.5, "x", 3.5], hi: 3, hihi: 3.5 });

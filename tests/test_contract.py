@@ -88,6 +88,14 @@ def test_every_widget_has_a_schema() -> None:
     assert set(WIDGET_CLASSES) <= classes, sorted(set(WIDGET_CLASSES) - classes)
 
 
+def test_every_widget_has_a_value() -> None:
+    """Every widget has a synced value (API-001), which its repr shows."""
+    for name in WIDGET_CLASSES:
+        cls = CLASSES[name]
+        assert "value" in cls.class_traits(sync=True), name
+        assert "value=" in repr(cls()), name
+
+
 def test_class_defaults_announce_no_liveness() -> None:
     """HOST-003: a host using class defaults never sees NO KERNEL."""
     for cls in (_base.InstrumentWidget, *(CLASSES[c] for c in WIDGET_CLASSES)):
@@ -329,6 +337,17 @@ def _recipe_messages() -> Any:
     return w, sent
 
 
+def _xy_messages() -> Any:
+    w = ai.XYGraph()
+    sent = _sent(w)
+    w.plot([1, 2, 3], [4, 5, 6], name="a")
+    w.plot([0.5], [1], name="b", style="markers")
+    w._handle_front_msg(w, {"type": "sync_request"}, [])
+    w.remove("a")
+    w.clear()
+    return w, sent
+
+
 @pytest.mark.parametrize(
     "make",
     [
@@ -338,6 +357,7 @@ def _recipe_messages() -> Any:
         _digital_messages,
         _trend_messages,
         _recipe_messages,
+        _xy_messages,
     ],
     ids=lambda f: f.__name__.strip("_"),
 )
@@ -357,7 +377,8 @@ def test_sent_messages_conform(make: Any) -> None:
         elif "repeat" in m:  # buffers repeated per item of a field, n from each item
             items = content[m["repeat"]]
             assert len(buffers) == len(m["buffers"]) * len(items)
-            for k, (_index, n, _total) in enumerate(items):
+            for k, item in enumerate(items):
+                n = item[1]  # [index or name, n, ...]
                 for j, bspec in enumerate(m["buffers"]):
                     b = buffers[k * len(m["buffers"]) + j]
                     assert len(b) == _buffer_bytes(w, {"n": n}, bspec), (content, bspec)

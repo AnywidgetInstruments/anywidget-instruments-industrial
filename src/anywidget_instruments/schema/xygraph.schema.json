@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://s-celles.github.io/anywidget-instruments/schema/xygraph.schema.json",
+  "title": "XYGraph",
+  "description": "Data sets of (x, y) pairs with arbitrary spacing: characteristic curves, scatter plots (IND-115).",
+  "type": "object",
+  "x-awi-class": "XYGraph",
+  "allOf": [
+    {
+      "$ref": "graph.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "xygraph",
+      "default": "xygraph",
+      "x-awi-writer": "host"
+    },
+    "size": {
+      "default": [
+        480,
+        300
+      ]
+    },
+    "value": {
+      "type": "object",
+      "properties": {
+        "sets": {
+          "type": "integer"
+        },
+        "points": {
+          "type": "integer"
+        }
+      },
+      "description": "Number of data sets and of points {sets, points}, written by the host with each data message.",
+      "default": {},
+      "readOnly": true,
+      "x-awi-writer": "host"
+    },
+    "series": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Unique; the data of a set travel under its name."
+          },
+          "color": {
+            "type": "string"
+          },
+          "style": {
+            "enum": [
+              "line",
+              "markers",
+              "both",
+              "step",
+              "bar"
+            ]
+          },
+          "width": {
+            "type": "number"
+          }
+        }
+      },
+      "description": "Data sets {name, color, style, width}, drawn in order. A set whose data have not arrived is not drawn; data of a name not listed here are dropped.",
+      "default": [],
+      "readOnly": true,
+      "x-awi-writer": "host"
+    },
+    "x_min": {
+      "$ref": "instrument.schema.json#/$defs/optionalNumber",
+      "description": "X range; null: from the data.",
+      "default": null,
+      "x-awi-writer": "host"
+    },
+    "x_max": {
+      "$ref": "instrument.schema.json#/$defs/optionalNumber",
+      "default": null,
+      "x-awi-writer": "host"
+    },
+    "y_min": {
+      "$ref": "instrument.schema.json#/$defs/optionalNumber",
+      "description": "Y range; null: from the data.",
+      "default": null,
+      "x-awi-writer": "host"
+    },
+    "y_max": {
+      "$ref": "instrument.schema.json#/$defs/optionalNumber",
+      "default": null,
+      "x-awi-writer": "host"
+    },
+    "show_legend": {
+      "type": "boolean",
+      "default": true,
+      "x-awi-writer": "host"
+    }
+  },
+  "x-awi-messages": [
+    {
+      "type": "data",
+      "direction": "host-to-front",
+      "description": "Data of some sets (clear false: the other sets keep theirs) or of every set (clear true: the sets not sent have no data). Sent when a set is plotted or removed and in reply to sync_request.",
+      "fields": {
+        "clear": {
+          "type": "boolean"
+        },
+        "sets": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer",
+                "minimum": 0
+              }
+            ],
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "description": "[name, n] of each set sent."
+        }
+      },
+      "repeat": "sets",
+      "buffers": [
+        {
+          "dtype": "<f8",
+          "shape": [
+            "n"
+          ],
+          "description": "x of the points of the set."
+        },
+        {
+          "dtype": "<f8",
+          "shape": [
+            "n"
+          ],
+          "description": "y of the points."
+        }
+      ]
+    },
+    {
+      "type": "sync_request",
+      "direction": "front-to-host",
+      "description": "Sent by each new view: the host answers with a data message holding every set (clear true).",
+      "fields": {},
+      "buffers": []
+    }
+  ]
+}

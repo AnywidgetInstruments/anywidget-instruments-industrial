@@ -158,13 +158,14 @@ Each widget lists its custom messages in `messages`:
 - `buffers` are the binary buffers sent with it, in order: little-endian,
   with a numpy-style `dtype` (`<f4` float32, `<f8` float64, `uint8`) and a
   `shape` whose names are message fields or traits. `repeat` names an array
-  field whose items each carry the buffers again (`TrendChart`: times and
-  values for each pen).
+  field whose items each carry the buffers again, `n` being the second
+  element of each item (`TrendChart`: times and values for each pen,
+  `[pen, n, total]`; `XYGraph`: x and y for each set, `[name, n]`).
 - Buffers may be `ArrayBuffer`, `DataView` or typed arrays (HOST-008). A
   buffer shorter than announced is never read past its end.
 - Widgets whose data travel as messages (`WaveformChart`, `IntensityChart`,
-  `TrendChart`, `Sparkline`, `KPITile`, `PictureControl`, the digital
-  graphs) send `sync_request` when a view is created: the host answers with a
+  `TrendChart`, `XYGraph`, `Sparkline`, `KPITile`, `PictureControl`, the
+  digital graphs) send `sync_request` when a view is created: the host answers with a
   `snapshot` (or `data`, `draw`) message. A host without history can ignore
   it.
 

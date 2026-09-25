@@ -364,3 +364,23 @@ recipe.on_edit(lambda e: print(e["action"], e["row"], e["column"], e["value"]))
 recipe.set_cell(0, "temp", 70)  # checked against the column, like an operator entry
 ```
 
+### XYGraph
+
+Data sets of (x, y) pairs with arbitrary spacing: the characteristic curve of
+a pump or a valve, an I-V curve, a scatter plot, measurements at irregular
+points. Each set is drawn as a line, markers, both, steps (a value held until
+the next x) or bars from zero. The axes follow the data unless `x_min`,
+`x_max`, `y_min`, `y_max` are set. The graph has the cursors, annotations,
+zoom, axis ranges and export of the other graphs; a cursor reads the value of
+every set at its x, interpolated between the points sorted by x.
+
+```python
+import numpy as np
+
+curve = ai.XYGraph(x_unit="m³/h", unit="m", label="Pump P-101")
+q = np.linspace(0, 120, 25)
+curve.plot(q, 42 - 0.002 * q**2, name="Head (catalogue)")
+curve.plot([30, 60, 90], [40.5, 35.0, 26.3], name="Measured", style="markers")
+curve.add_cursor(75)
+```
+
