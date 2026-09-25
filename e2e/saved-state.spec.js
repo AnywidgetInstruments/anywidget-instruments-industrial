@@ -20,12 +20,22 @@ test("saved widget state renders read-only without the kernel", async ({ page })
   const knob = widget(page, "Saved knob");
   await expect(knob.locator(".awi-value")).toHaveText("33.0");
   await page.keyboard.press("Control+s");
-  // while the file is being written the contents API may answer without
-  // content: poll until the saved notebook carries the widget state
+  // Read the file only once JupyterLab reports the save as finished: a read
+  // that meets the half-written file makes the server restore its backup,
+  // which can lose the notebook. An answer that is not JSON (an error while
+  // the file is replaced) counts as "not yet".
+  await expect(page.locator(".lm-TabBar-tab.jp-mod-dirty")).toHaveCount(0, { timeout: 15_000 });
   await expect.poll(async () => {
-    const nb = await page.evaluate(async (NB) => (await fetch(`/api/contents/${NB}`)).json(), NB);
-    return JSON.stringify(nb?.content?.metadata?.widgets ?? {}).includes("Saved knob");
-  }, { timeout: 15_000 }).toBe(true);
+    const text = await page.evaluate(async (NB) => {
+      const res = await fetch(`/api/contents/${NB}`);
+      return res.ok ? res.text() : "";
+    }, NB);
+    try {
+      return JSON.stringify(JSON.parse(text)?.content?.metadata?.widgets ?? {}).includes("Saved knob");
+    } catch {
+      return false;
+    }
+  }, { timeout: 15_000, intervals: [500, 1000] }).toBe(true);
 
   // shut the kernel down, then reopen the notebook
   await page.evaluate(async () => {
