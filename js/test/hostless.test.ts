@@ -748,6 +748,31 @@ describe("Synoptic canvas without a kernel", () => {
   });
 });
 
+describe("Hexadecimal and binary display (IND-110)", () => {
+  test("a keypad in hexadecimal shows A..F, hides the decimal point and commits the word", async () => {
+    const { model, el } = mount({ ...defaults("NumericEntry"), label: "Register", format: "%04X", min: 0, max: 65535, value: 31 });
+    await frame();
+    expect(el.querySelector(".awi-kp-display")?.textContent).toBe("001F");
+    const key = (name: string) => el.querySelector(`button[aria-label="${name}"]`) as HTMLButtonElement;
+    expect(key("F").hidden).toBe(false);
+    expect(key("Decimal point").disabled).toBe(true);
+    key("1").click();
+    key("A").click();
+    key("F").click();
+    key("Enter").click();
+    expect(model.get("value")).toBe(0x1af);
+  });
+
+  test("hex keys stay hidden in decimal; a tank shows its value in binary", async () => {
+    const { el } = mount({ ...defaults("NumericEntry"), format: "%.1f" });
+    await frame();
+    expect((el.querySelector('button[aria-label="F"]') as HTMLButtonElement).hidden).toBe(true);
+    const tank = mount({ ...defaults("Tank"), value: 5, max: 7, format: "%03b" });
+    await frame();
+    expect(tank.body.getAttribute("aria-valuetext")).toBe("101");
+  });
+});
+
 describe("Tank without a kernel", () => {
   test("indicator by default, markers read through the schema", async () => {
     const { root, body, el } = mount({ ...defaults("Tank"), value: 3.2, max: 4, unit: "m", markers: [0.5, "x", 3.5], hi: 3, hihi: 3.5 });

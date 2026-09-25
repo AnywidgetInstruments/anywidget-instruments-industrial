@@ -1,7 +1,7 @@
 // NumericEntry: numeric keypad for touch panels (IND-104).
 import { html } from "../core/dom.js";
 import { checkEntry } from "../core/entry.js";
-import { formatValue, withUnit } from "../core/format.js";
+import { formatValue, radixOf, withUnit } from "../core/format.js";
 import type { AnyModel } from "../core/model.js";
 import { parseNumber } from "../core/scale.js";
 import { BaseView } from "../core/view.js";
@@ -15,12 +15,30 @@ export const KEYS: Array<[string, string, string]> = [
   ["4", "4", "4"], ["5", "5", "5"], ["6", "6", "6"], ["C", "clear", "Clear the entry"],
   ["1", "1", "1"], ["2", "2", "2"], ["3", "3", "3"], ["±", "sign", "Change the sign"],
   ["0", "0", "0"], [".", ".", "Decimal point"], ["Esc", "cancel", "Cancel"], ["↵", "enter", "Enter"],
+  // hexadecimal digits, shown only for a hexadecimal format (IND-110)
+  ["A", "A", "A"], ["B", "B", "B"], ["C", "hexC", "C"], ["D", "D", "D"], ["E", "E", "E"], ["F", "F", "F"],
 ];
 
-/** Draft text after pressing `key` (digits, ".", "back", "clear", "sign"). */
+const DIGIT = /^[0-9A-F]$/;
+
+/** Value of a digit key, or -1 (the C digit is "hexC": the label C is the clear key). */
+function digitOf(action: string): number {
+  if (action === "hexC") return 12;
+  return DIGIT.test(action) ? parseInt(action, 16) : -1;
+}
+
+/** True when `action` can be used with values in base `radix`. */
+export function keyAllowed(action: string, radix: number): boolean {
+  const digit = digitOf(action);
+  if (digit >= 0) return digit < radix;
+  return action !== "." || radix === 10;
+}
+
+/** Draft text after pressing `key` (digits, "A".."F", ".", "back", "clear", "sign"). */
 export function editDraft(draft: string | null | undefined, key: string): string {
   const d = draft ?? "";
-  if (/^\d$/.test(key)) return d === "0" ? key : d === "-0" ? `-${key}` : d + key;
+  if (key === "hexC") key = "C";
+  if (DIGIT.test(key)) return d === "0" ? key : d === "-0" ? `-${key}` : d + key;
   if (key === ".") return d.includes(".") ? d : `${d === "" || d === "-" ? `${d}0` : d}.`;
   if (key === "back") return d.slice(0, -1);
   if (key === "clear") return "";
@@ -48,15 +66,18 @@ export class KeypadView extends BaseView<NumericEntryTraits> {
     this.display = html("div", { cls: "awi-kp-display", attrs: { role: "status", "aria-live": "polite" } });
     this.msg = html("div", { cls: "awi-entry-msg awi-kp-msg", attrs: { role: "alert" } });
     this.keys = KEYS.map(([text, action, name]) => {
-      const key = html("button", { cls: `awi-kp-key awi-kp-${/^\d$/.test(action) ? "digit" : action}`, text, attrs: { type: "button", "aria-label": name } });
+      const kind = /^\d$/.test(action) ? "digit" : digitOf(action) >= 0 ? "digit awi-kp-hex" : action;
+      const key = html("button", { cls: `awi-kp-key awi-kp-${kind}`, text, attrs: { type: "button", "aria-label": name } });
       key.addEventListener("click", () => this.press(action));
       return key;
     });
     b.append(this.display, this.msg, html("div", { cls: "awi-kp-grid" }, this.keys));
     b.addEventListener("keydown", (e) => {
       const map: Record<string, string> = { Enter: "enter", Escape: "cancel", Backspace: "back", Delete: "clear", ",": ".", ".": ".", "-": "sign" };
-      const action = /^\d$/.test(e.key) ? e.key : map[e.key];
-      if (!action) return;
+      const k = e.key.length === 1 ? e.key.toUpperCase() : e.key;
+      const hex = radixOf(this.get("format")) === 16;
+      const action = /^\d$/.test(k) || (hex && /^[A-F]$/.test(k)) ? (k === "C" ? "hexC" : k) : map[e.key];
+      if (!action || !keyAllowed(action, radixOf(this.get("format")))) return;
       e.preventDefault();
       e.stopPropagation();
       this.press(action);
@@ -116,7 +137,12 @@ export class KeypadView extends BaseView<NumericEntryTraits> {
     this.display.classList.toggle("awi-kp-editing", editing);
     this.root.classList.toggle("awi-kp-armed", this.armed !== null);
     const on = this.interactive;
-    for (const k of this.keys) k.disabled = !on;
+    const radix = radixOf(this.get("format"));
+    this.keys.forEach((k, i) => {
+      const action = KEYS[i][1];
+      k.disabled = !on || !keyAllowed(action, radix);
+      k.hidden = digitOf(action) >= 10 && radix !== 16;
+    });
     const range = `${formatValue(parseNumber(this.get("min")), this.get("format"))} to ${formatValue(parseNumber(this.get("max")), this.get("format"))}`;
     this.body.setAttribute("aria-description", `value ${withUnit(formatValue(parseNumber(this.get("value")), this.get("format")), unit)}, range ${range}${editing ? `, typing ${this.draft}` : ""}`);
   }

@@ -45,8 +45,10 @@ class NumericWidget(InstrumentWidget):
     ``ticks`` (major intervals), ``minor_ticks`` (subdivisions per interval).
 
     Display: ``format`` is a printf-like spec: ``%.2f`` fixed, ``%.3e`` scientific,
-    ``%.3g`` general, ``%.3n`` engineering (exponent multiple of 3) and
-    ``%.3s`` SI prefix (m, µ, k, M ...).
+    ``%.3g`` general, ``%.3n`` engineering (exponent multiple of 3),
+    ``%.3s`` SI prefix (m, µ, k, M ...), and for registers ``%X`` / ``%x``
+    hexadecimal, ``%b`` binary, ``%o`` octal, with an optional zero-padded
+    width such as ``%04X`` (IND-110); values are then typed in that base.
 
     Input (API-014): in control mode the value can be set on the drawing (drag,
     wheel, arrow keys) or typed in the value field (``entry=True``, the

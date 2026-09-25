@@ -21,7 +21,7 @@
     "scale": { "enum": ["linear", "log"], "default": "linear", "x-awi-writer": "host" },
     "ticks": { "type": "integer", "minimum": 1, "description": "Major scale intervals.", "default": 5, "x-awi-writer": "host" },
     "minor_ticks": { "type": "integer", "minimum": 0, "description": "Minor subdivisions per major interval.", "default": 4, "x-awi-writer": "host" },
-    "format": { "type": "string", "description": "printf-like spec: %.2f, %.3e, %.3g, %.3n (engineering), %.3s (SI prefix) (NUM-004).", "default": "%.1f", "x-awi-writer": "host" },
+    "format": { "type": "string", "description": "printf-like spec: %.2f, %.3e, %.3g, %.3n (engineering), %.3s (SI prefix) (NUM-004); %X, %x, %b, %o show the value as a hexadecimal, binary or octal integer, with an optional width padded with zeros such as %04X (IND-110), and values are then typed in that base.", "default": "%.1f", "x-awi-writer": "host" },
     "coerce": { "type": "boolean", "description": "Clamp values to [min, max] instead of rejecting typed values outside it (NUM-010).", "default": false, "x-awi-writer": "host" },
     "update_rate": { "type": "number", "minimum": 1, "description": "Maximum rate of intermediate values sent while dragging, in Hz (NUM-009).", "default": 30, "x-awi-writer": "host" },
     "entry": { "type": "boolean", "description": "Editable value field in control mode (API-014).", "default": true, "x-awi-writer": "host" },

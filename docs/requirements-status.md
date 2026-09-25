@@ -121,7 +121,7 @@ JupyterLab / Notebook 7 / marimo (`e2e/`).
 | IND-080 … IND-083 | S/C | ✅ | `Transmitter`: ISA-5.1 style bubble, NE 107 status by shape and text, **✕ BAD** and no `aria-valuenow` on failure, alarm limits (py, js, e2e) |
 | IND-090 … IND-093 | S/C | ✅ | `EventLog`: `log()`, `max_events`, category chips, filter by category and text, CSV, `connect()` / `disconnect()` audit trail (py, js, e2e) |
 | IND-100 … IND-104 | S | ✅ | `DeviationIndicator`, `Sparkline` (binary history), `BarGraph` (per-bar alarm levels), `KPITile` with `oee()`, `NumericEntry` keypad with range check and `confirm_delta` (py, js, e2e) |
-| IND-110 | S | ⬜ | Hexadecimal, binary and octal formats |
+| IND-110 | S | ✅ | `%x`, `%X`, `%b`, `%o` with zero-padded width in every numeric widget and scale; entry field and keypad take values in that base (A..F keys in hexadecimal) (js) |
 | IND-111, IND-112 | S | ⬜ | `BitField` |
 | IND-113, IND-114 | S/C | ⬜ | `RecipeTable` |
 | IND-115 | S | ⬜ | `XYGraph` |

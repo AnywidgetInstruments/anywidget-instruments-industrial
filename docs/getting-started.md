@@ -37,7 +37,8 @@ an `EmergencyStop` run first.
 
 `min`, `max`, `step`, `unit`, `scale` (`linear`/`log`), `ticks`,
 `minor_ticks`, `format` (`%.2f`, `%.3e`, `%.3g`, `%.3n` engineering, `%.3s`
-SI prefix), `coerce`, alarm limits `lolo`, `lo`, `hi`, `hihi` with
+SI prefix; `%04X` hexadecimal, `%016b` binary, `%o` octal for registers, the
+entry field and keypad then take values in that base), `coerce`, alarm limits `lolo`, `lo`, `hi`, `hihi` with
 `deadband` and the computed `alarm_level`, `show_limits`, engineering scaling
 `raw_min`/`raw_max`/`eng_min`/`eng_max` with `set_raw()`, `animate`.
 
