@@ -18,13 +18,13 @@ revision history).
 | `src/anywidget_instruments/` | Python package (one module per widget family, private `_*.py`) |
 | `src/anywidget_instruments/schema/` | Trait contract: one JSON Schema per widget, single source of truth for Python, TypeScript and hosts |
 | `src/anywidget_instruments/static/` | Built front-end bundle (not minified, with source map) and `contract.json`: generated, never edited, not committed |
-| `js/src/core/` | Shared front end (TypeScript): `view.ts` (base view), `model.ts` (AFM model), `scale.ts`, `format.ts`, `dom.ts`, `liveness.ts`, `plot.js` (graphs) |
-| `js/src/contract/` | Trait contract runtime: spec types and schema-driven helpers |
+| `js/src/core/` | Shared front end (TypeScript): `view.ts` (base view), `plot.ts` (graphs), `model.ts` (AFM model), `scale.ts`, `format.ts`, `dom.ts`, `buffers.ts`, `liveness.ts` |
+| `js/src/contract/` | Trait contract runtime: schema-driven reading, derived traits, and the logic shared with Python (checked by `tests/parity/`) |
 | `js/src/generated/` | `contract.ts`, generated from the schemas by `npm run gen`: not committed |
-| `js/src/widgets/` | One view per widget family; registered by `_kind` in `js/src/index.js`; being converted to TypeScript |
+| `js/src/widgets/` | One view per widget family (TypeScript); registered by `_kind` in `js/src/index.js` |
 | `js/src/styles.css` | All styles, scoped under `.awi-root`, colors as `--awi-*` custom properties |
 | `js/test/` | vitest unit tests (jsdom) |
-| `tests/` | pytest unit tests, including headless execution of `examples/*.ipynb` |
+| `tests/` | pytest unit tests, including headless execution of `examples/*.ipynb`; `test_contract.py` (Python against the schemas) and `parity/*.json` (cases shared with vitest) |
 | `e2e/` | Playwright end-to-end tests (JupyterLab, Notebook 7, marimo, visual, performance) |
 | `e2e-site/` | Browser tests of the built site's in-browser deployments (`npm run test:site`, run by the Docs workflow) |
 | `examples/` | Example notebooks and a marimo app |
@@ -53,18 +53,27 @@ pushing changes to the front end or to the kernel/front-end protocol.
 
 1. Python: subclass `InstrumentWidget` (or `NumericWidget`, `BooleanWidget`,
    `GraphWidget`, `ProcessObject`), set `_kind`, `_default_mode`,
-   `_default_size`, and declare synced traits with `.tag(sync=True)`.
+   `_default_size` (with `mode_trait` / `size_trait` so that the class
+   defaults match), and declare synced traits with `.tag(sync=True)`.
    Use `float_serializers` for traits that may hold NaN/inf.
-2. Front end: add or extend a view in `js/src/widgets/`, derived from
-   `BaseView` / `NumericView` / `PlotView`; list the traits that trigger a
-   redraw; register the `_kind` in `js/src/index.js`.
-3. Export the class in `src/anywidget_instruments/__init__.py` (`__all__`).
-4. Tests: pytest for kernel logic, vitest for pure front-end logic, and an
+2. Schema: add `src/anywidget_instruments/schema/<kind>.schema.json` with every
+   synced trait (type, bounds, default, `x-awi-writer`) and the custom
+   messages with their buffers (`x-awi-messages`). `tests/test_contract.py`
+   fails until Python and the schema agree.
+3. Front end: add or extend a TypeScript view in `js/src/widgets/`, derived
+   from `BaseView` / `NumericView` / `PlotView` and typed with the generated
+   `<Class>Traits`; list the traits that trigger a redraw; register the
+   `_kind` in `js/src/index.js`. Rules also implemented in Python go to
+   `js/src/contract/` with parity cases in `tests/parity/`; derived traits
+   are computed in `contract/derived.ts` when no host owns the state.
+4. Export the class in `src/anywidget_instruments/__init__.py` (`__all__`).
+5. Tests: pytest for kernel logic, vitest for pure front-end logic, a
+   host-less test in `js/test/hostless.test.ts` (plain trait dictionary), and an
    entry in `e2e/allwidgets.spec.js` (kernel → front end and front end → kernel).
-5. Add it to `js/preview/index.html`, refresh the visual baselines
+6. Add it to `js/preview/index.html`, refresh the visual baselines
    (`npx playwright test e2e/visual.spec.js --update-snapshots`) and check the
    screenshots, then document it in `docs/widgets.md` and `docs/api.md`.
-6. Update `docs/requirements-status.md` when a requirement changes status.
+7. Update `docs/requirements-status.md` when a requirement changes status.
 
 ## Conventions
 

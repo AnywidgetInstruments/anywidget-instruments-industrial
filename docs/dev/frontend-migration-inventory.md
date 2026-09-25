@@ -7,7 +7,17 @@ gets the same visual behavior as a Python kernel.
 
 This page describes the code at commit `0f0ffb8` (before the migration). It is
 a working document for developers; the host contract itself is described in
-a dedicated page for host authors (phase 4 of the migration).
+the [trait contract](../trait-contract.md) page for host authors.
+
+!!! note "Status: migration complete"
+    All 47 widgets now have a schema and a TypeScript view reading its traits
+    through it. The PURE items below were moved to (or shared with) the front
+    end, with parity cases where both sides keep them; the AMBIGUOUS items
+    were resolved by the authority rule of the specification (section 19.1):
+    derived traits and operator actions are applied by the front end only
+    when no host owns the state. `SynopticCanvas` children still need a host
+    widget manager (HOST-009). The tables below keep the "JS" references of
+    the code before the migration.
 
 ## Legend
 

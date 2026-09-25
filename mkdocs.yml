@@ -25,6 +25,7 @@ nav:
   - Guides:
       - Alarm conventions: alarm-conventions.md
       - Hosts and liveness: hosts.md
+      - Trait contract for host authors: trait-contract.md
   - API reference: api.md
   - Specification: specification.md
   - Development:

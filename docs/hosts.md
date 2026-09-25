@@ -9,6 +9,7 @@
 | JupyterLite (Pyodide) | tested (docs workflow) | no threads: heartbeat disabled |
 | VS Code, Google Colab | expected (anywidget hosts) | not covered by automated tests |
 | [KaimonSlate.jl](https://github.com/kahliburke/KaimonSlate.jl) (Julia) | expected, front end only | see below; the kernel-less path is tested with a host page modeled on its `SlateAFM` extension (E2E) |
+| Other hosts without Python | through the [trait contract](trait-contract.md) | a dictionary of traits and the anywidget model API are enough |
 
 ## KaimonSlate.jl
 
@@ -17,45 +18,34 @@ Julia notebook, hosts anywidget front-end modules through its `SlateAFM`
 extension (`pypi_afm` loads a published anywidget; see its
 [documentation](https://kahliburke.github.io/KaimonSlate.jl/dev/)). There the widgets are
 front ends bound to a dictionary of traits built from the class defaults:
-the Python side of this package (validation, callbacks, alarm logic, binary
-chart data, heartbeats) does not run.
+the Python side of this package does not run. The widgets follow the
+[trait contract](trait-contract.md), so they behave as with a Python kernel
+for everything the front end can do alone; what needs a program (process
+data, process events) is up to the host.
 
-- No widget reports **⚠ NO KERNEL**: stale-data detection is on only when a
-  host announces heartbeats (HOST-003).
-- The numeric widgets (`Knob`, `Dial`, `Gauge`, `Meter`, `Compass`,
-  `Tank`, `Thermometer`, `FillSlide`, `VUMeter`, `SevenSegment`,
-  `AnalogIndicator`, `Transmitter`, `NumericEntry`) behave as with a Python
-  kernel: traits are read through their schema (wrong types replaced by
-  defaults, bounds applied, the Compass heading wrapped), the value is
-  shown clamped when `coerce` is set, and `alarm_level` (and `peak` with
-  peak hold) is computed by the front end and written back to the trait
-  dictionary (HOST-002, HOST-004).
-- The Boolean widgets, `SelectorSwitch`, `StackLight`, `Pipe`,
-  `DeviationIndicator`, `ThemeSwitch`, the compact indicators and
-  `EventLog` read their traits through their schema; a selector resolves
-  its position and a stack light its states as the Python classes do, and
-  `BarGraph` computes its per-bar alarm levels. `AlarmIndicator` applies
-  an acknowledgement itself, and the `Valve`, `Pump` and `Motor` faceplates
-  apply auto / manual and, with `simulate`, the simulated state; both still
-  send their message to the host. Latches are host logic: a latched push
-  button stays set until the host resets it, and so does the emergency
-  stop. The theme switch changes the page theme only. `Sparkline` and
-  `KPITile` draw the history the host sends (`snapshot` and `append`
-  messages of float32 values, described in `contract.json`).
-- The supervisory objects work without a kernel: `StateMachine` (PackML
-  model by default) applies operator commands through its transition table;
-  `PIDFaceplate` applies SP / OP entries and mode changes with its rules
-  (clamping, confirmation, setpoint tracking) and derives its PV alarm;
-  `Annunciator` runs the ISA-18.1 sequence on the process conditions the
-  host writes (`active` of each window) and applies the operator buttons;
-  `AlarmBanner` and `AlarmList` apply acknowledgements and shelving (with
-  its expiry). Every operator action is still sent to the host. Process
-  events stay host events: the completion of an acting state, a PV value,
-  a new alarm.
-- The other widgets are being migrated (see the
-  [migration inventory](dev/frontend-migration-inventory.md)): until then,
-  the graphs draw the data a host sends
-  that provides them.
+No widget reports **⚠ NO KERNEL**: the stale-data indication is on only when
+a host announces heartbeats (HOST-003).
+
+| Widgets | Without a kernel, the front end… | Stays with the host |
+|---|---|---|
+| Numeric: `Knob`, `Dial`, `Gauge`, `Meter`, `Compass`, `Tank`, `Thermometer`, `FillSlide`, `VUMeter`, `SevenSegment`, `AnalogIndicator`, `Transmitter`, `NumericEntry` | reads the traits through the schema (bounds, heading wrap), shows the value clamped with `coerce`, computes `alarm_level` and `peak` and writes them back | the process value |
+| Boolean: `LED`, `ToggleSwitch`, `RockerSwitch`, `SlideSwitch`, `PushButton`, `EmergencyStop` | applies the mechanical action of switches and buttons | resetting a latch and the emergency stop |
+| `SelectorSwitch`, `StackLight`, `Pipe`, `ThemeSwitch` | resolves the selector position and the stack light states as the Python classes do; the theme switch sets the page theme | the theme of the other widgets |
+| `AlarmIndicator`, `AlarmBanner`, `AlarmList` | applies acknowledgements and shelving, with its expiry | raising and clearing alarms |
+| Compact: `DeviationIndicator`, `Sparkline`, `BarGraph`, `KPITile`, `EventLog` | computes the per-bar alarm levels; draws the history the host sends | the history (`snapshot`, `append` messages) and the events |
+| Process objects: `Valve`, `Pump`, `Motor` | applies auto / manual and, with `simulate`, the simulated state | the process feedback |
+| `StateMachine` | applies operator commands through the transition table (PackML model by default) | the completion of acting states |
+| `PIDFaceplate` | applies SP / OP entries and mode changes with their rules (clamping, confirmation, setpoint tracking), derives the PV alarm | the controller and the PV |
+| `Annunciator` | runs the ISA-18.1 sequence on the process conditions and applies the operator buttons | the process conditions (`active` of each window) |
+| Graphs: `WaveformChart`, `IntensityChart`, `DigitalWaveformGraph`, `MixedSignalGraph`, `TrendChart` | draws the data messages the host sends (float32 / float64 / uint8 buffers, see `contract.json`), with cursors, zoom, axis ranges and export; writes back the cursors, the Y range and the trend span set by the operator | the data |
+| `PolarPlot`, `SmithChart`, `RadarChart` | draws the data sets of `value` (JSON), with the radial range set by the operator | the data sets (Smith: reflection coefficients) |
+| `PictureControl` | draws the `draw` messages (images as buffers), records a click in `value` | the drawing commands |
+| `SynopticCanvas` | draws the pipe runs and the background (bytes or base64 text) | the children: nested widgets need a widget manager, a placeholder is shown otherwise |
+
+Every operator action is also sent to the host as a message, so a Julia
+program can react to it (HOST-012). Alarm levels and sequences computed in
+the browser are a visualization, not a protection layer (see the
+[safety notice](safety.md)).
 
 ## Stale-data indication (ROB-001)
 
