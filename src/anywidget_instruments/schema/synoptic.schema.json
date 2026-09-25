@@ -45,7 +45,7 @@
           }
         }
       },
-      "description": "Widgets placed on the canvas {widget, x, y}. The children are rendered through the host widget manager (Jupyter, marimo); a host without one gets a placeholder per child, while the pipes and the background still render (HOST-008).",
+      "description": "Widgets placed on the canvas {widget, x, y}. The children are rendered through the host widget manager (Jupyter, marimo); a host without one gets a placeholder per child, while the pipes and the background still render (HOST-009).",
       "default": [],
       "x-awi-writer": "host"
     },

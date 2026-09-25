@@ -26,7 +26,7 @@
     },
     "auto": {
       "type": "boolean",
-      "description": "Automatic mode: the commands are disabled on the faceplate. The faceplate AUTO / MANUAL buttons send auto and manual commands; without a host owning the state, the front end applies them itself (HOST-004).",
+      "description": "Automatic mode: the commands are disabled on the faceplate. The faceplate AUTO / MANUAL buttons send auto and manual commands; without a host owning the state, the front end applies them itself (HOST-012).",
       "default": true,
       "x-awi-writer": "both"
     },

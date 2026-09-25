@@ -58,7 +58,7 @@
           }
         }
       },
-      "description": "Alarms that are not back to normal, {id, timestamp, source, priority, message, state}; the view sorts them (unacknowledged first, then priority and time). Written by the host (Python: raise_alarm(), clear_alarm()); without a host owning the state, the front end applies the acknowledgements (an alarm back to normal leaves the list) and writes the list back (HOST-004).",
+      "description": "Alarms that are not back to normal, {id, timestamp, source, priority, message, state}; the view sorts them (unacknowledged first, then priority and time). Written by the host (Python: raise_alarm(), clear_alarm()); without a host owning the state, the front end applies the acknowledgements (an alarm back to normal leaves the list) and writes the list back (HOST-004, HOST-012).",
       "default": [],
       "readOnly": true,
       "x-awi-writer": "derived"

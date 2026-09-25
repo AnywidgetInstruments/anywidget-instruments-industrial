@@ -52,7 +52,7 @@
         "active_acknowledged",
         "cleared_unacknowledged"
       ],
-      "description": "ISA-18.2 alarm state. Transitions (x-awi-transitions, [state, event, next]): activate and clear come from the host; acknowledge from the operator (ACK), applied by the host when it owns the state, otherwise by the front end, which always sends the ack message (HOST-004).",
+      "description": "ISA-18.2 alarm state. Transitions (x-awi-transitions, [state, event, next]): activate and clear come from the host; acknowledge from the operator (ACK), applied by the host when it owns the state, otherwise by the front end, which always sends the ack message (HOST-012).",
       "default": "normal",
       "x-awi-writer": "both",
       "x-awi-transitions": [

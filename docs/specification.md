@@ -8,8 +8,8 @@
 | Author | Sébastien Celles |
 | Document type | Software requirements specification |
 | Notation | EARS (Easy Approach to Requirements Syntax) |
-| Version | 0.8 |
-| Date | 2026-09-24 |
+| Version | 0.9 |
+| Date | 2026-09-25 |
 | Status | Baseline for version 1.0 |
 
 ---
@@ -480,6 +480,10 @@ authors in the documentation.
 | HOST-006 | S | The library shall ship its front-end module unminified, with its source map. |
 | HOST-007 | M | The class default of every synchronized trait shall equal the default given by the widget schema, so that a host reading class defaults without creating a widget gets the documented defaults. |
 | HOST-008 | S | The front end shall decode binary buffers received as `ArrayBuffer`, `DataView` or typed arrays, in the little-endian layouts documented by the schemas. |
+| HOST-009 | S | Where a widget contains other widgets (`SynopticCanvas`), the front end shall render the children through the host widget manager when the host provides one; otherwise it shall show a placeholder for each child and still render its own content. |
+| HOST-010 | S | The front end shall accept a binary trait value (an image) as a buffer or as base64 text. |
+| HOST-011 | M | Continuous integration shall fail when a widget exported by the package has no schema, when a synchronized trait, a class default or a message sent by the Python package differs from the schema, or when the front end does not type-check against the types generated from the schemas. |
+| HOST-012 | M | When the operator acts on a widget (acknowledgement, command, entry, click), the front end shall send the action to the host as a message; where no host owns the state, the front end shall also apply the effect of the action to the traits, with the rules of the Python class. |
 
 ### 19.1 Authority over the State
 
@@ -493,6 +497,11 @@ authors in the documentation.
 - When no host owns the state (empty `_session`), the front end is
   authoritative for the derived traits: it computes them once per model and
   writes them back, so that the host can read them.
+- Operator actions always travel to the host as messages. Without a host
+  owning the state, the front end also applies their effect (HOST-012);
+  with one, it waits for the host to apply them. Process events (a new
+  alarm, the end of an acting state, a measured value) are host events in
+  both cases: the front end never invents them.
 - In both cases, alarm levels computed in the browser are a visualization.
   They are not a protection layer and do not replace the safety functions of
   the process (see the safety notice, DOC-007).
@@ -564,3 +573,4 @@ authors in the documentation.
 | 0.6 | BOOL-015 (push button with a built-in lamp); STYLE-007 `system` theme; STYLE-008 (three-position theme switch applied to the page). |
 | 0.7 | IND-070 .. IND-104: trend chart, transmitter with device status, event log, deviation indicator, sparkline, bar graph, KPI tile, numeric keypad. |
 | 0.8 | HOST-001 .. HOST-008: trait contract in JSON Schema, schema-driven reading in the front end, heartbeats only when announced, authority over the state (19.1), parity cases, readable front-end module, class defaults, buffer decoding. Author named in the metadata. |
+| 0.9 | HOST-009 .. HOST-012: nested widgets through the host widget manager, binary traits as buffers or base64 text, continuous integration against divergence of Python, schemas and front end, operator actions sent and applied; 19.1 extended to operator actions and process events. |

@@ -36,7 +36,7 @@
           "description": "Mouse button (0: main)."
         }
       },
-      "description": "Last click {x, y, button} in CSS pixels from the top-left corner (SPEC-006), control mode only. Written by the host when it owns the state; without one, the front end writes it back (HOST-004). The click is always sent as a click message.",
+      "description": "Last click {x, y, button} in CSS pixels from the top-left corner (SPEC-006), control mode only. Written by the host when it owns the state; without one, the front end writes it back (HOST-012). The click is always sent as a click message.",
       "default": {},
       "readOnly": true,
       "x-awi-writer": "derived"

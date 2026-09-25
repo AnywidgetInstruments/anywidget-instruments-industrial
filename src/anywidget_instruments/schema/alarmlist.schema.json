@@ -71,7 +71,7 @@
           }
         }
       },
-      "description": "Alarms {id, timestamp, source, priority, message, state, shelved_until, suppressed, out_of_service}. Written by the host (Python: raise_alarm(), suppress(), ...); without a host owning the state, the front end applies acknowledgements, shelving and its expiry, and writes the list back (HOST-004).",
+      "description": "Alarms {id, timestamp, source, priority, message, state, shelved_until, suppressed, out_of_service}. Written by the host (Python: raise_alarm(), suppress(), ...); without a host owning the state, the front end applies acknowledgements, shelving and its expiry, and writes the list back (HOST-004, HOST-012).",
       "default": [],
       "readOnly": true,
       "x-awi-writer": "derived"

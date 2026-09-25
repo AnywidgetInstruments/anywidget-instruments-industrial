@@ -416,7 +416,7 @@
     },
     "value": {
       "type": "string",
-      "description": "Current state. Empty or unknown: the initial state of the model. Written by the host, or by the front end when it applies an operator command without a host (HOST-004).",
+      "description": "Current state. Empty or unknown: the initial state of the model. Written by the host, or by the front end when it applies an operator command without a host (HOST-012).",
       "default": "",
       "readOnly": true,
       "x-awi-resolved": true,

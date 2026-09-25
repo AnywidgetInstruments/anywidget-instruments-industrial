@@ -1,7 +1,7 @@
 # Requirements status
 
 Status of each requirement of the
-[specification](specification.md) (version 0.8).
+[specification](specification.md) (version 0.9).
 
 Legend: ✅ implemented and tested · 🟡 partial / not verifiable here · ⬜ not started
 
@@ -127,28 +127,27 @@ Tests: py (`tests/test_industrial.py`), js (`js/test/industrial.test.js`), e2e
 example `examples/filling_line.ipynb`.
 
 ## HOST – Host independence
-Migration in progress. Migrated: the numeric widgets (`Knob`, `Dial`, `Gauge`,
-`Meter`, `Compass`, `Tank`, `Thermometer`, `FillSlide`, `VUMeter`,
-`SevenSegment`, `AnalogIndicator`, `Transmitter`, `NumericEntry`), the Boolean
-widgets (`LED`, `ToggleSwitch`, `RockerSwitch`, `SlideSwitch`, `PushButton`,
-`EmergencyStop`), `SelectorSwitch`, `StackLight`, `AlarmIndicator`,
-`ThemeSwitch`, `Pipe`, the compact indicators (`DeviationIndicator`,
-`Sparkline`, `BarGraph`, `KPITile`), the process objects (`Valve`, `Pump`,
-`Motor`), `EventLog` and the supervisory objects (`StateMachine`,
-`PIDFaceplate`, `Annunciator`, `AlarmBanner`, `AlarmList`). To do: the
-graphs and `SynopticCanvas` (see the
-[migration inventory](dev/frontend-migration-inventory.md)).
+All 47 widgets follow the trait contract: one JSON Schema each in
+`src/anywidget_instruments/schema/`, a TypeScript view reading its traits
+through it, and the front-end logic they share with Python checked by parity
+cases. The [trait contract](trait-contract.md) page describes it for host
+authors; the [migration inventory](dev/frontend-migration-inventory.md)
+records the analysis it started from.
 
 | ID | Pri | Status | Notes |
 |---|---|---|---|
-| HOST-001 | M | 🟡 | Schemas for the shared traits, the numeric base, peak hold and the migrated widgets; generated TypeScript types and `static/contract.json` (py, js) |
-| HOST-002 | M | 🟡 | Migrated widgets: traits read through the schema, coerced value, last valid scale, Compass heading wrapped (`x-awi-modulo`) (js, e2e host page) |
+| HOST-001 | M | ✅ | A schema per widget and per base class (47 widgets); generated TypeScript types and `static/contract.json`, shipped in the wheel (py, js) |
+| HOST-002 | M | ✅ | Every view reads its traits through the schema: wrong types replaced by the default, bounds applied, `"nan"` decoded, heading wrapped (`x-awi-modulo`), invalid array items dropped; reads are cached per raw value (js, e2e host page) |
 | HOST-003 | M | ✅ | Every widget: neutral class defaults, Python widgets announce the kernel session; no stale indication without an announcement (py, js, e2e host page) |
-| HOST-004 | M | 🟡 | `alarm_level` of the migrated numeric widgets and `peak` of `Gauge`, `Meter`, `VUMeter` computed by the front end without a host, host value kept otherwise; `BarGraph` alarm levels; `AlarmIndicator`, `AlarmBanner` and `AlarmList` actions (with shelving expiry), faceplate commands of the process objects and of `PIDFaceplate`, `StateMachine` commands and `Annunciator` sequences applied by the front end without a host (js, e2e host page) |
-| HOST-005 | M | 🟡 | Parity cases in `tests/parity/`: alarm levels, coerce, scale validity, heading wrap, peak hold, resolved defaults (selector, stack light), bar graph, process commands, state machine, PID operator rules, the 72 annunciator transitions, alarm list actions, accepted states; transition and simulation tables checked against the schemas (py, js) |
+| HOST-004 | M | ✅ | Derived traits computed by the front end without a host, host values kept otherwise: `alarm_level`, `peak`, `BarGraph` alarm levels, `StateMachine` state, `PIDFaceplate` summary, `Annunciator` windows and horn, shelving expiry, `PictureControl` click (js, e2e host page) |
+| HOST-005 | M | ✅ | Parity cases in `tests/parity/` (alarm levels, coerce, scales, heading wrap, peak hold, resolved defaults, bar graph, process commands, state machine, PID, the 72 annunciator transitions, alarm list, graph readouts of the waveform, intensity, digital and trend charts, Smith chart conversions, radar ranges, trend pens, image type); transition and simulation tables checked against the schemas (py, js) |
 | HOST-006 | S | ✅ | Unminified bundle with a linked source map, still reproducible |
-| HOST-007 | M | 🟡 | Checked for the widgets with a schema by `tests/test_contract.py` |
-| HOST-008 | S | 🟡 | `ArrayBuffer`, `DataView` and typed arrays accepted by `core/buffers.ts` (tested with `ArrayBuffer` history buffers); layouts documented for `Sparkline`, `KPITile`, the graphs to do |
+| HOST-007 | M | ✅ | Class and instance defaults of every widget checked against its schema by `tests/test_contract.py` (py) |
+| HOST-008 | S | ✅ | `ArrayBuffer`, `DataView` and typed arrays accepted (`core/buffers.ts`); every buffer layout documented in the schemas; sizes of the buffers Python sends checked against them; short buffers never over-read (py, js) |
+| HOST-009 | S | ✅ | `SynopticCanvas` children through the widget manager in Jupyter (e2e), placeholders with pipes and background without one (js) |
+| HOST-010 | S | ✅ | `SynopticCanvas.background` as a buffer (e2e) or base64 text, with the image type detected as in Python (py, js) |
+| HOST-011 | M | ✅ | `tests/test_contract.py` (every exported widget has a schema; trait names, types, bounds, read-only state, defaults, states and sent messages against the schemas) and `npm run typecheck`, both in CI |
+| HOST-012 | M | ✅ | Operator actions sent as messages; applied by the front end only without a host owning the state (js host-less tests, e2e) |
 
 ## DOC, QA
 | ID | Pri | Status | Notes |
