@@ -73,66 +73,24 @@ def _synced(cls: type) -> dict[str, t.TraitType]:
     return {k: v for k, v in cls.class_traits(sync=True).items() if k not in FRAMEWORK}
 
 
-#: Widgets migrated to the host-independent front end.
-MIGRATED = {
-    "Knob",
-    "Tank",
-    "Dial",
-    "Thermometer",
-    "FillSlide",
-    "SevenSegment",
-    "Compass",
-    "AnalogIndicator",
-    "Transmitter",
-    "NumericEntry",
-    "Gauge",
-    "Meter",
-    "VUMeter",
-    "LED",
-    "ToggleSwitch",
-    "RockerSwitch",
-    "SlideSwitch",
-    "PushButton",
-    "EmergencyStop",
-    "SelectorSwitch",
-    "StackLight",
-    "ThemeSwitch",
-    "Pipe",
-    "AlarmIndicator",
-    "DeviationIndicator",
-    "Sparkline",
-    "BarGraph",
-    "KPITile",
-    "Valve",
-    "Pump",
-    "Motor",
-    "EventLog",
-    "StateMachine",
-    "PIDFaceplate",
-    "Annunciator",
-    "AlarmBanner",
-    "AlarmList",
-    "PolarPlot",
-    "SmithChart",
-    "RadarChart",
-    "PictureControl",
-    "WaveformChart",
-    "IntensityChart",
-    "DigitalWaveformGraph",
-    "MixedSignalGraph",
-    "TrendChart",
-    "SynopticCanvas",
-}
+#: Every widget class the package exports: all follow the trait contract.
+WIDGET_CLASSES = sorted(
+    n
+    for n, c in vars(ai).items()
+    if isinstance(c, type) and issubclass(c, _base.InstrumentWidget) and c._kind.default_value
+)
 
 
-def test_migrated_widgets_have_a_schema() -> None:
+def test_every_widget_has_a_schema() -> None:
+    """A new widget cannot skip the contract (HOST-001): CI fails without its schema."""
     classes = {w["class"] for w in CONTRACT["widgets"].values()}
-    assert {"InstrumentWidget", "NumericWidget", *MIGRATED} <= classes
+    assert len(WIDGET_CLASSES) >= 47
+    assert set(WIDGET_CLASSES) <= classes, sorted(set(WIDGET_CLASSES) - classes)
 
 
 def test_class_defaults_announce_no_liveness() -> None:
     """HOST-003: a host using class defaults never sees NO KERNEL."""
-    for cls in (_base.InstrumentWidget, *(CLASSES[c] for c in MIGRATED)):
+    for cls in (_base.InstrumentWidget, *(CLASSES[c] for c in WIDGET_CLASSES)):
         traits = cls.class_traits()
         assert traits["_session"].default() == ""
         assert traits["_heartbeat"].default() == 0
