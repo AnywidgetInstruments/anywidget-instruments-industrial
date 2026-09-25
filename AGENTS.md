@@ -73,6 +73,8 @@ pushing changes to the front end or to the kernel/front-end protocol.
 6. Add it to `js/preview/index.html`, refresh the visual baselines
    (`npx playwright test e2e/visual.spec.js --update-snapshots`) and check the
    screenshots, then document it in `docs/widgets.md` and `docs/api.md`.
+   When a drawing changes, also refresh the documentation images of
+   `docs/img/` (see "Documentation images" in `docs/development.md`).
 7. Update `docs/requirements-status.md` when a requirement changes status.
 
 ## Conventions

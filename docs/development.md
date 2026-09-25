@@ -56,6 +56,19 @@ After an intended visual change, refresh the screenshot baselines with
 `npx playwright test e2e/visual.spec.js --update-snapshots` and check the new
 images before committing them.
 
+## Documentation images
+
+The pictures of `docs/img/` are captures of the real widgets: refresh them
+with the visual baselines whenever a drawing changes, so that the site never
+shows an older look.
+
+- Example notebooks (`filling_line.png`, `gallery.png`, ...):
+  `AWI_SHOTS=docs/img npx playwright test e2e/examples.spec.js`.
+- Batch reactor showcase (`showcase-reactor.png`,
+  `showcase-reactor-hero.png`): start
+  `marimo run lite/marimo/batch_reactor.py --headless --port 2719 --no-token`,
+  then run `node js/scripts/docs-images.mjs`.
+
 ## Preview page
 
 `js/preview/index.html` renders every widget with an in-memory model, without

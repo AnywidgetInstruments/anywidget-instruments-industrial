@@ -26,8 +26,14 @@ for (const file of examples) {
     const shot = await page.screenshot({ fullPage: false });
     await testInfo.attach(file.replace(".ipynb", ".png"), { body: shot, contentType: "image/png" });
     if (process.env.AWI_SHOTS) {
-      // documentation images: the first widget output of the notebook
-      const output = page.locator(".jp-OutputArea-output", { has: page.locator(".awi-root") }).first();
+      // documentation images: the first output with an instrument (the
+      // theme switch at the top of the notebooks is not one)
+      const output = page.locator(".jp-OutputArea-output", { has: page.locator(".awi-root:not(:has(.awi-theme-opt))") }).first();
+      // a viewport taller than the output, so that the status bar never covers it
+      const height = Math.ceil((await output.boundingBox())?.height ?? 0) + 200;
+      await page.setViewportSize({ width: 1400, height: Math.max(1000, height) });
+      await output.evaluate((el) => el.scrollIntoView({ block: "start" }));
+      await page.waitForTimeout(500);
       await output.screenshot({ path: `${process.env.AWI_SHOTS}/${file.replace(".ipynb", ".png")}` });
     }
   });
