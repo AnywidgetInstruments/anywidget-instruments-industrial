@@ -1,0 +1,93 @@
+<!doctype html>
+<!--
+  The batch reactor of examples/kaimonslate/batch_reactor.jl, hosted without
+  a Python kernel as SlateAFM does: each widget is bound to a dictionary of
+  traits (class defaults from contract.json and the traits the Julia notebook
+  gives). e2e/host.spec.js plays the Julia side: it writes traits and sends
+  the data messages the notebook sends, and checks the operator actions land
+  in the trait dictionaries the notebook reads.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Hostless batch reactor</title>
+    <link rel="stylesheet" href="/src/anywidget_instruments/static/index.css" />
+    <style>body { font-family: sans-serif; display: flex; flex-wrap: wrap; gap: 16px; padding: 16px; }</style>
+  </head>
+  <body>
+    <script type="module">
+      const contract = await (await fetch("/src/anywidget_instruments/static/contract.json")).json();
+      const { default: afm } = await import("/src/anywidget_instruments/static/index.js");
+
+      function hostModel(traits) {
+        const handlers = {};
+        const fire = (ev, ...a) => (handlers[ev] || []).slice().forEach((h) => h(...a));
+        const sent = [];
+        return {
+          traits,
+          sent,
+          get: (k) => traits[k],
+          set(k, v) {
+            if (JSON.stringify(traits[k]) === JSON.stringify(v)) return;
+            traits[k] = v;
+            fire(`change:${k}`);
+          },
+          save_changes: () => {},
+          on: (ev, cb) => (handlers[ev] ||= []).push(cb),
+          off: (ev, cb) => (handlers[ev] = (handlers[ev] || []).filter((h) => h !== cb)),
+          send: (content) => sent.push(content),
+          // Julia side: setw!(name; kw...) and afm_emit(id, content; buffers)
+          setw(kw) { for (const [k, v] of Object.entries(kw)) { traits[k] = v; fire(`change:${k}`); } },
+          emit(content, buffers = []) { fire("msg:custom", content, buffers); },
+        };
+      }
+
+      const nodes = (status) => [{ label: "Plant", level: "site", children: [{ label: "Reactors", level: "area", children: [{ id: "R-101", label: "R-101 batch reactor", level: "unit", children: [
+        ["feed", "Feed (P-101, XV-101)"], ["heat", "Heating (TIC-101)"], ["agit", "Agitator (M-101)"], ["drain", "Drain (P-102, XV-102)"],
+      ].map(([id, label]) => ({ id, label, level: "equipment", status: status[id] || "normal" })) }] }] }];
+      // the traits of examples/kaimonslate/batch_reactor.jl
+      const widgets = {
+        machine: ["StateMachine", { label: "R-101 state (PackML)", size: [560, 250] }],
+        light: ["StackLight", { tiers: ["red", "amber", "green"], labels: ["Fault", "Attention", "Running"], label: "Stack light" }],
+        batches: ["KPITile", { value: 0, unit: "batches", format: "%.0f", target: 3, label: "Batches today", size: [240, 110] }],
+        recipe: ["RecipeTable", { label: "Recipe PR-12 (edit while Idle)", size: [560, 170],
+          columns: [
+            { name: "phase", title: "Phase", type: "text", readonly: true },
+            { name: "level", title: "Level", unit: "m", min: 0.5, max: 3.5, step: 0.1 },
+            { name: "temp", title: "Temperature", unit: "°C", min: 20, max: 90, step: 1 },
+            { name: "hold", title: "Hold", unit: "s", min: 0, max: 600, step: 5 },
+            { name: "agitator", title: "Agitator", type: "choice", choices: ["off", "on"] },
+          ],
+          value: [
+            { phase: "Fill", level: 3.0, temp: 20, hold: 0, agitator: "off" },
+            { phase: "Heat", level: 3.0, temp: 70, hold: 0, agitator: "on" },
+            { phase: "React", level: 3.0, temp: 70, hold: 60, agitator: "on" },
+            { phase: "Cool", level: 3.0, temp: 40, hold: 0, agitator: "on" },
+          ] }],
+        level: ["Tank", { value: 0.0, max: 4, unit: "m", format: "%.2f", hi: 3.6, show_limits: true, label: "LT-101 level" }],
+        temp: ["Thermometer", { value: 20.0, min: 0, max: 100, unit: "°C", hi: 85, show_limits: true, label: "TT-101" }],
+        tic: ["PIDFaceplate", { tag: "TIC-101", unit: "°C", pv: 20.0, pv_max: 100, sp: 70.0, hi: 85, op_unit: "%", confirm_delta: 15, label: "Jacket temperature" }],
+        feed_valve: ["Valve", { mode: "indicator", tag: "XV-101", label: "Feed valve" }],
+        agitator: ["Motor", { mode: "indicator", tag: "M-101", label: "Agitator" }],
+        trip: ["PushButton", { text: "AGITATOR TRIP", color: "yellow", label: "Simulate a fault", size: [170, 60] }],
+        trend: ["TrendChart", { span: 180, label: "Trend", size: [560, 220], pens: [
+          { name: "Level", unit: "m", min: 0, max: 4 }, { name: "Temperature", unit: "°C", min: 0, max: 100, hi: 85 }, { name: "Heater", unit: "%", min: 0, max: 100 }] }],
+        alarms: ["AlarmList", { label: "Alarms", size: [560, 160] }],
+        events: ["EventLog", { label: "Event log", size: [560, 180] }],
+        plant: ["EquipmentTree", { nodes: nodes({}), show_level: false, label: "Plant model", expanded: ["Plant", "Plant/Reactors", "R-101"], size: [300, 220] }],
+      };
+      const classDefaults = (name) => Object.fromEntries(Object.entries(contract.widgets[name].traits).map(([k, s]) => [k, s.default]));
+      window.models = {};
+      window.plantNodes = nodes;
+      for (const [id, [cls, traits]] of Object.entries(widgets)) {
+        const el = document.createElement("div");
+        document.body.appendChild(el);
+        const model = hostModel({ ...classDefaults(cls), ...traits });
+        window.models[id] = model;
+        afm.initialize({ model });
+        afm.render({ model, el });
+      }
+      document.body.dataset.ready = "true";
+    </script>
+  </body>
+</html>

@@ -51,6 +51,18 @@ const DEMOS = {
     // Resetting completes by itself on the simulation clock
     await expect(machine.locator(".awi-sm-label-current")).toHaveText("▶ Idle", { timeout: 30_000 });
   },
+  batch_reactor: async (page) => {
+    const machine = widget(page, "R-101 state (PackML)");
+    await expect(machine.locator(".awi-sm-label-current")).toHaveText("▶ Stopped", LOAD);
+    await machine.getByRole("button", { name: "Reset", exact: true }).click();
+    // Resetting completes on the simulation clock, then the batch starts
+    await expect(machine.locator(".awi-sm-label-current")).toHaveText("▶ Idle", { timeout: 30_000 });
+    await machine.getByRole("button", { name: "Start", exact: true }).click();
+    await expect(machine.locator(".awi-sm-label-current")).toHaveText("▶ Execute", { timeout: 30_000 });
+    const feed = widget(page, "Feed valve");
+    await feed.scrollIntoViewIfNeeded();
+    await expect(feed).toContainText("OPEN", { timeout: 30_000 });
+  },
   operating_modes: async (page) => {
     const gemma = widget(page, "GEMMA");
     await expect(gemma.locator(".awi-sm-label-current")).toHaveText("▶ A1", LOAD);

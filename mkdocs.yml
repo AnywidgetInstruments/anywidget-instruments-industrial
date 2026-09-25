@@ -16,6 +16,7 @@ theme:
       toggle: { icon: material/weather-sunny, name: Light mode }
 nav:
   - Home: index.md
+  - Showcase: showcase.md
   - Getting started: getting-started.md
   - Widget catalog: widgets.md
   - Examples: examples.md
