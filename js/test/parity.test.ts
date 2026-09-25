@@ -15,6 +15,7 @@ import processCases from "../../tests/parity/process.json";
 import resolvedCases from "../../tests/parity/resolved.json";
 import machineCases from "../../tests/parity/statemachine.json";
 import stateCases from "../../tests/parity/states.json";
+import trendCases from "../../tests/parity/trend.json";
 import waveformCases from "../../tests/parity/waveform.json";
 import { type AlarmLevel, type AlarmLimits, computeAlarmLevel } from "../src/contract/alarm.js";
 import { acknowledgeRows, type AlarmRow, expireShelving, localIso, shelveRow, unshelveRow } from "../src/contract/alarms.js";
@@ -31,6 +32,7 @@ import { loopModeChange, operatorSet } from "../src/contract/pid.js";
 import { positionDemand, processCommand, type ProcessState } from "../src/contract/process.js";
 import { availableCommands, type Machine, nextState, normalizeMachine, SC } from "../src/contract/statemachine.js";
 import { readTrait } from "../src/contract/traits.js";
+import { normalizePen, PenRing } from "../src/contract/trend.js";
 import { Ring, valuesAt } from "../src/contract/waveform.js";
 import { parseNumber } from "../src/core/scale.js";
 import { CONTRACTS } from "../src/generated/contract.js";
@@ -296,6 +298,22 @@ describe("digital and mixed-signal graphs", () => {
       );
       for (const [x, expected] of c.cursors as Array<[number, Array<number | string>]>) {
         expect(digitalValuesAt(data, x, { x0: c.x0, dt: c.dt, buses: c.buses }), `${c.name} x=${x}`).toEqual(expected);
+      }
+    });
+  }
+});
+
+describe("trend chart", () => {
+  test.each(trendCases.normalize)("pens %#", (c) => {
+    expect(c.pens.map((p, j) => normalizePen(p, j))).toEqual(c.expected);
+  });
+  for (const c of trendCases.values_at) {
+    test(c.name, () => {
+      const rings = new Map(c.pens.map((p) => [p, new PenRing(c.history)]));
+      for (const [pen, values, times] of c.adds as Array<[string, number[], number[]]>) rings.get(pen)?.push(times, Float32Array.from(values), values.length);
+      for (const [x, expected] of c.cursors as Array<[number, Array<number | string>]>) {
+        const got = c.pens.map((p) => rings.get(p)?.at(x) ?? NaN);
+        expect(got.map((v) => (Number.isNaN(v) ? null : v)), `${c.name} x=${x}`).toEqual(expected.map((v) => (typeof v === "string" ? null : v)));
       }
     });
   }

@@ -107,6 +107,7 @@ MIGRATED = {
     "IntensityChart",
     "DigitalWaveformGraph",
     "MixedSignalGraph",
+    "TrendChart",
 }
 
 
@@ -336,9 +337,25 @@ def _digital_messages() -> Any:
     return w, sent
 
 
+def _trend_messages() -> Any:
+    w = ai.TrendChart(pens=["A", {"name": "B", "unit": "m"}], history=3)
+    sent = _sent(w)
+    w.add("A", [1.0, 2.0], time=[10.0, 11.0])
+    w.add_many({"A": 3.0, "B": [4.0, 5.0, 6.0, 7.0]}, time=12.0)
+    w._handle_front_msg(w, {"type": "sync_request"}, [])
+    w.clear()
+    return w, sent
+
+
 @pytest.mark.parametrize(
     "make",
-    [_picture_messages, _waveform_messages, _intensity_messages, _digital_messages],
+    [
+        _picture_messages,
+        _waveform_messages,
+        _intensity_messages,
+        _digital_messages,
+        _trend_messages,
+    ],
     ids=lambda f: f.__name__.strip("_"),
 )
 def test_sent_messages_conform(make: Any) -> None:
@@ -354,6 +371,13 @@ def test_sent_messages_conform(make: Any) -> None:
         if content["type"] == "draw":  # one buffer per image command, referenced by index
             refs = sorted(c["buffer"] for c in content["commands"] if "buffer" in c)
             assert refs == list(range(len(buffers)))
+        elif "repeat" in m:  # buffers repeated per item of a field, n from each item
+            items = content[m["repeat"]]
+            assert len(buffers) == len(m["buffers"]) * len(items)
+            for k, (_index, n, _total) in enumerate(items):
+                for j, bspec in enumerate(m["buffers"]):
+                    b = buffers[k * len(m["buffers"]) + j]
+                    assert len(b) == _buffer_bytes(w, {"n": n}, bspec), (content, bspec)
         else:
             assert len(buffers) == len(m["buffers"])
             for b, bspec in zip(buffers, m["buffers"], strict=True):

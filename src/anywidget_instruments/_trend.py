@@ -10,7 +10,7 @@ from typing import Any
 import numpy as np
 import traitlets as t
 
-from ._base import float_serializers
+from ._base import float_serializers, size_trait
 from ._graph import GraphWidget
 
 #: Keys of a pen description.
@@ -81,6 +81,7 @@ class TrendChart(GraphWidget):
 
     _kind = t.Unicode("trendchart").tag(sync=True)
     _default_size = (560, 260)
+    size = size_trait(*_default_size)
 
     #: Latest value of each pen, by name.
     value = t.Dict(read_only=True).tag(sync=True, **float_serializers)

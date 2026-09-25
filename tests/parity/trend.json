@@ -1,0 +1,18 @@
+{
+  "description": "TrendChart (IND-070, IND-073, CHART-104): pens as the host stores them, then the value of each pen under cursors (linear interpolation in time, NaN outside the kept samples). Values are exact in float32.",
+  "normalize": [
+    { "pens": ["LT-101"], "expected": [{ "name": "LT-101", "unit": "", "min": 0, "max": 100, "color": "", "format": "%.4g", "lolo": null, "lo": null, "hi": null, "hihi": null, "setpoint": null }] },
+    { "pens": [{ "name": "FT", "unit": "L/s", "min": -5, "max": 60, "color": "red", "hi": 50, "setpoint": 30, "format": "%.1f" }, { "name": "TT", "lo": null, "min": null }],
+      "expected": [
+        { "name": "FT", "unit": "L/s", "min": -5, "max": 60, "color": "red", "format": "%.1f", "lolo": null, "lo": null, "hi": 50, "hihi": null, "setpoint": 30 },
+        { "name": "TT", "unit": "", "min": 0, "max": 100, "color": "", "format": "%.4g", "lolo": null, "lo": null, "hi": null, "hihi": null, "setpoint": null } ] }
+  ],
+  "values_at": [
+    { "name": "interpolation in time, NaN outside the samples", "history": 10, "pens": ["A", "B"],
+      "adds": [["A", [1, 3], [100, 102]], ["B", [10], [101]], ["A", [7], [106]]],
+      "cursors": [[100, [1, "nan"]], [101, [2, 10]], [104, [5, "nan"]], [106, [7, "nan"]], [99, ["nan", "nan"]], [107, ["nan", "nan"]]] },
+    { "name": "oldest samples dropped", "history": 2, "pens": ["A"],
+      "adds": [["A", [1, 2, 4], [0, 1, 2]]],
+      "cursors": [[0.5, ["nan"]], [1, [2]], [1.5, [3]], [2, [4]]] }
+  ]
+}

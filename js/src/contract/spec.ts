@@ -66,6 +66,8 @@ export interface MessageSpec {
   direction: "host-to-front" | "front-to-host";
   description?: string;
   fields?: Record<string, unknown>;
+  /** Name of an array field: the buffers are repeated for each of its items, in order. */
+  repeat?: string;
   buffers: Array<{ dtype: string; shape?: string[]; order?: string; description?: string }>;
 }
 

@@ -369,3 +369,21 @@ def test_digital_values_at(case: dict[str, Any]) -> None:
         w.set_analog(case["analog"])
     for x, expected in case["cursors"]:
         assert w.values_at(x) == expected, (case["name"], x)
+
+
+TREND = _load("trend.json")
+
+
+@pytest.mark.parametrize("case", TREND["normalize"])
+def test_trend_pens_normalized(case: dict[str, Any]) -> None:
+    assert ai.TrendChart(pens=case["pens"]).pens == case["expected"]
+
+
+@pytest.mark.parametrize("case", TREND["values_at"], ids=[c["name"] for c in TREND["values_at"]])
+def test_trend_values_at(case: dict[str, Any]) -> None:
+    w = ai.TrendChart(pens=case["pens"], history=case["history"])
+    for pen, values, times in case["adds"]:
+        w.add(pen, values, time=times)
+    for x, expected in case["cursors"]:
+        got = [None if math.isnan(v) else v for v in w.values_at(x)]
+        assert got == [None if isinstance(v, str) else v for v in expected], (case["name"], x)

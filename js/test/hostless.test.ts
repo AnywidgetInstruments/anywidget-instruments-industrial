@@ -694,6 +694,32 @@ describe("Digital and mixed-signal graphs without a kernel", () => {
   });
 });
 
+describe("Trend chart without a kernel", () => {
+  test("pens with defaults, samples from ArrayBuffers, a short buffer is not over-read", async () => {
+    const { model, el, body } = mount({ ...defaults("TrendChart"), label: "Level", pens: [{ name: "LT-101" }, "not a pen", { name: "FT", unit: "L/s", min: 5, max: 5 }], value: { "LT-101": 2.5, FT: "nan" } });
+    const t0 = Date.UTC(2026, 8, 24, 10, 0, 0) / 1000;
+    const times = new Float64Array([t0, t0 + 1, t0 + 2]).buffer;
+    model.fireMsg({ type: "snapshot", pens: [[0, 3, 3], [1, 3, 3]] }, [times, new Float32Array([1, 2, 3]).buffer, times, new Float32Array([7]).buffer]);
+    await frame();
+    expect(body.getAttribute("aria-label")).toBe("Level: LT-101 2.5, FT NaN L/s");
+    // FT has an invalid scale (max <= min): shown as 0 .. 100
+    expect(el.querySelectorAll(".awi-pen")[1].textContent).toContain("[0 … 100]");
+    const csv = await csvOf(el);
+    expect(csv.split("\n").filter((l) => l.includes(",FT,"))).toHaveLength(1);
+    expect(csv.split("\n").filter((l) => l.includes(",LT-101,"))).toHaveLength(3);
+  });
+
+  test("the span chosen by the operator is written back", async () => {
+    const { model, el } = mount({ ...defaults("TrendChart"), pens: ["A"] });
+    await frame();
+    const sel = el.querySelector('select[aria-label="Time span"]') as HTMLSelectElement;
+    sel.value = "3600";
+    sel.dispatchEvent(new Event("change"));
+    expect(model.get("span")).toBe(3600);
+    expect(model.saved.at(-1)).toMatchObject({ span: 3600 });
+  });
+});
+
 describe("Tank without a kernel", () => {
   test("indicator by default, markers read through the schema", async () => {
     const { root, body, el } = mount({ ...defaults("Tank"), value: 3.2, max: 4, unit: "m", markers: [0.5, "x", 3.5], hi: 3, hihi: 3.5 });
