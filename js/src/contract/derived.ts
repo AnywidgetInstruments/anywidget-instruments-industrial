@@ -17,7 +17,7 @@ import { nextPeak, type PeakState } from "./peak.js";
 import { clampedSpOp, type PIDState } from "./pid.js";
 import { availableCommands, type Machine, normalizeMachine, resolveState } from "./statemachine.js";
 import type { WidgetContract } from "./spec.js";
-import { readTrait } from "./traits.js";
+import { plainValue, readTrait } from "./traits.js";
 
 /** True when a host owns the state and is authoritative for derived traits. */
 export function hostOwnsState(model: AnyModel): boolean {
@@ -153,7 +153,7 @@ function attachBarLevels(model: AnyModel<Traits>, contract: WidgetContract): () 
 
 /** Model of a state machine as the kernel stores it (the schema default when invalid). */
 export function machineOf(model: AnyModel, contract: WidgetContract): Machine {
-  return normalizeMachine(model.get("machine")) ?? (normalizeMachine(contract.traits.machine.default) as Machine);
+  return normalizeMachine(plainValue(model.get("machine"))) ?? (normalizeMachine(contract.traits.machine.default) as Machine);
 }
 
 /** value and available_commands of a state machine (IND-060, IND-061). */

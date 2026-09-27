@@ -173,6 +173,24 @@ describe.each(NUMERIC)("%s without a kernel", (title, max) => {
   });
 });
 
+describe("Gauge in a WebAssembly kernel", () => {
+  test("ranges arriving as Maps are drawn, as ranges arriving as objects are", async () => {
+    // Pyodide hands a Python dict over as a Map: the arcs used to be read as
+    // having no bounds and were silently not drawn (NUM-103).
+    const entry = (from: number, to: number, color: string) => new Map<string, unknown>([["from", from], ["to", to], ["color", color]]);
+    const { el } = mount({
+      ...defaults("Gauge"),
+      value: 2500,
+      min: 0,
+      max: 7000,
+      ranges: [entry(5500, 6200, "#ffb300"), entry(6200, 7000, "#d32f2f")],
+      label: "Engine speed",
+    });
+    await frame();
+    expect(el.querySelectorAll(".awi-range").length).toBe(2);
+  });
+});
+
 describe("Compass without a kernel", () => {
   test("wraps the heading as the kernel does", async () => {
     const { model, body } = mount({ ...defaults("Compass"), value: -90, label: "Heading" });

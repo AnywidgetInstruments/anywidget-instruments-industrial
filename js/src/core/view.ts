@@ -1,7 +1,7 @@
 // Base view shared by every widget: common traits, render scheduling,
 // throttled value sending and visibility handling.
 import type { WidgetContract } from "../contract/spec.js";
-import { readTrait } from "../contract/traits.js";
+import { plainValue, readTrait } from "../contract/traits.js";
 import { BY_KIND } from "../generated/contract.js";
 import { html, safeColor, setAttr, setHidden, setText } from "./dom.js";
 import { type Liveness, liveness, recordBeat } from "./liveness.js";
@@ -123,7 +123,8 @@ export class BaseView<T extends object = Traits> {
   get(name: string): unknown {
     const raw = (this.model as unknown as AnyModel<Traits>).get(name);
     const spec = this.contract?.traits[name];
-    if (!spec) return raw;
+    // no schema to read it through, but a dictionary may still come as a Map
+    if (!spec) return plainValue(raw);
     // renderCommon() reads some twenty traits on every change: a value
     // unchanged since the last read (same object) is not read again (PERF-002)
     const last = this._reads.get(name);
