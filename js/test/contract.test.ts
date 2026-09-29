@@ -29,6 +29,34 @@ describe("generated contract", () => {
   });
 });
 
+describe("dictionaries handed over as Maps", () => {
+  // Pyodide converts a Python dict to a JavaScript Map, and the structured clone
+  // between a WebAssembly kernel's worker and the page keeps it one; a host
+  // sending JSON gives plain objects. Both must read alike (HOST-002).
+  const gauge = CONTRACTS.Gauge.traits;
+
+  test("a Map is read as a plain object", () => {
+    expect(readValue({ type: "object" } as TraitSpec, new Map<string, unknown>([["from", 1], ["to", 2]]))).toEqual({ from: 1, to: 2 });
+  });
+
+  test("the ranges of a gauge arriving as Maps are read as objects", () => {
+    const raw = [new Map<string, unknown>([["from", 5500], ["to", 6200], ["color", "#ffb300"]])];
+    expect(readTrait(gauge.ranges, raw)).toEqual([{ from: 5500, to: 6200, color: "#ffb300" }]);
+  });
+
+  test("Maps nested in a dictionary are converted too", () => {
+    const raw = new Map<string, unknown>([["inner", new Map([["a", 1]])], ["list", [new Map([["b", 2]])]]]);
+    expect(traits.plainValue(raw)).toEqual({ inner: { a: 1 }, list: [{ b: 2 }] });
+  });
+
+  test("a value holding no Map keeps its identity, so an unchanged trait is not read again", () => {
+    const ranges = [{ from: 0, to: 1, color: "red" }];
+    const samples = [1, 2, 3];
+    expect(traits.plainValue(ranges)).toBe(ranges);
+    expect(traits.plainValue(samples)).toBe(samples);
+  });
+});
+
 describe("readTrait", () => {
   test("wrong types fall back to the default", () => {
     const onInvalid = vi.fn();

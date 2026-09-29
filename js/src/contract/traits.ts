@@ -6,12 +6,50 @@
 // the default, a number outside the schema bounds is clamped, non-finite
 // floats encoded as strings are decoded. Values sent by a Python kernel
 // always conform, so reading them is the identity.
+//
+// Dictionaries do not always arrive as plain objects. Pyodide converts a
+// Python dict to a JavaScript Map, and the structured clone between a
+// WebAssembly kernel's worker and the page keeps it one, where a host sending
+// JSON gives objects. Views read `r.from`, not `r.get("from")`, so every value
+// is read with its Maps turned into plain objects first.
 import { parseNumber } from "../core/scale.js";
 import type { TraitSpec, ValueSpec } from "./spec.js";
 
 const NONFINITE = new Set(["nan", "inf", "-inf", "NaN", "Infinity", "-Infinity"]);
 
-const isPlainObject = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
+const isPlainObject = (v: unknown): v is Record<string, unknown> =>
+  typeof v === "object" && v !== null && !Array.isArray(v) && !(v instanceof Map) && !(v instanceof ArrayBuffer) && !ArrayBuffer.isView(v);
+
+/**
+ * `raw` with every Map, however deep, turned into a plain object. A value
+ * holding no Map is returned itself, so an unchanged trait keeps its identity
+ * and is not read again (PERF-002); arrays of numbers are not copied.
+ */
+export function plainValue(raw: unknown): unknown {
+  if (raw instanceof Map) {
+    return Object.fromEntries(Array.from(raw, ([k, v]) => [String(k), plainValue(v)]));
+  }
+  if (Array.isArray(raw)) {
+    let out: unknown[] | undefined;
+    for (let i = 0; i < raw.length; i++) {
+      const item: unknown = raw[i];
+      if (typeof item !== "object" || item === null) continue;
+      const read = plainValue(item);
+      if (read !== item) (out ??= raw.slice())[i] = read;
+    }
+    return out ?? raw;
+  }
+  if (isPlainObject(raw)) {
+    let out: Record<string, unknown> | undefined;
+    for (const [k, v] of Object.entries(raw)) {
+      if (typeof v !== "object" || v === null) continue;
+      const read = plainValue(v);
+      if (read !== v) (out ??= { ...raw })[k] = read;
+    }
+    return out ?? raw;
+  }
+  return raw;
+}
 
 function readNumber(spec: ValueSpec, raw: unknown): number | undefined {
   let v: number;
@@ -46,6 +84,7 @@ function readBytes(raw: unknown): Uint8Array | undefined {
  */
 export function readValue(spec: ValueSpec, raw: unknown): unknown {
   if (raw === null) return spec.nullable ? null : undefined;
+  raw = plainValue(raw);
   switch (spec.type) {
     case "number":
     case "integer":
