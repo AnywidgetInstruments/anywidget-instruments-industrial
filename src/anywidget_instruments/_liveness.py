@@ -16,6 +16,7 @@ with its own ``mo.Thread`` (plain threads cannot reach the front end there).
 from __future__ import annotations
 
 import contextlib
+import sys
 import threading
 import time
 import uuid
@@ -91,6 +92,19 @@ def _context_key() -> int | None:
         return None
 
 
+def _threads_available() -> bool:
+    """Whether a heartbeat thread may run here.
+
+    Pyodide has no threads. Starting one used to fail, which disabled the
+    heartbeat; marimo's WebAssembly runtime now emulates ``mo.Thread`` on the
+    event loop, so ``start()`` succeeds and the heartbeat's blocking loop then
+    collides with the kernel's own tasks ("Cannot enter into task ... while
+    another task ... is being executed"). Pyodide is therefore recognized
+    rather than waited on to fail.
+    """
+    return sys.platform != "emscripten"
+
+
 def _alive(thread: threading.Thread | None) -> bool:
     return thread is not None and thread.is_alive() and not getattr(thread, "should_exit", False)
 
@@ -100,7 +114,10 @@ def register(widget: Any) -> None:
     with _lock:
         group = _groups.setdefault(key, _Group())
         group.widgets.add(widget)
-        if _interval > 0 and not _alive(group.thread):
+        if _interval > 0 and not _threads_available():
+            # no threads (Pyodide / JupyterLite / marimo WebAssembly): stale detection disabled
+            set_heartbeat(0)
+        elif _interval > 0 and not _alive(group.thread):
             thread_cls = _marimo_thread_class() or threading.Thread
             group.thread = thread_cls(
                 target=_loop, args=(group,), name="awi-heartbeat", daemon=True

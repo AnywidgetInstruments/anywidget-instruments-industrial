@@ -83,6 +83,26 @@ def test_no_threads_disables_heartbeat(monkeypatch):
         ai.set_heartbeat(2)
 
 
+def test_no_heartbeat_thread_under_pyodide_even_where_threads_start(monkeypatch):
+    """marimo's WebAssembly runtime emulates threads on the event loop, so start()
+    succeeds there; the heartbeat's blocking loop then collides with the kernel's
+    own tasks. Under Pyodide no heartbeat thread is started at all (ROB-004)."""
+    import threading
+
+    started = []
+    monkeypatch.setattr(_liveness, "_groups", {})
+    monkeypatch.setattr(_liveness, "_threads_available", lambda: False)
+    monkeypatch.setattr(threading.Thread, "start", lambda self: started.append(self))
+    try:
+        k = ai.Knob()
+        assert started == []
+        assert ai.get_heartbeat() == 0
+        assert k._heartbeat == 0
+    finally:
+        monkeypatch.undo()
+        ai.set_heartbeat(2)
+
+
 def test_picture_flushes_without_threads(monkeypatch):
     import threading
 
