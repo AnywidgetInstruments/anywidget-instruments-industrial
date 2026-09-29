@@ -141,9 +141,11 @@ class DigitalWaveformGraph(GraphWidget):
     show_lines_in_bus = t.Bool(True).tag(sync=True)
 
     def __init__(self, **kwargs: Any) -> None:
-        super().__init__(**kwargs)
+        # before super().__init__: the cursor observer reads the data when the
+        # constructor sets cursors
         self._bits: np.ndarray = np.zeros((0, 0), dtype=np.uint8)
         self._analog: np.ndarray = np.zeros((0, 0), dtype=np.float64)
+        super().__init__(**kwargs)
         self.on_msg(self._handle_front_msg)
 
     @property
