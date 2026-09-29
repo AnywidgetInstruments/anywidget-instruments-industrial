@@ -1,6 +1,7 @@
 # Widget catalog
 
-![Widget gallery, system style in a dark host](img/gallery-dark.png)
+![Widget gallery](img/gallery-modern.png#only-light)
+![Widget gallery](img/gallery-dark.png#only-dark)
 
 ## At a glance
 

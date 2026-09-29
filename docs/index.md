@@ -22,7 +22,8 @@ notebook (see [Hosts](hosts.md)).
 
     [![Batch reactor operator station](img/showcase-reactor-hero.png){ width="560" }](showcase.md)
 
-![Widget gallery](img/gallery-modern.png)
+![Widget gallery](img/gallery-modern.png#only-light)
+![Widget gallery](img/gallery-dark.png#only-dark)
 
 !!! warning "Safety"
     The library is for visualization, teaching, simulation and supervision.
@@ -53,3 +54,11 @@ ai.Panel([gain, level])
 * [Examples](examples.md) — PID tuning, tank supervision, signal acquisition
 * [API reference](api.md) — generated from the docstrings
 * [License and citation](citing.md) — BSD 3-Clause; how to cite the library
+
+## Related projects
+
+| Project | What it is | Documentation |
+|---|---|---|
+| [anywidget-instruments](https://github.com/s-celles/anywidget-instruments) | Instrumentation widgets for notebooks: gauges, tanks, LEDs, switches, charts, alarms, SCADA objects | <https://s-celles.github.io/anywidget-instruments/> |
+| [anywidget-automotives](https://github.com/s-celles/anywidget-automotives) | Automotive instruments built on anywidget-instruments (design stage) | <https://s-celles.github.io/anywidget-automotives/> |
+| [afm-host-panel](https://github.com/s-celles/afm-host-panel) | Grafana panel plugin that runs anywidget modules, with both libraries built in | <https://s-celles.github.io/afm-host-panel/> |

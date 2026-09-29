@@ -67,7 +67,10 @@ station objects), examples, the API reference, the
 [Try it in your browser](https://s-celles.github.io/anywidget-instruments/try/),
 with nothing to install (marimo apps, also as JupyterLite notebooks).
 
-![Widget gallery](docs/img/gallery-modern.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/gallery-dark.png">
+  <img alt="Widget gallery" src="docs/img/gallery-modern.png">
+</picture>
 
 Contributing: see [development](docs/development.md) and `AGENTS.md`.
 
@@ -79,6 +82,14 @@ widget is not an emergency stop device: see the
 [safety notice](docs/safety.md). The industrial standards that inspired the
 widgets are listed in [Standards and references](docs/standards.md); the
 library does not claim conformity with them.
+
+## Related projects
+
+| Project | What it is | Documentation |
+|---|---|---|
+| [anywidget-instruments](https://github.com/s-celles/anywidget-instruments) | Instrumentation widgets for notebooks: gauges, tanks, LEDs, switches, charts, alarms, SCADA objects | <https://s-celles.github.io/anywidget-instruments/> |
+| [anywidget-automotives](https://github.com/s-celles/anywidget-automotives) | Automotive instruments built on anywidget-instruments (design stage) | <https://s-celles.github.io/anywidget-automotives/> |
+| [afm-host-panel](https://github.com/s-celles/afm-host-panel) | Grafana panel plugin that runs anywidget modules, with both libraries built in | <https://s-celles.github.io/afm-host-panel/> |
 
 ## License and citation
 

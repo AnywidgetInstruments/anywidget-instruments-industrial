@@ -1,5 +1,6 @@
 site_name: anywidget-instruments
 site_description: Instrumentation widgets for computational notebooks
+site_url: https://s-celles.github.io/anywidget-instruments/
 repo_url: https://github.com/s-celles/anywidget-instruments
 edit_uri: ""
 # DOC-005: buildable offline — no Google Fonts, no CDN assets.
@@ -9,11 +10,16 @@ theme:
   features:
     - navigation.sections
     - content.code.copy
+  # System preference by default; the toggle cycles light, dark, system.
   palette:
-    - scheme: default
-      toggle: { icon: material/weather-night, name: Dark mode }
-    - scheme: slate
-      toggle: { icon: material/weather-sunny, name: Light mode }
+    - media: "(prefers-color-scheme)"
+      toggle: { icon: material/brightness-auto, name: Switch to light mode }
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle: { icon: material/weather-sunny, name: Switch to dark mode }
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle: { icon: material/weather-night, name: Switch to system preference }
 nav:
   - Home: index.md
   - Showcase: showcase.md
