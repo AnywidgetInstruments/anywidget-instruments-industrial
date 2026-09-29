@@ -38,6 +38,10 @@ class IntensityChart(GraphWidget):
     show_colorbar = t.Bool(True).tag(sync=True)
 
     def __init__(self, **kwargs: Any) -> None:
+        # an empty buffer before super().__init__: the cursor observer reads it when
+        # the constructor sets cursors
+        self._buf = np.full((0, 0), np.nan)
+        self._total = 0
         super().__init__(**kwargs)
         self._reset()
         self.on_msg(self._handle_front_msg)

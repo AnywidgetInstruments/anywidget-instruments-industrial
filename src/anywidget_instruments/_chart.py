@@ -56,6 +56,10 @@ class WaveformChart(GraphWidget):
 
     def __init__(self, **kwargs: Any) -> None:
         kwargs["mode"] = "indicator"
+        # an empty buffer before super().__init__: the cursor observer reads it when
+        # the constructor sets cursors, in an order that depends on string hashing
+        self._buf = np.full((0, 0), np.nan)
+        self._total = 0
         super().__init__(**kwargs)
         self._reset_buffer()
         self.on_msg(self._handle_front_msg)

@@ -164,11 +164,20 @@ def test_digital_graph_buses_in_constructor():
     assert g.bus_values(g.buses[0]).tolist() == [0, 1, 2, 3]
 
 
-@pytest.mark.parametrize("cls", [ai.DigitalWaveformGraph, ai.MixedSignalGraph])
-def test_logic_graph_cursors_in_constructor(cls):
+GRAPHS = [
+    ai.WaveformChart,
+    ai.IntensityChart,
+    ai.DigitalWaveformGraph,
+    ai.MixedSignalGraph,
+    ai.TrendChart,
+    ai.XYGraph,
+]
+
+
+@pytest.mark.parametrize("cls", GRAPHS, ids=lambda c: c.__name__)
+def test_graph_cursors_in_constructor(cls):
     # the cursor observer runs during construction, before any data is set
     g = cls(cursors=[{"x": 1.5, "name": "C1", "color": ""}])
-    assert g.n_samples == 0
     assert [c["name"] for c in g.cursor_values] == ["C1"]
 
 
