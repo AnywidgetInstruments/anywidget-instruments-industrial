@@ -64,6 +64,10 @@ shows an older look.
 
 - Example notebooks (`filling_line.png`, `gallery.png`, ...):
   `AWI_SHOTS=docs/img npx playwright test e2e/examples.spec.js`.
+- Widget pages (`docs/widgets/*.md`, `docs/img/widgets/`, the widget pages of
+  the nav and the links of the catalog), from the preview page and the trait
+  contract: `npm run build && node js/scripts/widget-pages.mjs`. Run it when a
+  widget, a schema or a drawing changes; do not edit the pages by hand.
 - Batch reactor showcase (`showcase-reactor.png`,
   `showcase-reactor-hero.png`): start
   `marimo run lite/marimo/batch_reactor.py --headless --port 2719 --no-token`,

@@ -10,21 +10,21 @@ by default; every widget switches with `mode`.
 
 | Group | Widgets | Standards followed |
 |---|---|---|
-| Controls, continuous | `Knob` (C), `Dial` (C), `FillSlide` (C), `NumericEntry` (C, keypad); a numeric entry field on every numeric control | |
-| Controls, discrete | `PushButton` (C), `ToggleSwitch` (C), `RockerSwitch` (C), `SlideSwitch` (C), `SelectorSwitch` (C), `EmergencyStop` (C) | IEC 60073 (button and lamp colors) |
-| Indicators, analog | `Gauge`, `Meter`, `VUMeter`, `Tank`, `Thermometer`, `SevenSegment`, `Compass`, `AnalogIndicator` (I) | ISA-101 (`AnalogIndicator`) |
-| Indicators, discrete | `LED`, `StackLight`, `BitField` (I) | IEC 60073 |
-| Graphs, time | `WaveformChart`, `IntensityChart`, `DigitalWaveformGraph`, `MixedSignalGraph` (I) | |
-| Graphs, trends | `TrendChart`, `Sparkline` (I) | ISA-101 |
-| Compact indicators | `DeviationIndicator`, `BarGraph`, `KPITile` (I) | ISA-101, ISO 22400 (`oee`) |
-| Graphs, specialized | `PolarPlot`, `SmithChart`, `RadarChart`, `PictureControl` | |
-| Alarms and events | `AlarmIndicator`, `AlarmBanner`, `AlarmList`, `Annunciator`, `EventLog` | ISA-18.1, ISA-18.2 / IEC 62682 |
-| Process symbols | `Valve`, `Pump`, `Motor`, `Pipe` (faceplates) | ISA-5.1 (symbols) |
-| Field instruments | `Transmitter` (I) | ISA-5.1, NAMUR NE 107 |
-| Supervisory objects | `PIDFaceplate` with `PID`, `StateMachine` | ISA-101, ISA-TR88.00.02 |
-| Recipes and plant structure | `RecipeTable` (C), `XYGraph` (I), `EquipmentTree` (C) | IEC 62264, IEC 61512 (`EquipmentTree` levels) |
-| Custom front panels | `SvgPanel` (C) and its templates | |
-| Layout and session | `Panel`, `SynopticCanvas`, `ThemeSwitch` | |
+| Controls, continuous | [`Knob`](widgets/knob.md) (C), [`Dial`](widgets/dial.md) (C), [`FillSlide`](widgets/fill-slide.md) (C), [`NumericEntry`](widgets/numeric-entry.md) (C, keypad); a numeric entry field on every numeric control | |
+| Controls, discrete | [`PushButton`](widgets/push-button.md) (C), [`ToggleSwitch`](widgets/toggle-switch.md) (C), [`RockerSwitch`](widgets/rocker-switch.md) (C), [`SlideSwitch`](widgets/slide-switch.md) (C), [`SelectorSwitch`](widgets/selector-switch.md) (C), [`EmergencyStop`](widgets/emergency-stop.md) (C) | IEC 60073 (button and lamp colors) |
+| Indicators, analog | [`Gauge`](widgets/gauge.md), [`Meter`](widgets/meter.md), [`VUMeter`](widgets/vu-meter.md), [`Tank`](widgets/tank.md), [`Thermometer`](widgets/thermometer.md), [`SevenSegment`](widgets/seven-segment.md), [`Compass`](widgets/compass.md), [`AnalogIndicator`](widgets/analog-indicator.md) (I) | ISA-101 ([`AnalogIndicator`](widgets/analog-indicator.md)) |
+| Indicators, discrete | [`LED`](widgets/led.md), [`StackLight`](widgets/stack-light.md), [`BitField`](widgets/bit-field.md) (I) | IEC 60073 |
+| Graphs, time | [`WaveformChart`](widgets/waveform-chart.md), [`IntensityChart`](widgets/intensity-chart.md), [`DigitalWaveformGraph`](widgets/digital-waveform-graph.md), [`MixedSignalGraph`](widgets/mixed-signal-graph.md) (I) | |
+| Graphs, trends | [`TrendChart`](widgets/trend-chart.md), [`Sparkline`](widgets/sparkline.md) (I) | ISA-101 |
+| Compact indicators | [`DeviationIndicator`](widgets/deviation-indicator.md), [`BarGraph`](widgets/bar-graph.md), [`KPITile`](widgets/kpi-tile.md) (I) | ISA-101, ISO 22400 (`oee`) |
+| Graphs, specialized | [`PolarPlot`](widgets/polar-plot.md), [`SmithChart`](widgets/smith-chart.md), [`RadarChart`](widgets/radar-chart.md), [`PictureControl`](widgets/picture-control.md) | |
+| Alarms and events | [`AlarmIndicator`](widgets/alarm-indicator.md), [`AlarmBanner`](widgets/alarm-banner.md), [`AlarmList`](widgets/alarm-list.md), [`Annunciator`](widgets/annunciator.md), [`EventLog`](widgets/event-log.md) | ISA-18.1, ISA-18.2 / IEC 62682 |
+| Process symbols | [`Valve`](widgets/valve.md), [`Pump`](widgets/pump.md), [`Motor`](widgets/motor.md), [`Pipe`](widgets/pipe.md) (faceplates) | ISA-5.1 (symbols) |
+| Field instruments | [`Transmitter`](widgets/transmitter.md) (I) | ISA-5.1, NAMUR NE 107 |
+| Supervisory objects | [`PIDFaceplate`](widgets/pid-faceplate.md) with `PID`, [`StateMachine`](widgets/state-machine.md) | ISA-101, ISA-TR88.00.02 |
+| Recipes and plant structure | [`RecipeTable`](widgets/recipe-table.md) (C), [`XYGraph`](widgets/xy-graph.md) (I), [`EquipmentTree`](widgets/equipment-tree.md) (C) | IEC 62264, IEC 61512 ([`EquipmentTree`](widgets/equipment-tree.md) levels) |
+| Custom front panels | [`SvgPanel`](widgets/svg-panel.md) (C) and its templates | |
+| Layout and session | `Panel`, [`SynopticCanvas`](widgets/synoptic-canvas.md), [`ThemeSwitch`](widgets/theme-switch.md) | |
 
 There is no password or login widget: a widget cannot keep a secret and a
 notebook cannot enforce an access control. See

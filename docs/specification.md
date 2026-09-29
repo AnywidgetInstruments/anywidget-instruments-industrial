@@ -8,8 +8,8 @@
 | Author | Sébastien Celles |
 | Document type | Software requirements specification |
 | Notation | EARS (Easy Approach to Requirements Syntax) |
-| Version | 0.14 |
-| Date | 2026-09-25 |
+| Version | 0.15 |
+| Date | 2026-09-29 |
 | Status | Baseline for version 1.0 |
 
 ---
@@ -335,6 +335,7 @@ Requirements use identifiers `<GROUP>-<NNN>` with priorities:
 | DOC-005 | S | The documentation shall be buildable offline and deployable as a static site. |
 | DOC-006 | C | The documentation shall include live examples running in the browser (JupyterLite or marimo WASM). |
 | DOC-007 | M | The documentation shall state that the library is not a safety-related system, that the EmergencyStop widget is not an emergency stop device, and that safety functions must be implemented independently of the library; the README and the docstrings of the EmergencyStop, alarm, controller and state model classes shall refer to this statement. |
+| DOC-008 | S | The documentation shall give every widget a page with its picture in the light and in the dark theme, the one matching the reader's theme shown, captured from the widget itself by an automated run, with the traits of the widget and an example that sets them. |
 
 ---
 
@@ -620,3 +621,4 @@ authors in the documentation.
 | 0.12 | IND-120 .. IND-126: SVG faceplates (SvgPanel, role convention, indicator and control roles, entry fields, problem report, templates). Authentication widgets added to the out-of-scope list. |
 | 0.13 | IND-067: state diagram with right-angle labelled arrows, acting and wait states told apart, dashed zones whose commands leave as one arrow, waypoints; IND-066 notes limited to the global commands no zone draws. |
 | 0.14 | GEN-006: BSD 3-Clause license (was MIT) with citation metadata and a request to cite. |
+| 0.15 | DOC-008: a page per widget, pictured in the light and the dark theme. |

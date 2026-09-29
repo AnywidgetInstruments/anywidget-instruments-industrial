@@ -24,7 +24,77 @@ nav:
   - Home: index.md
   - Showcase: showcase.md
   - Getting started: getting-started.md
-  - Widget catalog: widgets.md
+  - Widget catalog:
+      - Overview: widgets.md
+      # BEGIN widget pages (js/scripts/widget-pages.mjs)
+      - Controls, continuous:
+          - Knob: widgets/knob.md
+          - Dial: widgets/dial.md
+          - FillSlide: widgets/fill-slide.md
+          - NumericEntry: widgets/numeric-entry.md
+      - Controls, discrete:
+          - PushButton: widgets/push-button.md
+          - ToggleSwitch: widgets/toggle-switch.md
+          - RockerSwitch: widgets/rocker-switch.md
+          - SlideSwitch: widgets/slide-switch.md
+          - SelectorSwitch: widgets/selector-switch.md
+          - EmergencyStop: widgets/emergency-stop.md
+      - Indicators, analog:
+          - Gauge: widgets/gauge.md
+          - Meter: widgets/meter.md
+          - VUMeter: widgets/vu-meter.md
+          - Tank: widgets/tank.md
+          - Thermometer: widgets/thermometer.md
+          - SevenSegment: widgets/seven-segment.md
+          - Compass: widgets/compass.md
+          - AnalogIndicator: widgets/analog-indicator.md
+      - Indicators, discrete:
+          - LED: widgets/led.md
+          - StackLight: widgets/stack-light.md
+          - BitField: widgets/bit-field.md
+      - Graphs, time:
+          - WaveformChart: widgets/waveform-chart.md
+          - IntensityChart: widgets/intensity-chart.md
+          - DigitalWaveformGraph: widgets/digital-waveform-graph.md
+          - MixedSignalGraph: widgets/mixed-signal-graph.md
+      - Graphs, trends:
+          - TrendChart: widgets/trend-chart.md
+          - Sparkline: widgets/sparkline.md
+      - Compact indicators:
+          - DeviationIndicator: widgets/deviation-indicator.md
+          - BarGraph: widgets/bar-graph.md
+          - KPITile: widgets/kpi-tile.md
+      - Graphs, specialized:
+          - PolarPlot: widgets/polar-plot.md
+          - SmithChart: widgets/smith-chart.md
+          - RadarChart: widgets/radar-chart.md
+          - PictureControl: widgets/picture-control.md
+      - Alarms and events:
+          - AlarmIndicator: widgets/alarm-indicator.md
+          - AlarmBanner: widgets/alarm-banner.md
+          - AlarmList: widgets/alarm-list.md
+          - Annunciator: widgets/annunciator.md
+          - EventLog: widgets/event-log.md
+      - Process symbols:
+          - Valve: widgets/valve.md
+          - Pump: widgets/pump.md
+          - Motor: widgets/motor.md
+          - Pipe: widgets/pipe.md
+      - Field instruments:
+          - Transmitter: widgets/transmitter.md
+      - Supervisory objects:
+          - PIDFaceplate: widgets/pid-faceplate.md
+          - StateMachine: widgets/state-machine.md
+      - Recipes and plant structure:
+          - RecipeTable: widgets/recipe-table.md
+          - XYGraph: widgets/xy-graph.md
+          - EquipmentTree: widgets/equipment-tree.md
+      - Custom front panels:
+          - SvgPanel: widgets/svg-panel.md
+      - Layout and session:
+          - SynopticCanvas: widgets/synoptic-canvas.md
+          - ThemeSwitch: widgets/theme-switch.md
+      # END widget pages
   - Examples: examples.md
   - Try it in the browser: try.md
   - Safety notice: safety.md
@@ -58,6 +128,7 @@ markdown_extensions:
   - admonition
   - tables
   - attr_list
+  - md_in_html
   - toc: { permalink: true }
   - pymdownx.highlight
   - pymdownx.superfences

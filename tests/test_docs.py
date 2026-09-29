@@ -14,7 +14,11 @@ import re
 import pytest
 
 ROOT = pathlib.Path(__file__).parents[1]
-PAGES = [ROOT / "README.md", *sorted((ROOT / "docs").glob("*.md"))]
+PAGES = [
+    ROOT / "README.md",
+    *sorted((ROOT / "docs").glob("*.md")),
+    *sorted((ROOT / "docs" / "widgets").glob("*.md")),
+]
 SKIP_MARK = "<!-- illustration: not run -->"
 BLOCK = re.compile(r"(?P<before>[^\n]*\n)?```python\n(?P<code>.*?)```", re.DOTALL)
 
@@ -37,7 +41,11 @@ def blocks(page: pathlib.Path) -> list[tuple[int, str]]:
     return out
 
 
-@pytest.mark.parametrize("page", [p for p in PAGES if blocks(p)], ids=lambda p: p.name)
+@pytest.mark.parametrize(
+    "page",
+    [p for p in PAGES if blocks(p)],
+    ids=lambda p: str(p.relative_to(ROOT / "docs")) if p.parent.name == "widgets" else p.name,
+)
 def test_python_examples_run(page: pathlib.Path) -> None:
     # the pages write `ai` and `np` for the package and numpy, as the examples do
     namespace: dict[str, object] = {"__name__": f"docs_{page.stem}"}
@@ -77,3 +85,37 @@ def test_every_widget_is_documented() -> None:
         "hosts.md": [w for w in widgets if f"`{w}`" not in hosts],
     }
     assert missing == {"widgets.md": [], "api.md": [], "hosts.md": []}
+
+
+def page_name(cls: str) -> str:
+    """Page of a widget, as js/scripts/widget-pages.mjs names it: PIDFaceplate -> pid-faceplate."""
+    name = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1-\2", cls)
+    return re.sub(r"([a-z0-9])([A-Z])", r"\1-\2", name).lower()
+
+
+def test_every_widget_has_a_page_and_pictures() -> None:
+    """DOC-008: a page per widget, with its picture in the light and the dark theme."""
+    import anywidget_instruments as ai
+
+    abstract = {
+        "InstrumentWidget",
+        "NumericWidget",
+        "BooleanWidget",
+        "GraphWidget",
+        "ProcessObject",
+    }
+    docs = ROOT / "docs"
+    missing = []
+    for name in ai.__all__:
+        cls = getattr(ai, name)
+        if not (isinstance(cls, type) and issubclass(cls, ai.InstrumentWidget)) or name in abstract:
+            continue
+        page = docs / "widgets" / f"{page_name(name)}.md"
+        needed = [page] + [
+            docs / "img" / "widgets" / f"{page_name(name)}-{scheme}.png"
+            for scheme in ("light", "dark")
+        ]
+        missing += [str(p.relative_to(ROOT)) for p in needed if not p.exists()]
+        if page.exists() and f"# {name}\n" not in page.read_text(encoding="utf-8"):
+            missing.append(f"{page.relative_to(ROOT)}: title")
+    assert missing == []

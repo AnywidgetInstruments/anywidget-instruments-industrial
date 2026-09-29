@@ -168,6 +168,7 @@ const specs = [
 ];
 const grid = document.getElementById("grid");
 window.models = [];
+window.specs = specs; // read by js/scripts/widget-pages.mjs
 for (const s of specs) {
   const el = document.createElement("div");
   grid.appendChild(el);
