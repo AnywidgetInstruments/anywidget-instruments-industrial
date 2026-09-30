@@ -53,8 +53,8 @@ jobs:
         run: |
           mkdir -p lite/marimo/public
           cp dist/*.whl lite/marimo/public/
-          # the core first: the library depends on it
-          (cd dist && ls anywidget_instruments-*.whl anywidget_instruments_industrial-*.whl) > lite/marimo/public/wheel.txt
+          # the core first: the library depends on it (one ls each: ls sorts by locale)
+          (cd dist && ls anywidget_instruments-*.whl && ls anywidget_instruments_industrial-*.whl) > lite/marimo/public/wheel.txt
           for nb in lite/marimo/*.py; do
             name=$(basename "$nb" .py)
             marimo export html-wasm "$nb" -o "site/marimo/$name" --mode run --show-code
