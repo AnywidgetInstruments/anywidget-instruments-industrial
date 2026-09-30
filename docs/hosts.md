@@ -9,7 +9,7 @@
 | JupyterLite (Pyodide) | tested (docs workflow) | no threads: heartbeat disabled |
 | VS Code, Google Colab | expected (anywidget hosts) | not covered by automated tests |
 | [KaimonSlate.jl](https://github.com/kahliburke/KaimonSlate.jl) (Julia) | expected, front end only | see below; the kernel-less path is tested with a host page modeled on its `SlateAFM` extension (E2E) |
-| Grafana, with [afm-host-panel](https://s-celles.github.io/afm-host-panel/instruments/) | tested (afm-host-panel E2E), front end only | the front end is bundled in the panel plugin; traits come from Grafana queries and dashboard variables, controls write back to variables |
+| Grafana, with [afm-host-panel](https://anywidgetinstruments.github.io/afm-host-panel/instruments/) | tested (afm-host-panel E2E), front end only | the front end is bundled in the panel plugin; traits come from Grafana queries and dashboard variables, controls write back to variables |
 | Other hosts without Python | through the [trait contract](trait-contract.md) | a dictionary of traits and the anywidget model API are enough |
 
 ## KaimonSlate.jl

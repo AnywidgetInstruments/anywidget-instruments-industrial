@@ -1,7 +1,7 @@
 site_name: anywidget-instruments
 site_description: Instrumentation widgets for computational notebooks
-site_url: https://s-celles.github.io/anywidget-instruments/
-repo_url: https://github.com/s-celles/anywidget-instruments
+site_url: https://anywidgetinstruments.github.io/anywidget-instruments-industrial/
+repo_url: https://github.com/AnywidgetInstruments/anywidget-instruments-industrial
 edit_uri: ""
 # DOC-005: buildable offline — no Google Fonts, no CDN assets.
 theme:

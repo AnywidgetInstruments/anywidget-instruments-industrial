@@ -45,11 +45,11 @@ Download them from the repository:
 
 | Sector | Notebook | References |
 |---|---|---|
-| All sectors (tour) | <a href="https://github.com/s-celles/anywidget-instruments/blob/main/examples/gallery.ipynb">Gallery</a>, <a href="https://github.com/s-celles/anywidget-instruments/blob/main/examples/marimo_panel.py">marimo panel</a> | IEC 60073, ISA-18.2 / IEC 62682 (alarm indicator) |
-| Water and wastewater | <a href="https://github.com/s-celles/anywidget-instruments/blob/main/examples/tank_supervision.ipynb">Tank level supervision</a> | ISA-18.2 / IEC 62682 (alarm banner), ISA-5.1 (tags, symbols) |
-| Chemical and process control | <a href="https://github.com/s-celles/anywidget-instruments/blob/main/examples/pid_first_order.ipynb">First-order process with PID tuning</a> | IEC 60204-1, ISO 13850 (emergency stop look only, see the safety notice) |
-| Food, beverage and packaging | <a href="https://github.com/s-celles/anywidget-instruments/blob/main/examples/filling_line.ipynb">Filling line operator station</a> | ISA-TR88.00.02 (PackML states), ISA-18.1, ISA-18.2 / IEC 62682, ISA-101, IEC 60073 |
-| Laboratory, test and measurement | <a href="https://github.com/s-celles/anywidget-instruments/blob/main/examples/signal_acquisition.ipynb">Real-time signal acquisition</a> | SI prefixes (units) |
+| All sectors (tour) | <a href="https://github.com/AnywidgetInstruments/anywidget-instruments-industrial/blob/main/examples/gallery.ipynb">Gallery</a>, <a href="https://github.com/AnywidgetInstruments/anywidget-instruments-industrial/blob/main/examples/marimo_panel.py">marimo panel</a> | IEC 60073, ISA-18.2 / IEC 62682 (alarm indicator) |
+| Water and wastewater | <a href="https://github.com/AnywidgetInstruments/anywidget-instruments-industrial/blob/main/examples/tank_supervision.ipynb">Tank level supervision</a> | ISA-18.2 / IEC 62682 (alarm banner), ISA-5.1 (tags, symbols) |
+| Chemical and process control | <a href="https://github.com/AnywidgetInstruments/anywidget-instruments-industrial/blob/main/examples/pid_first_order.ipynb">First-order process with PID tuning</a> | IEC 60204-1, ISO 13850 (emergency stop look only, see the safety notice) |
+| Food, beverage and packaging | <a href="https://github.com/AnywidgetInstruments/anywidget-instruments-industrial/blob/main/examples/filling_line.ipynb">Filling line operator station</a> | ISA-TR88.00.02 (PackML states), ISA-18.1, ISA-18.2 / IEC 62682, ISA-101, IEC 60073 |
+| Laboratory, test and measurement | <a href="https://github.com/AnywidgetInstruments/anywidget-instruments-industrial/blob/main/examples/signal_acquisition.ipynb">Real-time signal acquisition</a> | SI prefixes (units) |
 
 ### All sectors
 

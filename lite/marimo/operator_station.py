@@ -42,7 +42,7 @@ def _(installed):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
-    [⬅ Back to the examples](https://s-celles.github.io/anywidget-instruments/try/)
+    [⬅ Back to the examples](https://anywidgetinstruments.github.io/anywidget-instruments-industrial/try/)
 
     # Operator station
 
@@ -57,7 +57,7 @@ def _(mo):
     ISA-101 (PID faceplate), IEC 60073 (stack light colors). These standards
     inspired the widgets; the library does not claim conformity with them
     ([Standards and
-    references](https://s-celles.github.io/anywidget-instruments/standards/)).
+    references](https://anywidgetinstruments.github.io/anywidget-instruments-industrial/standards/)).
 
     > **The code is hidden.** To see it, open the **⋯** menu at the top right
     > and choose **Show code**; in the marimo editor, click a cell's collapsed code.

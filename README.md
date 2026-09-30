@@ -52,19 +52,19 @@ ai.Panel([gain, level, run, stop], columns=4)
 A complete operator station on a simulated batch reactor (PackML state
 machine, recipe, PID faceplate, alarms, trends, event log, plant model),
 the same in marimo, JupyterLite and, from Julia, KaimonSlate.jl:
-[open it in your browser](https://s-celles.github.io/anywidget-instruments/marimo/batch_reactor/)
-or see [all three versions](https://s-celles.github.io/anywidget-instruments/showcase/).
+[open it in your browser](https://anywidgetinstruments.github.io/anywidget-instruments-industrial/marimo/batch_reactor/)
+or see [all three versions](https://anywidgetinstruments.github.io/anywidget-instruments-industrial/showcase/).
 
 ![Batch reactor operator station](docs/img/showcase-reactor-hero.png)
 
 ## Documentation
 
-<https://s-celles.github.io/anywidget-instruments/>: getting started, the
+<https://anywidgetinstruments.github.io/anywidget-instruments-industrial/>: getting started, the
 widget catalog (numeric, Boolean, graphs, displays, supervisory and operator
 station objects), examples, the API reference, the
 [specification](docs/specification.md) and its
 [requirements status](docs/requirements-status.md).
-[Try it in your browser](https://s-celles.github.io/anywidget-instruments/try/),
+[Try it in your browser](https://anywidgetinstruments.github.io/anywidget-instruments-industrial/try/),
 with nothing to install (marimo apps, also as JupyterLite notebooks).
 
 <picture>
@@ -87,9 +87,9 @@ library does not claim conformity with them.
 
 | Project | What it is | Documentation |
 |---|---|---|
-| [anywidget-instruments](https://github.com/s-celles/anywidget-instruments) | Instrumentation widgets for notebooks: gauges, tanks, LEDs, switches, charts, alarms, SCADA objects | <https://s-celles.github.io/anywidget-instruments/> |
-| [anywidget-automotives](https://github.com/s-celles/anywidget-automotives) | Automotive instruments built on anywidget-instruments (design stage) | <https://s-celles.github.io/anywidget-automotives/> |
-| [afm-host-panel](https://github.com/s-celles/afm-host-panel) | Grafana panel plugin that runs anywidget modules, with both libraries built in | <https://s-celles.github.io/afm-host-panel/> |
+| [anywidget-instruments-industrial](https://github.com/AnywidgetInstruments/anywidget-instruments-industrial) | Instrumentation widgets for notebooks: gauges, tanks, LEDs, switches, charts, alarms, SCADA objects | <https://anywidgetinstruments.github.io/anywidget-instruments-industrial/> |
+| [anywidget-instruments-automotive](https://github.com/AnywidgetInstruments/anywidget-instruments-automotive) | Automotive instruments built on anywidget-instruments | <https://anywidgetinstruments.github.io/anywidget-instruments-automotive/> |
+| [afm-host-panel](https://github.com/AnywidgetInstruments/afm-host-panel) | Grafana panel plugin that runs anywidget modules, with both libraries built in | <https://anywidgetinstruments.github.io/afm-host-panel/> |
 
 ## License and citation
 

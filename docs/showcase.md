@@ -10,7 +10,7 @@ event log, batch counters and the plant model.
 <p>
 <a class="md-button md-button--primary" href="../marimo/batch_reactor/">▶ Open in the browser (marimo)</a>
 <a class="md-button" href="../lite/lab/index.html?path=batch_reactor.ipynb">▶ Open in JupyterLite</a>
-<a class="md-button" href="https://github.com/s-celles/anywidget-instruments/blob/main/examples/kaimonslate/batch_reactor.jl">Julia: KaimonSlate.jl notebook</a>
+<a class="md-button" href="https://github.com/AnywidgetInstruments/anywidget-instruments-industrial/blob/main/examples/kaimonslate/batch_reactor.jl">Julia: KaimonSlate.jl notebook</a>
 </p>
 
 The first two run entirely in your browser, with nothing to install (the
@@ -43,9 +43,9 @@ first load downloads the Python runtime and takes a few seconds).
 
 | Host | Notebook | Who runs the process |
 |---|---|---|
-| [marimo](https://marimo.io), in the browser or locally | [`lite/marimo/batch_reactor.py`](https://github.com/s-celles/anywidget-instruments/blob/main/lite/marimo/batch_reactor.py) | Python: the widget objects, a marimo refresh clock |
-| JupyterLite, JupyterLab, Notebook 7 | [`lite/content/batch_reactor.ipynb`](https://github.com/s-celles/anywidget-instruments/blob/main/lite/content/batch_reactor.ipynb) | Python: the widget objects, an `asyncio` task |
-| [KaimonSlate.jl](https://github.com/kahliburke/KaimonSlate.jl) (Julia) | [`examples/kaimonslate/batch_reactor.jl`](https://github.com/s-celles/anywidget-instruments/blob/main/examples/kaimonslate/batch_reactor.jl) | Julia: no Python kernel; the widgets are bound to trait dictionaries |
+| [marimo](https://marimo.io), in the browser or locally | [`lite/marimo/batch_reactor.py`](https://github.com/AnywidgetInstruments/anywidget-instruments-industrial/blob/main/lite/marimo/batch_reactor.py) | Python: the widget objects, a marimo refresh clock |
+| JupyterLite, JupyterLab, Notebook 7 | [`lite/content/batch_reactor.ipynb`](https://github.com/AnywidgetInstruments/anywidget-instruments-industrial/blob/main/lite/content/batch_reactor.ipynb) | Python: the widget objects, an `asyncio` task |
+| [KaimonSlate.jl](https://github.com/kahliburke/KaimonSlate.jl) (Julia) | [`examples/kaimonslate/batch_reactor.jl`](https://github.com/AnywidgetInstruments/anywidget-instruments-industrial/blob/main/examples/kaimonslate/batch_reactor.jl) | Julia: no Python kernel; the widgets are bound to trait dictionaries |
 
 In Python, the process model reads and writes the widget objects
 (`machine.state_complete()`, `tank.value = …`, `trend.add(…)`). In Julia,

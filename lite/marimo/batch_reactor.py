@@ -42,7 +42,7 @@ def _(installed):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
-    [⬅ Back to the examples](https://s-celles.github.io/anywidget-instruments/examples/)
+    [⬅ Back to the examples](https://anywidgetinstruments.github.io/anywidget-instruments-industrial/examples/)
 
     # Batch reactor R-101: a complete operator station
 
@@ -66,9 +66,9 @@ def _(mo):
     ISA-18.2 / IEC 62682 (alarm list), IEC 60073 (stack light), IEC 62264
     (equipment hierarchy). These standards inspired the widgets; the library
     does not claim conformity with them ([Standards and
-    references](https://s-celles.github.io/anywidget-instruments/standards/)).
+    references](https://anywidgetinstruments.github.io/anywidget-instruments-industrial/standards/)).
     The simulation is not meant to control real equipment ([safety
-    notice](https://s-celles.github.io/anywidget-instruments/safety/)).
+    notice](https://anywidgetinstruments.github.io/anywidget-instruments-industrial/safety/)).
 
     > **The code is hidden.** To see it, open the **⋯** menu at the top right
     > and choose **Show code**; in the marimo editor, click a cell's collapsed code.

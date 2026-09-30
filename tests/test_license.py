@@ -34,7 +34,10 @@ def test_license_is_declared_everywhere() -> None:
 def test_citation_metadata_follows_the_release() -> None:
     assert _cff("cff-version") == "1.2.0"
     assert _cff("version") == ai.__version__
-    assert _cff("repository-code") == "https://github.com/s-celles/anywidget-instruments"
+    assert (
+        _cff("repository-code")
+        == "https://github.com/AnywidgetInstruments/anywidget-instruments-industrial"
+    )
     orcid = re.search(r"orcid: \"https://orcid.org/([0-9X-]+)\"", _read("CITATION.cff"))
     assert orcid and orcid.group(1) in _read("docs/citing.md")
     # the citing page gives the same version as the metadata

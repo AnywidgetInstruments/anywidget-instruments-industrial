@@ -39,9 +39,9 @@ docs = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/s-celles/anywidget-instruments"
-Issues = "https://github.com/s-celles/anywidget-instruments/issues"
-Specification = "https://s-celles.github.io/anywidget-instruments/specification/"
+Homepage = "https://github.com/AnywidgetInstruments/anywidget-instruments-industrial"
+Issues = "https://github.com/AnywidgetInstruments/anywidget-instruments-industrial/issues"
+Specification = "https://anywidgetinstruments.github.io/anywidget-instruments-industrial/specification/"
 
 [tool.hatch.build]
 only-packages = true

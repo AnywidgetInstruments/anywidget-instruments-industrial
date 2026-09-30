@@ -16,7 +16,7 @@ def _():
 def _(mo):
     mo.md(
         """
-        [⬅ Back to the examples](https://s-celles.github.io/anywidget-instruments/examples/)
+        [⬅ Back to the examples](https://anywidgetinstruments.github.io/anywidget-instruments-industrial/examples/)
 
         > **The code is hidden.** To see it, open the **⋯** menu at the top right
         > and choose **Show code**; in the marimo editor, click a cell's collapsed code.

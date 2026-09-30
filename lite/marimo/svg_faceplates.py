@@ -40,7 +40,7 @@ def _(installed):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
-    [⬅ Back to the examples](https://s-celles.github.io/anywidget-instruments/try/)
+    [⬅ Back to the examples](https://anywidgetinstruments.github.io/anywidget-instruments-industrial/try/)
 
     # SVG faceplates
 

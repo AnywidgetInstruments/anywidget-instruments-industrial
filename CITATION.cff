@@ -11,8 +11,8 @@ authors:
     affiliation: "Université de Poitiers"
 version: 0.1.0.dev0
 license: BSD-3-Clause
-repository-code: "https://github.com/s-celles/anywidget-instruments"
-url: "https://s-celles.github.io/anywidget-instruments/"
+repository-code: "https://github.com/AnywidgetInstruments/anywidget-instruments-industrial"
+url: "https://anywidgetinstruments.github.io/anywidget-instruments-industrial/"
 abstract: >-
   Knobs, gauges, LEDs, charts, alarms and supervisory objects (PID
   faceplate, state machine, alarm list, SVG faceplates) for Jupyter,

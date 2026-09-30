@@ -3,7 +3,7 @@
 ## License
 
 anywidget-instruments is distributed under the
-[BSD 3-Clause license](https://github.com/s-celles/anywidget-instruments/blob/main/LICENSE):
+[BSD 3-Clause license](https://github.com/AnywidgetInstruments/anywidget-instruments-industrial/blob/main/LICENSE):
 you may use, modify and redistribute it, including in commercial and closed
 products, provided that you keep the copyright notice and the license text,
 and that you do not use the author's name to endorse derived products. The
@@ -17,7 +17,7 @@ product, please cite it. This is a request, not a condition of the license:
 citations are how the work is found, credited and kept alive.
 
 The citation metadata is in
-[`CITATION.cff`](https://github.com/s-celles/anywidget-instruments/blob/main/CITATION.cff)
+[`CITATION.cff`](https://github.com/AnywidgetInstruments/anywidget-instruments-industrial/blob/main/CITATION.cff)
 at the root of the repository; GitHub shows it as *Cite this repository*,
 and reference managers can import it.
 
@@ -28,7 +28,7 @@ APA:
 
 > Celles, S. (2026). *anywidget-instruments: instrumentation widgets for
 > computational notebooks* (Version 0.1.0.dev0) [Computer software].
-> https://github.com/s-celles/anywidget-instruments
+> https://github.com/AnywidgetInstruments/anywidget-instruments-industrial
 
 BibTeX:
 
@@ -39,7 +39,7 @@ BibTeX:
   year    = {2026},
   version = {0.1.0.dev0},
   license = {BSD-3-Clause},
-  url     = {https://github.com/s-celles/anywidget-instruments}
+  url     = {https://github.com/AnywidgetInstruments/anywidget-instruments-industrial}
 }
 ```
 
