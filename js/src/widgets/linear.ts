@@ -1,8 +1,8 @@
 // Linear numeric widgets: Tank, Thermometer, FillSlide, VUMeter (NUM-105..108).
-import { clear, safeColor, svg, svgText } from "../core/dom.js";
+import { clear, safeColor, svg, svgText } from "anywidget-instruments/js/src/core/dom.js";
 import { formatValue, tickFormat } from "../core/format.js";
-import type { AnyModel } from "../core/model.js";
-import { linearHit, parseNumber, ticks } from "../core/scale.js";
+import type { AnyModel } from "anywidget-instruments/js/src/core/model.js";
+import { linearHit, parseNumber, ticks } from "anywidget-instruments/js/src/core/scale.js";
 import type { FillSlideTraits, TankTraits, VUMeterTraits } from "../generated/contract.js";
 import { NumericView, svgPoint } from "./numeric.js";
 

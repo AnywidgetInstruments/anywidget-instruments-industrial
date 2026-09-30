@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anywidgetinstruments.github.io/anywidget-instruments-industrial/schema/analogindicator.schema.json",
+  "title": "AnalogIndicator",
+  "description": "High-performance analog bar indicator (IND-001 .. IND-003).",
+  "type": "object",
+  "x-awi-class": "AnalogIndicator",
+  "allOf": [
+    {
+      "$ref": "numeric.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "analogindicator",
+      "default": "analogindicator",
+      "x-awi-writer": "host"
+    },
+    "mode": {
+      "default": "indicator"
+    },
+    "normal_hi": {
+      "$ref": "https://anywidgetinstruments.github.io/anywidget-instruments/schema/instrument.schema.json#/$defs/optionalNumber",
+      "description": "Upper end of the normal operating range.",
+      "default": null,
+      "x-awi-writer": "host"
+    },
+    "normal_lo": {
+      "$ref": "https://anywidgetinstruments.github.io/anywidget-instruments/schema/instrument.schema.json#/$defs/optionalNumber",
+      "description": "Lower end of the normal operating range, shaded on the scale (IND-002).",
+      "default": null,
+      "x-awi-writer": "host"
+    },
+    "orientation": {
+      "enum": [
+        "horizontal",
+        "vertical"
+      ],
+      "description": "Bar direction.",
+      "default": "horizontal",
+      "x-awi-writer": "host"
+    },
+    "show_limits": {
+      "default": true
+    },
+    "size": {
+      "description": "[width, height] in CSS pixels. The Python class uses (70, 220) when created vertical; other hosts give the size with the orientation.",
+      "default": [
+        240,
+        56
+      ]
+    },
+    "target": {
+      "$ref": "https://anywidgetinstruments.github.io/anywidget-instruments/schema/instrument.schema.json#/$defs/optionalNumber",
+      "description": "Desired value, marked on the scale.",
+      "default": null,
+      "x-awi-writer": "host"
+    }
+  }
+}

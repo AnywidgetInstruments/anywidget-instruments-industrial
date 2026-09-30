@@ -8,7 +8,7 @@ Field transmitter shown as an instrument bubble with a device status (IND-080 ..
 ![Transmitter, light theme](../img/widgets/transmitter-light.png#only-light){ width="118" }
 ![Transmitter, dark theme](../img/widgets/transmitter-dark.png#only-dark){ width="118" }
 
-**Field instruments** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.Transmitter) ·
+**Field instruments** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.Transmitter) ·
 schema [`transmitter.schema.json`](../trait-contract.md)
 
 ## Example

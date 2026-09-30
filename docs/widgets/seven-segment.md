@@ -8,7 +8,7 @@ Seven-segment numeric display (NUM-109).
 ![SevenSegment, light theme](../img/widgets/seven-segment-light.png#only-light){ width="208" }
 ![SevenSegment, dark theme](../img/widgets/seven-segment-dark.png#only-dark){ width="208" }
 
-**Indicators, analog** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.SevenSegment) ·
+**Indicators, analog** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.SevenSegment) ·
 schema [`sevensegment.schema.json`](../trait-contract.md)
 
 ## Example

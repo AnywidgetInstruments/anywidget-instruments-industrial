@@ -28,15 +28,21 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: The anywidget-instruments core, at the commit of package.json (not on the package index yet)
+        run: pip install "anywidget-instruments @ git+https://github.com/AnywidgetInstruments/anywidget-instruments@$(node -p "require('./package.json').devDependencies['anywidget-instruments'].split('#')[1]")"
       - run: pip install build uv -e ".[docs]" # uv: import analysis of the marimo export
       - run: python -m build --wheel -o dist
+      - name: Wheel of the anywidget-instruments core, at the commit of package.json
+        run: |
+          sha=$(node -p "require('./package.json').devDependencies['anywidget-instruments'].split('#')[1]")
+          pip wheel --no-deps -w dist "anywidget-instruments @ git+https://github.com/AnywidgetInstruments/anywidget-instruments@$sha"
       - name: The wheel ships the bundle, the contract, the schemas and the SVG templates
         run: |
           python - <<'PY'
           import glob, zipfile
-          names = zipfile.ZipFile(glob.glob("dist/*.whl")[0]).namelist()
+          names = zipfile.ZipFile(glob.glob("dist/anywidget_instruments_industrial-*.whl")[0]).namelist()
           for needed in ("static/index.js", "static/contract.json", "schema/knob.schema.json", "templates/voltmeter.svg"):
-              assert any(n.endswith("anywidget_instruments/" + needed) for n in names), needed
+              assert any(n.endswith("anywidget_instruments_industrial/" + needed) for n in names), needed
           PY
       - name: MkDocs (offline-capable, strict)
         run: mkdocs build --strict -d site
@@ -47,7 +53,8 @@ jobs:
         run: |
           mkdir -p lite/marimo/public
           cp dist/*.whl lite/marimo/public/
-          (cd dist && ls *.whl) > lite/marimo/public/wheel.txt
+          # the core first: the library depends on it
+          (cd dist && ls anywidget_instruments-*.whl anywidget_instruments_industrial-*.whl) > lite/marimo/public/wheel.txt
           for nb in lite/marimo/*.py; do
             name=$(basename "$nb" .py)
             marimo export html-wasm "$nb" -o "site/marimo/$name" --mode run --show-code

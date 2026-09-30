@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anywidgetinstruments.github.io/anywidget-instruments-industrial/schema/transmitter.schema.json",
+  "title": "Transmitter",
+  "description": "Field transmitter shown as an instrument bubble with a device status (IND-080 .. IND-083).",
+  "type": "object",
+  "x-awi-class": "Transmitter",
+  "allOf": [
+    {
+      "$ref": "numeric.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "transmitter",
+      "default": "transmitter",
+      "x-awi-writer": "host"
+    },
+    "format": {
+      "default": "%.2f"
+    },
+    "mode": {
+      "default": "indicator"
+    },
+    "size": {
+      "default": [
+        110,
+        84
+      ]
+    },
+    "status": {
+      "enum": [
+        "ok",
+        "failure",
+        "check",
+        "out_of_spec",
+        "maintenance"
+      ],
+      "description": "Device status after the NAMUR NE 107 categories: ok, failure, check (function check), out_of_spec, maintenance (IND-081). While failure, the value is shown invalid (IND-082).",
+      "default": "ok",
+      "x-awi-writer": "host"
+    },
+    "status_text": {
+      "type": "string",
+      "description": "Optional detail of the status, e.g. the diagnostic message.",
+      "default": "",
+      "x-awi-writer": "host"
+    },
+    "tag": {
+      "type": "string",
+      "description": "Instrument tag, e.g. LT-101: function letters above the line, loop number below (IND-080).",
+      "default": "",
+      "x-awi-writer": "host"
+    }
+  }
+}

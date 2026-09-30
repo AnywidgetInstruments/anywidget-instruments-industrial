@@ -1,7 +1,7 @@
 // ISA-18.1 annunciator (IND-040 .. IND-043): the front-end port of
 // annunciator_transition and of the panel logic of Annunciator (set,
 // acknowledge, reset, silence, first-out mark, horn) in
-// src/anywidget_instruments/_annunciator.py. Both are checked against the
+// src/anywidget_instruments_industrial/_annunciator.py. Both are checked against the
 // shared cases of tests/parity/annunciator.json.
 
 export type Sequence = "A" | "M" | "R";

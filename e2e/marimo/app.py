@@ -7,7 +7,7 @@ app = marimo.App()
 def _():
     import marimo as mo
 
-    import anywidget_instruments as ai
+    import anywidget_instruments_industrial as ai
 
     return ai, mo
 

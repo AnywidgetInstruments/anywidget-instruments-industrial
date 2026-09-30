@@ -1,6 +1,6 @@
 // Form entry of numeric values (API-014, NUM-010).
 import { formatValue, parseEntry, radixOf, withUnit } from "./format.js";
-import { snap } from "./scale.js";
+import { snap } from "anywidget-instruments/js/src/core/scale.js";
 
 /**
  * Check a typed entry against the scale (NUM-010): a number, snapped to

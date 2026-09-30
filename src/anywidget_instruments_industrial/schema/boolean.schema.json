@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anywidgetinstruments.github.io/anywidget-instruments-industrial/schema/boolean.schema.json",
+  "title": "Boolean",
+  "description": "Traits shared by the Boolean widgets (BOOL-*).",
+  "type": "object",
+  "x-awi-abstract": true,
+  "x-awi-class": "BooleanWidget",
+  "allOf": [
+    {
+      "$ref": "https://anywidgetinstruments.github.io/anywidget-instruments/schema/instrument.schema.json"
+    }
+  ],
+  "properties": {
+    "value": {
+      "type": "boolean",
+      "description": "State of the control or indicator. Set by the host, or by the user in control mode.",
+      "default": false,
+      "x-awi-writer": "both"
+    },
+    "default_state": {
+      "type": "boolean",
+      "description": "State a latch returns to once the host has read it (BOOL-008).",
+      "default": false,
+      "x-awi-writer": "host"
+    },
+    "mechanical_action": {
+      "enum": [
+        "switch_when_pressed",
+        "switch_when_released",
+        "switch_until_released",
+        "latch_when_pressed",
+        "latch_when_released",
+        "latch_until_released"
+      ],
+      "description": "How the control reacts to the pointer (BOOL-007). With a latch, the host reads the value and restores default_state; without a host that does it, a latched value stays set.",
+      "default": "switch_when_pressed",
+      "x-awi-writer": "host"
+    },
+    "latch_timeout": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Seconds after which an unread latch expires (host side); 0: never.",
+      "default": 0,
+      "x-awi-writer": "host"
+    },
+    "confirm": {
+      "type": "boolean",
+      "description": "Ask for a confirmation before changing the value (BOOL-011).",
+      "default": false,
+      "x-awi-writer": "host"
+    },
+    "_pressed": {
+      "type": "boolean",
+      "description": "True while the pointer (or Space / Enter) is held on the control.",
+      "default": false,
+      "x-awi-writer": "front"
+    },
+    "_seq": {
+      "type": "integer",
+      "description": "Sequence number of the last press / release update sent by the front end; a host drops an update whose number is not newer (BOOL-010).",
+      "default": 0,
+      "x-awi-writer": "front"
+    }
+  },
+  "x-awi-messages": [
+    {
+      "type": "latch_expired",
+      "direction": "host-to-front",
+      "description": "An unread latch expired (latch_timeout): the view flashes.",
+      "fields": {},
+      "buffers": []
+    }
+  ]
+}

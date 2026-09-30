@@ -1,7 +1,7 @@
 // Boolean widgets and mechanical actions (BOOL-001..BOOL-014).
-import { clear, svg, svgText } from "../core/dom.js";
-import type { AnyModel } from "../core/model.js";
-import { BaseView } from "../core/view.js";
+import { clear, svg, svgText } from "anywidget-instruments/js/src/core/dom.js";
+import type { AnyModel } from "anywidget-instruments/js/src/core/model.js";
+import { BaseView } from "anywidget-instruments/js/src/core/view.js";
 import type { BooleanTraits, LEDTraits, PushButtonTraits, ToggleSwitchTraits } from "../generated/contract.js";
 
 /** Traits of the Boolean widgets, from their schemas (LED and PushButton both have a shape). */

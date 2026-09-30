@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anywidgetinstruments.github.io/anywidget-instruments-industrial/schema/compass.schema.json",
+  "title": "Compass",
+  "description": "Heading display in degrees with cardinal labels (SPEC-001).",
+  "type": "object",
+  "x-awi-class": "Compass",
+  "allOf": [
+    {
+      "$ref": "numeric.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "compass",
+      "default": "compass",
+      "x-awi-writer": "host"
+    },
+    "format": {
+      "default": "%.0f"
+    },
+    "max": {
+      "default": 360.0
+    },
+    "mode": {
+      "default": "indicator"
+    },
+    "ticks": {
+      "default": 8
+    },
+    "unit": {
+      "default": "°"
+    },
+    "value": {
+      "description": "Heading in degrees, wrapped into [0, 360) (a finite value v is stored as v modulo 360, with a positive result).",
+      "x-awi-modulo": 360
+    }
+  }
+}

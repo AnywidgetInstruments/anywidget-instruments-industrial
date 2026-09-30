@@ -1,10 +1,10 @@
 // NumericEntry: numeric keypad for touch panels (IND-104).
-import { html, setText } from "../core/dom.js";
+import { html, setText } from "anywidget-instruments/js/src/core/dom.js";
 import { checkEntry } from "../core/entry.js";
 import { formatValue, radixOf, withUnit } from "../core/format.js";
-import type { AnyModel } from "../core/model.js";
-import { parseNumber } from "../core/scale.js";
-import { BaseView } from "../core/view.js";
+import type { AnyModel } from "anywidget-instruments/js/src/core/model.js";
+import { parseNumber } from "anywidget-instruments/js/src/core/scale.js";
+import { BaseView } from "anywidget-instruments/js/src/core/view.js";
 import type { NumericEntryTraits } from "../generated/contract.js";
 
 const TRAITS = ["value", "min", "max", "unit", "format", "confirm_delta", "coerce"];

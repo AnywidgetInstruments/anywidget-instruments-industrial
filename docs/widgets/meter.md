@@ -8,7 +8,7 @@ Analog needle meter with a sector scale (NUM-104).
 ![Meter, light theme](../img/widgets/meter-light.png#only-light){ width="208" }
 ![Meter, dark theme](../img/widgets/meter-dark.png#only-dark){ width="208" }
 
-**Indicators, analog** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.Meter) ·
+**Indicators, analog** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.Meter) ·
 schema [`meter.schema.json`](../trait-contract.md)
 
 ## Example

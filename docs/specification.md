@@ -4,11 +4,11 @@
 
 | Field | Value |
 |-------|-------|
-| Project | anywidget-instruments (working name) |
+| Project | anywidget-instruments-industrial (working name) |
 | Author | Sébastien Celles |
 | Document type | Software requirements specification |
 | Notation | EARS (Easy Approach to Requirements Syntax) |
-| Version | 0.16 |
+| Version | 0.17 |
 | Date | 2026-09-30 |
 | Status | Baseline for version 1.0 |
 
@@ -70,7 +70,7 @@ provides them.
 | Latch | A mechanical action where the value returns to its default state once the kernel has read it. |
 | Alarm limits | Low-low, low, high and high-high thresholds attached to a numeric value. |
 | Skin | A set of images or SVG fragments replacing the default drawing of a widget part. |
-| Library | The anywidget-instruments package as a whole. |
+| Library | The anywidget-instruments-industrial package as a whole. |
 
 ### 1.6 Requirement Identifiers and Priority
 
@@ -85,7 +85,7 @@ Requirements use identifiers `<GROUP>-<NNN>` with priorities:
 
 | ID | Pri. | Requirement |
 |---|---|---|
-| GEN-001 | M | The library shall be distributed as a single Python package on PyPI and conda-forge. |
+| GEN-001 | M | The library shall be distributed as the Python package `anywidget-instruments-industrial` (module `anywidget_instruments_industrial`) on PyPI and conda-forge. |
 | GEN-002 | M | The library shall implement every widget as a subclass of `anywidget.AnyWidget`. |
 | GEN-003 | M | The library shall render correctly in JupyterLab, Jupyter Notebook 7, VS Code notebooks, Google Colab and marimo. |
 | GEN-004 | M | The library shall ship all front-end code as pre-bundled ES modules, so that the user needs no JavaScript toolchain. |
@@ -93,9 +93,10 @@ Requirements use identifiers `<GROUP>-<NNN>` with priorities:
 | GEN-006 | M | The library shall be released under the BSD 3-Clause license and shall ship citation metadata (`CITATION.cff`) with a request to cite it. |
 | GEN-007 | M | The library shall support CPython 3.10 and later. |
 | GEN-008 | S | The library shall keep each front-end module compliant with the anywidget Front-End Module (AFM) specification, so that the modules can be reused by other AFM host platforms (R, Deno, Julia bridges). |
-| GEN-009 | S | The library shall limit its runtime Python dependencies to `anywidget`, `traitlets` and `numpy`. |
+| GEN-009 | S | The library shall limit its runtime Python dependencies to `anywidget-instruments` (the core of the family), `anywidget`, `traitlets` and `numpy`. |
 | GEN-010 | M | When the library is imported, the library shall not modify global notebook state or register global CSS outside its own widget roots. |
 | GEN-011 | S | Where marimo is the host, the library shall expose each control so that it triggers marimo reactive re-execution when its value changes. |
+| GEN-012 | M | The library shall build on the anywidget-instruments core: its widgets shall derive from the core base class and base view, its schemas shall extend the core base schema by its `$id`, and its themes, liveness and widget frame shall be those of the core; its schemas shall carry `$id`s under `https://anywidgetinstruments.github.io/anywidget-instruments-industrial/schema/`. |
 
 ---
 
@@ -597,7 +598,7 @@ authors in the documentation.
 
 ## 21. Open Questions
 
-1. Final project name (candidates: `anywidget-instruments`, `ipyinstruments`, `notebook-panel`).
+1. Final project name (candidates: `anywidget-instruments-industrial`, `ipyinstruments`, `notebook-panel`).
 2. Front-end rendering technology: plain SVG for all widgets, or Canvas/WebGL for charts only (impacts CHART-005 and PERF-004).
 3. Whether a Julia binding sharing the same ES modules (per GEN-008) is in scope for 1.0 or a later release.
 4. Whether latch semantics (BOOL-010) should rely on an explicit `read_latched()` call or on the first trait read by an observer.
@@ -623,3 +624,4 @@ authors in the documentation.
 | 0.14 | GEN-006: BSD 3-Clause license (was MIT) with citation metadata and a request to cite. |
 | 0.15 | DOC-008: a page per widget, pictured in the light and the dark theme. |
 | 0.16 | DOC-007: the page of each safety-related widget (EmergencyStop, alarms, PID faceplate, state machine) shows the safety notice before its example. |
+| 0.17 | GEN-012: the library builds on the anywidget-instruments core, which now holds the base view, base class, base schema and its generator, themes and liveness; GEN-001: package renamed anywidget-instruments-industrial (module anywidget_instruments_industrial); GEN-009: the core is a dependency; schema `$id`s under anywidgetinstruments.github.io/anywidget-instruments-industrial. |

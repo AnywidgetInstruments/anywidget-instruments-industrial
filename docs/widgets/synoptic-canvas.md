@@ -8,7 +8,7 @@ Widgets and pipe runs placed at absolute coordinates on a background image (SCAD
 ![SynopticCanvas, light theme](../img/widgets/synoptic-canvas-light.png#only-light){ width="330" }
 ![SynopticCanvas, dark theme](../img/widgets/synoptic-canvas-dark.png#only-dark){ width="330" }
 
-**Layout and session** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.SynopticCanvas) ·
+**Layout and session** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.SynopticCanvas) ·
 schema [`synoptic.schema.json`](../trait-contract.md)
 
 ## Example

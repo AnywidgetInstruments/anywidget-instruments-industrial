@@ -1,11 +1,11 @@
 // SvgPanel: a front panel drawn in a vector editor; labelled elements are
 // animated from the values and act as controls (IND-120 .. IND-126).
 import { CONTROL_ROLES, matches, optionValue, parseRole, type Role, rotateAngle, stepValue, fraction, truthy } from "../contract/svgpanel.js";
-import { clear, html, parseSkin, safeColor, setAttr, setHidden, setText } from "../core/dom.js";
+import { clear, html, parseSkin, safeColor, setAttr, setHidden, setText } from "anywidget-instruments/js/src/core/dom.js";
 import { checkEntry } from "../core/entry.js";
 import { formatValue, withUnit } from "../core/format.js";
-import type { AnyModel } from "../core/model.js";
-import { BaseView } from "../core/view.js";
+import type { AnyModel } from "anywidget-instruments/js/src/core/model.js";
+import { BaseView } from "anywidget-instruments/js/src/core/view.js";
 import type { SvgPanelTraits } from "../generated/contract.js";
 
 const TRAITS = ["svg", "value", "problems", "show_entries"];

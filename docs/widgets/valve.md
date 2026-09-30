@@ -8,7 +8,7 @@ On/off or control valve (SCADA-001).
 ![Valve, light theme](../img/widgets/valve-light.png#only-light){ width="114" }
 ![Valve, dark theme](../img/widgets/valve-dark.png#only-dark){ width="114" }
 
-**Process symbols** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.Valve) ·
+**Process symbols** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.Valve) ·
 schema [`valve.schema.json`](../trait-contract.md)
 
 ## Example

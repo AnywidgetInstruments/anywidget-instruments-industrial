@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anywidgetinstruments.github.io/anywidget-instruments-industrial/schema/smith.schema.json",
+  "title": "SmithChart",
+  "description": "Smith chart of reflection coefficients (SPEC-003).",
+  "type": "object",
+  "x-awi-class": "SmithChart",
+  "allOf": [
+    {
+      "$ref": "series.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "smith",
+      "default": "smith",
+      "x-awi-writer": "host"
+    },
+    "value": {
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string",
+            "description": "CSS color; empty: the trace palette."
+          },
+          "style": {
+            "enum": [
+              "line",
+              "markers",
+              "both"
+            ]
+          },
+          "re": {
+            "type": "array",
+            "items": {
+              "$ref": "https://anywidgetinstruments.github.io/anywidget-instruments/schema/instrument.schema.json#/$defs/float"
+            },
+            "description": "Real parts of the reflection coefficients Γ."
+          },
+          "im": {
+            "type": "array",
+            "items": {
+              "$ref": "https://anywidgetinstruments.github.io/anywidget-instruments/schema/instrument.schema.json#/$defs/float"
+            },
+            "description": "Imaginary parts of Γ, one per real part."
+          }
+        }
+      },
+      "description": "Data sets {name, color, style, re, im} of reflection coefficients Γ = (Z - z0) / (Z + z0); a host plotting impedances converts them (Python: plot(z, kind=\"impedance\"))."
+    },
+    "z0": {
+      "type": "number",
+      "minimum": 0,
+      "exclusiveMinimum": 0,
+      "description": "Reference impedance in ohms, used to show impedances in the tooltips (must be > 0).",
+      "default": 50.0,
+      "x-awi-writer": "host"
+    },
+    "show_admittance": {
+      "type": "boolean",
+      "description": "Also draw the constant-conductance circles.",
+      "default": false,
+      "x-awi-writer": "host"
+    }
+  }
+}

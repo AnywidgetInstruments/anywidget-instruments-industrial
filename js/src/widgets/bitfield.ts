@@ -1,9 +1,9 @@
 // BitField: an integer word as a row of indicators, one per bit (IND-111, IND-112).
 import { activeBits, bitOf, toggleBit, wordOf } from "../contract/bitfield.js";
-import { clear, html, safeColor, setAttr, setText } from "../core/dom.js";
+import { clear, html, safeColor, setAttr, setText } from "anywidget-instruments/js/src/core/dom.js";
 import { formatValue } from "../core/format.js";
-import type { AnyModel } from "../core/model.js";
-import { BaseView } from "../core/view.js";
+import type { AnyModel } from "anywidget-instruments/js/src/core/model.js";
+import { BaseView } from "anywidget-instruments/js/src/core/view.js";
 import type { BitFieldTraits } from "../generated/contract.js";
 
 const TRAITS = ["value", "bits", "labels", "colors", "on_color", "msb_first", "show_hex"];

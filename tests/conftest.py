@@ -6,7 +6,7 @@ from collections.abc import Iterator
 
 import pytest
 
-from anywidget_instruments import _style
+from anywidget_instruments_industrial import _style
 
 
 @pytest.fixture(autouse=True)

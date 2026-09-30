@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anywidgetinstruments.github.io/anywidget-instruments-industrial/schema/dial.schema.json",
+  "title": "Dial",
+  "description": "Rotary control with a circular scale, optionally multi-turn (NUM-102).",
+  "type": "object",
+  "x-awi-class": "Dial",
+  "allOf": [
+    {
+      "$ref": "numeric.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "dial",
+      "default": "dial",
+      "x-awi-writer": "host"
+    },
+    "angle_range": {
+      "type": "number",
+      "minimum": 10.0,
+      "maximum": 360.0,
+      "description": "Angle swept by one turn of the scale, in degrees.",
+      "default": 300.0,
+      "x-awi-writer": "host"
+    },
+    "turns": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Number of turns for the full scale (multi-turn dial, e.g. a ten-turn potentiometer).",
+      "default": 1,
+      "x-awi-writer": "host"
+    }
+  }
+}

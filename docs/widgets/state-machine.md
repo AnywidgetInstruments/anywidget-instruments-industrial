@@ -11,7 +11,7 @@ Machine state model with operator commands, PackML (ISA-TR88.00.02) by default (
 ![StateMachine, light theme](../img/widgets/state-machine-light.png#only-light){ width="728" }
 ![StateMachine, dark theme](../img/widgets/state-machine-dark.png#only-dark){ width="728" }
 
-**Supervisory objects** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.StateMachine) ·
+**Supervisory objects** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.StateMachine) ·
 schema [`statemachine.schema.json`](../trait-contract.md)
 
 ## Example

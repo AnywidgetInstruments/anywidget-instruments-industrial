@@ -1,6 +1,6 @@
 // WaveformChart history and cursor readout (CHART-001 .. CHART-009,
 // CHART-104): the front-end port of the ring buffer and of
-// WaveformChart.values_at (src/anywidget_instruments/_chart.py). Both are
+// WaveformChart.values_at (src/anywidget_instruments_industrial/_chart.py). Both are
 // checked against tests/parity/waveform.json.
 
 export type UpdateMode = "strip" | "scope" | "sweep";

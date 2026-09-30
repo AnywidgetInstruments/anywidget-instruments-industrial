@@ -1,12 +1,12 @@
 // Base view of every graph: canvas plot area, axes, zoom tool, cursors,
 // annotations and export (CHART-104..107).
 import type { GraphWidgetTraits } from "../generated/contract.js";
-import { clear, html, safeColor, setAttr, setHidden, setText } from "./dom.js";
+import { clear, html, safeColor, setAttr, setHidden, setText } from "anywidget-instruments/js/src/core/dom.js";
 import { checkEntry, type EntryResult } from "./entry.js";
 import { formatValue, parseEntry } from "./format.js";
-import type { AnyModel } from "./model.js";
-import { niceTicks, parseNumber } from "./scale.js";
-import { BaseView } from "./view.js";
+import type { AnyModel } from "anywidget-instruments/js/src/core/model.js";
+import { niceTicks, parseNumber } from "anywidget-instruments/js/src/core/scale.js";
+import { BaseView } from "anywidget-instruments/js/src/core/view.js";
 
 export const PLOT_TRAITS = ["cursors", "cursor_values", "annotations", "export", "x_unit", "unit"];
 

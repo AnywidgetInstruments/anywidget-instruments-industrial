@@ -1,7 +1,9 @@
-// anywidget-instruments front-end entry point (AFM module).
+// anywidget-instruments-industrial front-end entry point (AFM module).
 // A single bundle serves every widget; the `_kind` trait selects the view.
 import { attachDerived } from "./contract/derived.js";
-import { watchModel } from "./core/liveness.js";
+import { watchModel } from "anywidget-instruments/js/src/core/liveness.js";
+import { registerContracts } from "anywidget-instruments/js/src/core/view.js";
+import { BY_KIND } from "./generated/contract.js";
 import { AlarmView } from "./widgets/alarm.js";
 import { AlarmListView } from "./widgets/alarmlist.js";
 import { AnnunciatorView } from "./widgets/annunciator.js";
@@ -30,6 +32,9 @@ import { EventLogView } from "./widgets/eventlog.js";
 import { KeypadView } from "./widgets/keypad.js";
 import { TransmitterView } from "./widgets/transmitter.js";
 import { TrendView } from "./widgets/trend.js";
+
+// the base view reads the traits of a widget through the contract of its kind (HOST-002)
+registerContracts(BY_KIND);
 
 const VIEWS = {
   knob: RotaryView,
@@ -89,7 +94,7 @@ const VIEWS = {
 function render({ model, el }) {
   const View = VIEWS[model.get("_kind")];
   if (!View) {
-    el.textContent = `anywidget-instruments: unknown widget kind "${model.get("_kind")}"`;
+    el.textContent = `anywidget-instruments-industrial: unknown widget kind "${model.get("_kind")}"`;
     return undefined;
   }
   const view = new View(model, el);

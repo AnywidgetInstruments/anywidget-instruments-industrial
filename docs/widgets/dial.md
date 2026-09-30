@@ -8,7 +8,7 @@ Rotary control with a circular scale, optionally multi-turn (NUM-102).
 ![Dial, light theme](../img/widgets/dial-light.png#only-light){ width="168" }
 ![Dial, dark theme](../img/widgets/dial-dark.png#only-dark){ width="168" }
 
-**Controls, continuous** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.Dial) ·
+**Controls, continuous** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.Dial) ·
 schema [`dial.schema.json`](../trait-contract.md)
 
 ## Example

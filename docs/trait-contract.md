@@ -21,10 +21,10 @@ The Python wheel ships everything a host needs, and no Python code has to run:
 
 | File | Content |
 |---|---|
-| `anywidget_instruments/static/index.js` | The front-end module (ES module, unminified, with `index.js.map`), exporting `initialize` and `render` as anywidget expects |
-| `anywidget_instruments/static/index.css` | Styles, scoped under `.awi-root` |
-| `anywidget_instruments/static/contract.json` | The contract, flattened for hosts (generated) |
-| `anywidget_instruments/schema/*.schema.json` | One JSON Schema (draft 2020-12) per widget and per base class: the source of truth |
+| `anywidget_instruments_industrial/static/index.js` | The front-end module (ES module, unminified, with `index.js.map`), exporting `initialize` and `render` as anywidget expects |
+| `anywidget_instruments_industrial/static/index.css` | Styles, scoped under `.awi-root` |
+| `anywidget_instruments_industrial/static/contract.json` | The contract, flattened for hosts (generated) |
+| `anywidget_instruments_industrial/schema/*.schema.json` | One JSON Schema (draft 2020-12) per widget and per base class: the source of truth |
 
 The schemas describe a trait dictionary: validate the dictionary a host builds
 against the schema of the widget to catch mistakes early. `contract.json` is

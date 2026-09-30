@@ -8,7 +8,7 @@ Scrolling 2-D color map: spectrogram or waterfall (CHART-101).
 ![IntensityChart, light theme](../img/widgets/intensity-chart-light.png#only-light){ width="428" }
 ![IntensityChart, dark theme](../img/widgets/intensity-chart-dark.png#only-dark){ width="428" }
 
-**Graphs, time** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.IntensityChart) ·
+**Graphs, time** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.IntensityChart) ·
 schema [`intensitychart.schema.json`](../trait-contract.md)
 
 ## Example

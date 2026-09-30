@@ -1,7 +1,7 @@
 // Digital and mixed-signal graphs (CHART-102, CHART-103): decoding of the
 // data message, bus values and the cursor readout, the front-end ports of
 // DigitalWaveformGraph.bus_values / values_at
-// (src/anywidget_instruments/_graphs.py), checked against
+// (src/anywidget_instruments_industrial/_graphs.py), checked against
 // tests/parity/digital.json.
 import { type BufferLike, toFloat32, toUint8 } from "../core/buffers.js";
 

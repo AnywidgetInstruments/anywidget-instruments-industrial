@@ -8,7 +8,7 @@ Horizontal or vertical slider control and bar indicator (NUM-108).
 ![FillSlide, light theme](../img/widgets/fill-slide-light.png#only-light){ width="268" }
 ![FillSlide, dark theme](../img/widgets/fill-slide-dark.png#only-dark){ width="268" }
 
-**Controls, continuous** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.FillSlide) ·
+**Controls, continuous** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.FillSlide) ·
 schema [`fillslide.schema.json`](../trait-contract.md)
 
 ## Example

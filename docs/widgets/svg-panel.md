@@ -8,7 +8,7 @@ Front panel drawn in a vector editor: elements labelled awi:<role>=<name>;<optio
 ![SvgPanel, light theme](../img/widgets/svg-panel-light.png#only-light){ width="228" }
 ![SvgPanel, dark theme](../img/widgets/svg-panel-dark.png#only-dark){ width="228" }
 
-**Custom front panels** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.SvgPanel) ·
+**Custom front panels** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.SvgPanel) ·
 schema [`svgpanel.schema.json`](../trait-contract.md)
 
 ## Example

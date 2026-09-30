@@ -34,7 +34,7 @@ update the indicators.
 
 The package is not on the package index yet, so both deployments install the
 wheel built with this site (a `micropip` cell in marimo,
-`%pip install anywidget-instruments` in JupyterLite).
+`%pip install anywidget-instruments-industrial` in JupyterLite).
 
 !!! note
     Pyodide has no threads. Stale-data detection (heartbeats) is off, and

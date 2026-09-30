@@ -8,7 +8,7 @@ Group of aligned bars on a shared scale with per-bar alarm levels (IND-102).
 ![BarGraph, light theme](../img/widgets/bar-graph-light.png#only-light){ width="248" }
 ![BarGraph, dark theme](../img/widgets/bar-graph-dark.png#only-dark){ width="248" }
 
-**Compact indicators** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.BarGraph) ·
+**Compact indicators** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.BarGraph) ·
 schema [`bargraph.schema.json`](../trait-contract.md)
 
 ## Example

@@ -8,7 +8,7 @@ Vertical indicator with bulb and fluid column (NUM-107).
 ![Thermometer, light theme](../img/widgets/thermometer-light.png#only-light){ width="108" }
 ![Thermometer, dark theme](../img/widgets/thermometer-dark.png#only-dark){ width="108" }
 
-**Indicators, analog** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.Thermometer) ·
+**Indicators, analog** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.Thermometer) ·
 schema [`thermometer.schema.json`](../trait-contract.md)
 
 ## Example

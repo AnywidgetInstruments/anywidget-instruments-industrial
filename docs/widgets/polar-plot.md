@@ -8,7 +8,7 @@ Magnitude and angle data sets on polar axes (SPEC-002).
 ![PolarPlot, light theme](../img/widgets/polar-plot-light.png#only-light){ width="228" }
 ![PolarPlot, dark theme](../img/widgets/polar-plot-dark.png#only-dark){ width="228" }
 
-**Graphs, specialized** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.PolarPlot) ·
+**Graphs, specialized** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.PolarPlot) ·
 schema [`polar.schema.json`](../trait-contract.md)
 
 ## Example

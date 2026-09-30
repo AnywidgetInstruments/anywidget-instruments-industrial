@@ -8,7 +8,7 @@ High-performance analog bar indicator (IND-001 .. IND-003).
 ![AnalogIndicator, light theme](../img/widgets/analog-indicator-light.png#only-light){ width="248" }
 ![AnalogIndicator, dark theme](../img/widgets/analog-indicator-dark.png#only-dark){ width="248" }
 
-**Indicators, analog** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.AnalogIndicator) ·
+**Indicators, analog** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.AnalogIndicator) ·
 schema [`analogindicator.schema.json`](../trait-contract.md)
 
 ## Example

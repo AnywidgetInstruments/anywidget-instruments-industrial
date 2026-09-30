@@ -8,7 +8,7 @@ Pump with stopped, running and fault states and a rotation animation (SCADA-002)
 ![Pump, light theme](../img/widgets/pump-light.png#only-light){ width="98" }
 ![Pump, dark theme](../img/widgets/pump-dark.png#only-dark){ width="98" }
 
-**Process symbols** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.Pump) ·
+**Process symbols** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.Pump) ·
 schema [`pump.schema.json`](../trait-contract.md)
 
 ## Example

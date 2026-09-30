@@ -1,5 +1,5 @@
 // Alarm levels with hysteresis (ALARM-002, ALARM-003): the front-end port of
-// compute_alarm_level (src/anywidget_instruments/_alarm_logic.py). Both are
+// compute_alarm_level (src/anywidget_instruments_industrial/_alarm_logic.py). Both are
 // checked against the shared cases of tests/parity/alarm_level.json.
 
 export const ALARM_LEVELS = ["normal", "lo", "lolo", "hi", "hihi"] as const;

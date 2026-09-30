@@ -11,7 +11,7 @@ Red mushroom emergency stop button (BOOL-012); a drawing, not an emergency stop 
 ![EmergencyStop, light theme](../img/widgets/emergency-stop-light.png#only-light){ width="118" }
 ![EmergencyStop, dark theme](../img/widgets/emergency-stop-dark.png#only-dark){ width="118" }
 
-**Controls, discrete** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.EmergencyStop) ·
+**Controls, discrete** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.EmergencyStop) ·
 schema [`emergencystop.schema.json`](../trait-contract.md)
 
 ## Example

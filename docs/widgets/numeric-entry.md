@@ -8,7 +8,7 @@ Numeric keypad with a display, for touch panels (IND-104).
 ![NumericEntry, light theme](../img/widgets/numeric-entry-light.png#only-light){ width="188" }
 ![NumericEntry, dark theme](../img/widgets/numeric-entry-dark.png#only-dark){ width="188" }
 
-**Controls, continuous** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.NumericEntry) ·
+**Controls, continuous** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.NumericEntry) ·
 schema [`numericentry.schema.json`](../trait-contract.md)
 
 ## Example

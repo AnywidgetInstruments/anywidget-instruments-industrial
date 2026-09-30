@@ -1,7 +1,7 @@
 // Seven-segment numeric display (NUM-109).
-import { clear, safeColor, svg } from "../core/dom.js";
-import type { AnyModel } from "../core/model.js";
-import { keyStep } from "../core/scale.js";
+import { clear, safeColor, svg } from "anywidget-instruments/js/src/core/dom.js";
+import type { AnyModel } from "anywidget-instruments/js/src/core/model.js";
+import { keyStep } from "anywidget-instruments/js/src/core/scale.js";
 import type { SevenSegmentTraits } from "../generated/contract.js";
 import { NumericView } from "./numeric.js";
 

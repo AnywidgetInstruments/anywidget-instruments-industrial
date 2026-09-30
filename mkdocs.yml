@@ -1,4 +1,4 @@
-site_name: anywidget-instruments
+site_name: anywidget-instruments-industrial
 site_description: Instrumentation widgets for computational notebooks
 site_url: https://anywidgetinstruments.github.io/anywidget-instruments-industrial/
 repo_url: https://github.com/AnywidgetInstruments/anywidget-instruments-industrial
@@ -124,6 +124,8 @@ plugins:
             show_signature_annotations: true
             separate_signature: true
             filters: ["!^_"]
+            # names re-exported from the anywidget-instruments core (batch, set_theme...)
+            preload_modules: [anywidget_instruments]
 markdown_extensions:
   - admonition
   - tables

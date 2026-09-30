@@ -8,7 +8,7 @@ Integer word (status or fault word, register) shown as a row of indicators, one 
 ![BitField, light theme](../img/widgets/bit-field-light.png#only-light){ width="528" }
 ![BitField, dark theme](../img/widgets/bit-field-dark.png#only-dark){ width="528" }
 
-**Indicators, discrete** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.BitField) ·
+**Indicators, discrete** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.BitField) ·
 schema [`bitfield.schema.json`](../trait-contract.md)
 
 ## Example

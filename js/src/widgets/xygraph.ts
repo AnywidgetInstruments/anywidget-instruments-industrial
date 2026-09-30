@@ -1,9 +1,9 @@
 // XYGraph: data sets of (x, y) pairs with arbitrary spacing (IND-115).
 import { xyValueAt } from "../contract/xy.js";
 import { type BufferLike, toFloat64 } from "../core/buffers.js";
-import { setAttr } from "../core/dom.js";
+import { setAttr } from "anywidget-instruments/js/src/core/dom.js";
 import { formatValue } from "../core/format.js";
-import type { AnyModel } from "../core/model.js";
+import type { AnyModel } from "anywidget-instruments/js/src/core/model.js";
 import { type Area, type Colors, PlotView, type Range, type Ranges, type SvgBuilder } from "../core/plot.js";
 import type { XYGraphTraits } from "../generated/contract.js";
 import { drawLegend, traceStyle } from "./chart.js";

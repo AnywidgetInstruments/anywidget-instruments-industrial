@@ -6,7 +6,7 @@ import json
 import pathlib
 import re
 
-import anywidget_instruments as ai
+import anywidget_instruments_industrial as ai
 
 ROOT = pathlib.Path(__file__).parents[1]
 SPDX = "BSD-3-Clause"

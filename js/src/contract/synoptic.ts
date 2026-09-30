@@ -1,6 +1,6 @@
 // SynopticCanvas background (SCADA-010): the type of an image from its
 // first bytes, the front-end port of SynopticCanvas._check_background
-// (src/anywidget_instruments/_process.py), checked against
+// (src/anywidget_instruments_industrial/_process.py), checked against
 // tests/parity/synoptic.json.
 
 export type ImageMime = "image/png" | "image/jpeg" | "image/svg+xml";

@@ -1,8 +1,8 @@
 // PictureControl (SPEC-005..007): display list drawn on a canvas.
 import { hostOwnsState } from "../contract/derived.js";
-import { html, safeColor, setAttr } from "../core/dom.js";
-import type { AnyModel } from "../core/model.js";
-import { BaseView } from "../core/view.js";
+import { html, safeColor, setAttr } from "anywidget-instruments/js/src/core/dom.js";
+import type { AnyModel } from "anywidget-instruments/js/src/core/model.js";
+import { BaseView } from "anywidget-instruments/js/src/core/view.js";
 import type { PictureControlTraits } from "../generated/contract.js";
 
 /** A drawing command of a draw message (fields checked when drawn). */

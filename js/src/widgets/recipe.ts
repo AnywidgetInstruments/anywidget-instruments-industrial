@@ -1,10 +1,10 @@
 // RecipeTable: typed columns edited by the operator (IND-113, IND-114).
 import { hostOwnsState } from "../contract/derived.js";
 import { type CellCheck, checkCell, checkTyped, type Column, defaultRow, normalizeColumn, sortedOrder } from "../contract/recipe.js";
-import { clear, html, setAttr, setText } from "../core/dom.js";
+import { clear, html, setAttr, setText } from "anywidget-instruments/js/src/core/dom.js";
 import { formatValue, withUnit } from "../core/format.js";
-import type { AnyModel } from "../core/model.js";
-import { BaseView } from "../core/view.js";
+import type { AnyModel } from "anywidget-instruments/js/src/core/model.js";
+import { BaseView } from "anywidget-instruments/js/src/core/view.js";
 import type { RecipeTableTraits } from "../generated/contract.js";
 
 const TRAITS = ["columns", "value", "row_edit", "max_rows"];

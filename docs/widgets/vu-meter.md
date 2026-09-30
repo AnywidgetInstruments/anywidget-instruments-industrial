@@ -8,7 +8,7 @@ Segmented bar graph with peak-hold marker (NUM-105).
 ![VUMeter, light theme](../img/widgets/vu-meter-light.png#only-light){ width="68" }
 ![VUMeter, dark theme](../img/widgets/vu-meter-dark.png#only-dark){ width="68" }
 
-**Indicators, analog** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.VUMeter) ·
+**Indicators, analog** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.VUMeter) ·
 schema [`vumeter.schema.json`](../trait-contract.md)
 
 ## Example

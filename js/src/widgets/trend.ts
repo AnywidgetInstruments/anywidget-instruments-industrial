@@ -2,12 +2,12 @@
 // history (IND-070..075).
 import { normalizePen, PenRing } from "../contract/trend.js";
 import { type BufferLike, toFloat32, toFloat64 } from "../core/buffers.js";
-import { clear, html, safeColor, setAttr, setHidden, setText } from "../core/dom.js";
+import { clear, html, safeColor, setAttr, setHidden, setText } from "anywidget-instruments/js/src/core/dom.js";
 import type { EntryResult } from "../core/entry.js";
 import { formatValue } from "../core/format.js";
-import type { AnyModel } from "../core/model.js";
+import type { AnyModel } from "anywidget-instruments/js/src/core/model.js";
 import { type Area, type Colors, PlotView, type Ranges, type SvgBuilder } from "../core/plot.js";
-import { parseNumber } from "../core/scale.js";
+import { parseNumber } from "anywidget-instruments/js/src/core/scale.js";
 import type { TrendChartTraits } from "../generated/contract.js";
 
 export { PenRing };

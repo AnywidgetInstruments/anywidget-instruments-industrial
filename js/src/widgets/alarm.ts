@@ -1,9 +1,9 @@
 // AlarmIndicator (SCADA-005, SCADA-007, SCADA-008). Conventions: docs/alarm-conventions.md
 import { hostOwnsState } from "../contract/derived.js";
 import { applyTransition } from "../contract/transitions.js";
-import { html, svg } from "../core/dom.js";
-import type { AnyModel } from "../core/model.js";
-import { BaseView } from "../core/view.js";
+import { html, svg } from "anywidget-instruments/js/src/core/dom.js";
+import type { AnyModel } from "anywidget-instruments/js/src/core/model.js";
+import { BaseView } from "anywidget-instruments/js/src/core/view.js";
 import type { AlarmIndicatorTraits } from "../generated/contract.js";
 
 const STATE_TEXT: Record<string, string> = {

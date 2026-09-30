@@ -8,7 +8,7 @@ Drawing surface driven by the host with drawing commands (SPEC-005 .. SPEC-007).
 ![PictureControl, light theme](../img/widgets/picture-control-light.png#only-light){ width="328" }
 ![PictureControl, dark theme](../img/widgets/picture-control-dark.png#only-dark){ width="328" }
 
-**Graphs, specialized** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.PictureControl) ·
+**Graphs, specialized** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.PictureControl) ·
 schema [`picture.schema.json`](../trait-contract.md)
 
 ## Example

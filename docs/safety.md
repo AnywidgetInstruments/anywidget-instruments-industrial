@@ -1,7 +1,7 @@
 # Safety notice
 
 !!! danger "Not a safety-related system"
-    anywidget-instruments is a library for **visualization, teaching,
+    anywidget-instruments-industrial is a library for **visualization, teaching,
     simulation, prototyping and supervision in notebooks**. It is not designed,
     developed, verified or certified according to functional safety standards
     (IEC 61508, IEC 62061, ISO 13849-1) and **must not be used to perform a

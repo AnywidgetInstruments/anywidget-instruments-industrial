@@ -8,7 +8,7 @@ Round or square LED indicator (BOOL-001, BOOL-002).
 ![LED, light theme](../img/widgets/led-light.png#only-light){ width="56" }
 ![LED, dark theme](../img/widgets/led-dark.png#only-dark){ width="56" }
 
-**Indicators, discrete** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.LED) ·
+**Indicators, discrete** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.LED) ·
 schema [`led.schema.json`](../trait-contract.md)
 
 ## Example

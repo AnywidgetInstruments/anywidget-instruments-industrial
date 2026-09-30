@@ -22,6 +22,7 @@ JupyterLab / Notebook 7 / marimo (`e2e/`).
 | GEN-009 | S | ✅ | Runtime deps: `anywidget`, `traitlets`, `numpy` |
 | GEN-010 | M | ✅ | No global state on import; CSS scoped under `.awi-root` |
 | GEN-011 | S | ✅ | `mo.ui.anywidget(...)` triggers reactive re-execution (e2e marimo) |
+| GEN-012 | M | ✅ | Base view, contract reading and generator, styles, liveness and base class from the anywidget-instruments core (`package.json`, `pyproject.toml`); base schema by `$id` |
 
 ## API – Common widget API
 | ID | Pri | Status | Notes |
@@ -147,7 +148,7 @@ example `examples/filling_line.ipynb`.
 
 ## HOST – Host independence
 All 47 widgets follow the trait contract: one JSON Schema each in
-`src/anywidget_instruments/schema/`, a TypeScript view reading its traits
+`src/anywidget_instruments_industrial/schema/`, a TypeScript view reading its traits
 through it, and the front-end logic they share with Python checked by parity
 cases. The [trait contract](trait-contract.md) page describes it for host
 authors; the [migration inventory](dev/frontend-migration-inventory.md)
@@ -186,7 +187,7 @@ records the analysis it started from.
 | QA-006 | M | ✅ | CI: lint, type check, unit, e2e, reproducible build, bundle budget |
 
 ## Open questions (spec §21): decisions for this implementation
-1. Name: `anywidget-instruments` (import `anywidget_instruments`).
+1. Name: `anywidget-instruments-industrial` (import `anywidget_instruments_industrial`).
 2. Rendering: SVG for instruments, Canvas 2D for graphs and PictureControl.
 3. Julia binding: out of scope for 1.0; the single AFM module is ready for it.
 4. Latch semantics: explicit `read_latched()`.

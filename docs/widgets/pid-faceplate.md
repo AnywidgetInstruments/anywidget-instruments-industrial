@@ -11,7 +11,7 @@ Operator faceplate of a control loop (IND-030 .. IND-034).
 ![PIDFaceplate, light theme](../img/widgets/pid-faceplate-light.png#only-light){ width="248" }
 ![PIDFaceplate, dark theme](../img/widgets/pid-faceplate-dark.png#only-dark){ width="248" }
 
-**Supervisory objects** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.PIDFaceplate) ·
+**Supervisory objects** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.PIDFaceplate) ·
 schema [`pidfaceplate.schema.json`](../trait-contract.md)
 
 ## Example

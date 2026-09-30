@@ -2,9 +2,9 @@
 // highlighted and the commands valid in that state.
 import { hostOwnsState, machineOf } from "../contract/derived.js";
 import { globalCommands, type Machine, nextState } from "../contract/statemachine.js";
-import { clear, html, svg, svgText } from "../core/dom.js";
-import type { AnyModel } from "../core/model.js";
-import { BaseView } from "../core/view.js";
+import { clear, html, svg, svgText } from "anywidget-instruments/js/src/core/dom.js";
+import type { AnyModel } from "anywidget-instruments/js/src/core/model.js";
+import { BaseView } from "anywidget-instruments/js/src/core/view.js";
 import type { StateMachineTraits } from "../generated/contract.js";
 import { type Box, inZone, insetOutline, type LabelSpot, placeLabel, type Pt, type Rect, routePoints, type Segment, zoneExit } from "./smlayout.js";
 

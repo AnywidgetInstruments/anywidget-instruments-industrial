@@ -1,8 +1,8 @@
 // Event log (IND-090..093): newest first, filter by category and text, CSV.
-import { clear, html } from "../core/dom.js";
-import type { AnyModel } from "../core/model.js";
+import { clear, html } from "anywidget-instruments/js/src/core/dom.js";
+import type { AnyModel } from "anywidget-instruments/js/src/core/model.js";
 import { download } from "../core/plot.js";
-import { BaseView } from "../core/view.js";
+import { BaseView } from "anywidget-instruments/js/src/core/view.js";
 import type { EventLogTraits } from "../generated/contract.js";
 
 export type LogEvent = EventLogTraits["value"][number];

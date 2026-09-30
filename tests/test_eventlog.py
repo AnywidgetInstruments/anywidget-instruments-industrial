@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-import anywidget_instruments as ai
+import anywidget_instruments_industrial as ai
 
 
 def test_log_appends_timestamped_events_and_keeps_max():

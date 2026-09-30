@@ -1,12 +1,12 @@
 // Shared behaviour of numeric widgets: value text, alarm and range badges,
 // keyboard / wheel interaction and ARIA attributes.
 import { coerceValue, normalizeValueLabels, type Scale, ScaleGuard, type ValueLabel, valueLabelOf, valueOfLabel } from "../contract/numeric.js";
-import { html, parseSkin, setAttr, setAttrs, setHidden, setText, svg } from "../core/dom.js";
+import { html, parseSkin, setAttr, setAttrs, setHidden, setText, svg } from "anywidget-instruments/js/src/core/dom.js";
 import { checkEntry } from "../core/entry.js";
 import { formatValue, withUnit } from "../core/format.js";
-import type { AnyModel } from "../core/model.js";
-import { fromFraction, keyStep, parseNumber, type Position, position, snap, toFraction } from "../core/scale.js";
-import { BaseView } from "../core/view.js";
+import type { AnyModel } from "anywidget-instruments/js/src/core/model.js";
+import { fromFraction, keyStep, parseNumber, type Position, position, snap, toFraction } from "anywidget-instruments/js/src/core/scale.js";
+import { BaseView } from "anywidget-instruments/js/src/core/view.js";
 import type { NumericTraits } from "../generated/contract.js";
 
 export { checkEntry };

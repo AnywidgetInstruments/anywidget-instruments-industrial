@@ -11,7 +11,7 @@ Alarm summary table with shelving, suppression and out-of-service states (IND-05
 ![AlarmList, light theme](../img/widgets/alarm-list-light.png#only-light){ width="650" }
 ![AlarmList, dark theme](../img/widgets/alarm-list-dark.png#only-dark){ width="650" }
 
-**Alarms and events** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.AlarmList) ·
+**Alarms and events** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.AlarmList) ·
 schema [`alarmlist.schema.json`](../trait-contract.md)
 
 ## Example

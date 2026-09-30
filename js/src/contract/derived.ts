@@ -6,7 +6,7 @@
 // notebook reopened without it) the host computes it and the front end only
 // displays it. Otherwise the front end computes it once per model (not per
 // view, so every view agrees), and writes it back so that the host sees it.
-import type { AnyModel, Traits } from "../core/model.js";
+import type { AnyModel, Traits } from "anywidget-instruments/js/src/core/model.js";
 import { BY_KIND } from "../generated/contract.js";
 import { type AlarmLevel, computeAlarmLevel } from "./alarm.js";
 import { acknowledgeRows, type AlarmRow, expireShelving, nextExpiry, shelveRow, unshelveRow } from "./alarms.js";
@@ -16,8 +16,8 @@ import { coerceValue } from "./numeric.js";
 import { nextPeak, type PeakState } from "./peak.js";
 import { clampedSpOp, type PIDState } from "./pid.js";
 import { availableCommands, type Machine, normalizeMachine, resolveState } from "./statemachine.js";
-import type { WidgetContract } from "./spec.js";
-import { plainValue, readTrait } from "./traits.js";
+import type { WidgetContract } from "anywidget-instruments/js/src/contract/spec.js";
+import { plainValue, readTrait } from "anywidget-instruments/js/src/contract/traits.js";
 
 /** True when a host owns the state and is authoritative for derived traits. */
 export function hostOwnsState(model: AnyModel): boolean {

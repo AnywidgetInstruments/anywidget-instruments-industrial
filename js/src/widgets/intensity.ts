@@ -1,11 +1,11 @@
 // IntensityChart: scrolling colour map (CHART-101).
 import { RowRing, rowIndexAt } from "../contract/intensity.js";
 import { type BufferLike, toFloat32 } from "../core/buffers.js";
-import { setAttr } from "../core/dom.js";
+import { setAttr } from "anywidget-instruments/js/src/core/dom.js";
 import { formatValue } from "../core/format.js";
-import type { AnyModel } from "../core/model.js";
+import type { AnyModel } from "anywidget-instruments/js/src/core/model.js";
 import { type Area, type Colors, PlotView, type Range, type Ranges, type SvgBuilder } from "../core/plot.js";
-import { autoscale, niceTicks } from "../core/scale.js";
+import { autoscale, niceTicks } from "anywidget-instruments/js/src/core/scale.js";
 import type { IntensityChartTraits } from "../generated/contract.js";
 
 // Colormap control points (approximations of matplotlib's maps).

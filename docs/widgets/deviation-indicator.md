@@ -8,7 +8,7 @@ Centre-zero bar of the deviation between a value and its setpoint (IND-100).
 ![DeviationIndicator, light theme](../img/widgets/deviation-indicator-light.png#only-light){ width="228" }
 ![DeviationIndicator, dark theme](../img/widgets/deviation-indicator-dark.png#only-dark){ width="228" }
 
-**Compact indicators** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.DeviationIndicator) ·
+**Compact indicators** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.DeviationIndicator) ·
 schema [`deviation.schema.json`](../trait-contract.md)
 
 ## Example

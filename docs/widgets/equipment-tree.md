@@ -8,7 +8,7 @@ Hierarchy of equipment (site, area, unit, module) with a status per node, that t
 ![EquipmentTree, light theme](../img/widgets/equipment-tree-light.png#only-light){ width="328" }
 ![EquipmentTree, dark theme](../img/widgets/equipment-tree-dark.png#only-dark){ width="328" }
 
-**Recipes and plant structure** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.EquipmentTree) ·
+**Recipes and plant structure** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.EquipmentTree) ·
 schema [`equipmenttree.schema.json`](../trait-contract.md)
 
 ## Example

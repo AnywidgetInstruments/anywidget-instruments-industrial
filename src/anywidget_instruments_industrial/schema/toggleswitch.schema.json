@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anywidgetinstruments.github.io/anywidget-instruments-industrial/schema/toggleswitch.schema.json",
+  "title": "ToggleSwitch",
+  "description": "Toggle (bat-handle) switch (BOOL-003).",
+  "type": "object",
+  "x-awi-class": "ToggleSwitch",
+  "allOf": [
+    {
+      "$ref": "boolean.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "toggleswitch",
+      "default": "toggleswitch",
+      "x-awi-writer": "host"
+    },
+    "orientation": {
+      "enum": [
+        "vertical",
+        "horizontal"
+      ],
+      "description": "Lever direction.",
+      "default": "vertical",
+      "x-awi-writer": "host"
+    },
+    "size": {
+      "description": "[width, height] in CSS pixels. The Python class uses (100, 60) when created horizontal; other hosts give the size with the orientation.",
+      "default": [
+        60,
+        100
+      ]
+    }
+  }
+}

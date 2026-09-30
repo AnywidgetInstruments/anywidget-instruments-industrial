@@ -1,4 +1,4 @@
-# anywidget-instruments
+# anywidget-instruments-industrial
 
 Instrumentation widgets for computational notebooks: knobs, gauges,
 meters, tanks, LEDs, switches with mechanical actions, emergency stop,
@@ -34,7 +34,7 @@ notebook (see [Hosts](hosts.md)).
     the library does not claim conformity with them.
 
 ```python
-import anywidget_instruments as ai
+import anywidget_instruments_industrial as ai
 
 gain = ai.Knob(2.5, min=0, max=10, step=0.1, unit="dB", label="Gain")
 level = ai.Tank(1.2, max=5, unit="m", lo=0.5, hi=4.5, show_limits=True, label="Level")
@@ -60,5 +60,5 @@ ai.Panel([gain, level])
 | Project | What it is | Documentation |
 |---|---|---|
 | [anywidget-instruments-industrial](https://github.com/AnywidgetInstruments/anywidget-instruments-industrial) | Instrumentation widgets for notebooks: gauges, tanks, LEDs, switches, charts, alarms, SCADA objects | <https://anywidgetinstruments.github.io/anywidget-instruments-industrial/> |
-| [anywidget-instruments-automotive](https://github.com/AnywidgetInstruments/anywidget-instruments-automotive) | Automotive instruments built on anywidget-instruments | <https://anywidgetinstruments.github.io/anywidget-instruments-automotive/> |
+| [anywidget-instruments-automotive](https://github.com/AnywidgetInstruments/anywidget-instruments-automotive) | Automotive instruments built on anywidget-instruments-industrial | <https://anywidgetinstruments.github.io/anywidget-instruments-automotive/> |
 | [afm-host-panel](https://github.com/AnywidgetInstruments/afm-host-panel) | Grafana panel plugin that runs anywidget modules, with both libraries built in | <https://anywidgetinstruments.github.io/afm-host-panel/> |

@@ -8,7 +8,7 @@ Trend of named pens against wall-clock time, live or browsing the history (IND-0
 ![TrendChart, light theme](../img/widgets/trend-chart-light.png#only-light){ width="528" }
 ![TrendChart, dark theme](../img/widgets/trend-chart-dark.png#only-dark){ width="528" }
 
-**Graphs, trends** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.TrendChart) ·
+**Graphs, trends** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.TrendChart) ·
 schema [`trendchart.schema.json`](../trait-contract.md)
 
 ## Example

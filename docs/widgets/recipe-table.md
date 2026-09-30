@@ -8,7 +8,7 @@ Table of typed columns whose rows the operator edits: recipes, setpoint tables (
 ![RecipeTable, light theme](../img/widgets/recipe-table-light.png#only-light){ width="568" }
 ![RecipeTable, dark theme](../img/widgets/recipe-table-dark.png#only-dark){ width="568" }
 
-**Recipes and plant structure** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.RecipeTable) ·
+**Recipes and plant structure** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.RecipeTable) ·
 schema [`recipetable.schema.json`](../trait-contract.md)
 
 ## Example

@@ -1,6 +1,6 @@
 // Machine state model (IND-060 .. IND-063): the front-end port of
 // _check_model, StateMachine._next and _update_commands
-// (src/anywidget_instruments/_statemachine.py). Both are checked against the
+// (src/anywidget_instruments_industrial/_statemachine.py). Both are checked against the
 // shared cases of tests/parity/statemachine.json.
 
 /** Completion of an acting state: a host event, not an operator command. */

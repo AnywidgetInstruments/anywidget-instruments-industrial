@@ -2,9 +2,10 @@ import time
 
 import numpy as np
 import pytest
+from anywidget_instruments import _liveness
 
-import anywidget_instruments as ai
-from anywidget_instruments import _liveness, _picture
+import anywidget_instruments_industrial as ai
+from anywidget_instruments_industrial import _picture
 
 
 def capture(w):
@@ -122,7 +123,7 @@ def test_text_anchor_validation():
 
 
 def test_post_run_cell_hook(monkeypatch):
-    from anywidget_instruments import _picture
+    from anywidget_instruments_industrial import _picture
 
     registered = []
 

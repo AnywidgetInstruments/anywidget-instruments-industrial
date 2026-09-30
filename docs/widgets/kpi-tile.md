@@ -8,7 +8,7 @@ Key performance indicator tile: value, target, difference to the target, optiona
 ![KPITile, light theme](../img/widgets/kpi-tile-light.png#only-light){ width="198" }
 ![KPITile, dark theme](../img/widgets/kpi-tile-dark.png#only-dark){ width="198" }
 
-**Compact indicators** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.KPITile) ·
+**Compact indicators** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.KPITile) ·
 schema [`kpitile.schema.json`](../trait-contract.md)
 
 ## Example

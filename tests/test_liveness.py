@@ -1,7 +1,7 @@
 import pytest
-
-import anywidget_instruments as ai
 from anywidget_instruments import _liveness
+
+import anywidget_instruments_industrial as ai
 
 
 def test_widgets_share_session_and_heartbeat():
@@ -106,7 +106,7 @@ def test_no_heartbeat_thread_under_pyodide_even_where_threads_start(monkeypatch)
 def test_picture_flushes_without_threads(monkeypatch):
     import threading
 
-    from anywidget_instruments import _picture
+    from anywidget_instruments_industrial import _picture
 
     pic = ai.PictureControl()
     sent = []

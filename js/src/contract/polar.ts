@@ -1,7 +1,7 @@
 // Polar family (SPEC-002 .. SPEC-004): angle mapping, Smith chart
 // conversions and radar axis ranges. The conversions are the front-end
 // ports of SmithChart.gamma / SmithChart.impedance and the ranges follow
-// RadarChart's rule (src/anywidget_instruments/_polar.py); both sides are
+// RadarChart's rule (src/anywidget_instruments_industrial/_polar.py); both sides are
 // checked against tests/parity/polar.json.
 
 export interface AngleConvention {

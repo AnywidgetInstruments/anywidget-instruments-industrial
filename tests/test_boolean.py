@@ -3,7 +3,7 @@ import time
 import pytest
 import traitlets as t
 
-import anywidget_instruments as ai
+import anywidget_instruments_industrial as ai
 
 BOOLEAN = [
     ai.LED,

@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 import traitlets as t
 
-import anywidget_instruments as ai
+import anywidget_instruments_industrial as ai
 
 
 def test_transmitter_defaults_and_status():

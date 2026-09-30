@@ -11,7 +11,7 @@ Single alarm annunciator with the ISA-18.2 alarm states (SCADA-005, SCADA-007).
 ![AlarmIndicator, light theme](../img/widgets/alarm-indicator-light.png#only-light){ width="288" }
 ![AlarmIndicator, dark theme](../img/widgets/alarm-indicator-dark.png#only-dark){ width="288" }
 
-**Alarms and events** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.AlarmIndicator) ·
+**Alarms and events** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.AlarmIndicator) ·
 schema [`alarmindicator.schema.json`](../trait-contract.md)
 
 ## Example

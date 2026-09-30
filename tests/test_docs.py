@@ -49,7 +49,7 @@ def blocks(page: pathlib.Path) -> list[tuple[int, str]]:
 def test_python_examples_run(page: pathlib.Path) -> None:
     # the pages write `ai` and `np` for the package and numpy, as the examples do
     namespace: dict[str, object] = {"__name__": f"docs_{page.stem}"}
-    exec("import numpy as np\nimport anywidget_instruments as ai", namespace)
+    exec("import numpy as np\nimport anywidget_instruments_industrial as ai", namespace)
     for line, code in blocks(page):
         try:
             exec(compile(code, f"{page.name}:{line}", "exec"), namespace)
@@ -59,7 +59,7 @@ def test_python_examples_run(page: pathlib.Path) -> None:
 
 def test_every_widget_is_documented() -> None:
     """Each exported widget is in the catalog, the API reference and the host coverage table."""
-    import anywidget_instruments as ai
+    import anywidget_instruments_industrial as ai
 
     abstract = {
         "InstrumentWidget",
@@ -81,7 +81,7 @@ def test_every_widget_is_documented() -> None:
     hosts = (docs / "hosts.md").read_text(encoding="utf-8")
     missing = {
         "widgets.md": [w for w in widgets if f"`{w}`" not in catalog],
-        "api.md": [w for w in widgets if f"anywidget_instruments.{w}\n" not in api],
+        "api.md": [w for w in widgets if f"anywidget_instruments_industrial.{w}\n" not in api],
         "hosts.md": [w for w in widgets if f"`{w}`" not in hosts],
     }
     assert missing == {"widgets.md": [], "api.md": [], "hosts.md": []}
@@ -95,7 +95,7 @@ def page_name(cls: str) -> str:
 
 def test_every_widget_has_a_page_and_pictures() -> None:
     """DOC-008: a page per widget, with its picture in the light and the dark theme."""
-    import anywidget_instruments as ai
+    import anywidget_instruments_industrial as ai
 
     abstract = {
         "InstrumentWidget",

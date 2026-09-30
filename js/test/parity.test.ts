@@ -43,11 +43,11 @@ import { positionDemand, processCommand, type ProcessState } from "../src/contra
 import { checkCell, normalizeColumn } from "../src/contract/recipe.js";
 import { availableCommands, type Machine, nextState, normalizeMachine, SC } from "../src/contract/statemachine.js";
 import { imageMime } from "../src/contract/synoptic.js";
-import { readTrait } from "../src/contract/traits.js";
+import { readTrait } from "anywidget-instruments/js/src/contract/traits.js";
 import { normalizePen, PenRing } from "../src/contract/trend.js";
 import { Ring, valuesAt } from "../src/contract/waveform.js";
 import { xyValueAt } from "../src/contract/xy.js";
-import { parseNumber } from "../src/core/scale.js";
+import { parseNumber } from "anywidget-instruments/js/src/core/scale.js";
 import { CONTRACTS } from "../src/generated/contract.js";
 
 type Step = [number | string, string] | [Record<string, number | null>, number | string, string];

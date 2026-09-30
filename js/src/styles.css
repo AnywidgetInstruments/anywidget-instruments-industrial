@@ -1,259 +1,12 @@
-/* anywidget-instruments styles.
+/* anywidget-instruments-industrial styles, on top of the base styles of
+ * anywidget-instruments-industrial (palettes, themes, widget frame).
  * Every rule is scoped under .awi-root (GEN-010) and every color is a CSS
  * custom property (STYLE-003) that can be overridden per widget or per page:
  *   .awi-root { --awi-accent: hotpink; }
  */
-
-.awi-root {
-  /* palette: modern (default) */
-  --awi-fg: #1f2937;
-  --awi-muted: #6b7280;
-  --awi-bg: transparent;
-  --awi-face: #f9fafb;
-  --awi-face-stroke: #9ca3af;
-  --awi-plot-bg: #ffffff;
-  --awi-grid: #e5e7eb;
-  --awi-accent: #2563eb;
-  --awi-fill: #2563eb;
-  --awi-track: #e5e7eb;
-  --awi-needle: #dc2626;
-  --awi-knob: #d1d5db;
-  --awi-knob-stroke: #6b7280;
-  --awi-pointer: #111827;
-  --awi-led-on: #22c55e;
-  --awi-led-off: #1f3a2a;
-  --awi-switch-on: #16a34a;
-  --awi-seg-on: #ef4444;
-  --awi-seg-off: rgba(239, 68, 68, 0.12);
-  --awi-seg-bg: #111827;
-  --awi-ok: #16a34a;
-  --awi-warn: #d97706;
-  --awi-danger: #dc2626;
-  /* alarm levels (ALARM-002) */
-  --awi-alarm-lo: #b45309;
-  --awi-alarm-hi: #b45309;
-  --awi-alarm-lolo: #b91c1c;
-  --awi-alarm-hihi: #b91c1c;
-  /* alarm priorities (SCADA-008, see docs/alarm-conventions.md) */
-  --awi-prio-critical: #d10000;
-  --awi-prio-high: #f27b00;
-  --awi-prio-medium: #e6c700;
-  --awi-prio-low: #00a4c7;
-  /* chart traces */
-  --awi-trace-0: #2563eb;
-  --awi-trace-1: #dc2626;
-  --awi-trace-2: #16a34a;
-  --awi-trace-3: #9333ea;
-  --awi-trace-4: #ea580c;
-  --awi-trace-5: #0891b2;
-  --awi-trace-6: #be185d;
-  --awi-trace-7: #4d7c0f;
-  /* industrial objects (IND-*): grey scale for normal operation (ISA-101) */
-  --awi-hp-track: #e5e7eb;
-  --awi-hp-normal: #b6bcc6;
-  --awi-hp-pointer: #374151;
-  /* stack light tiers (IEC 60073) */
-  --awi-stack-red: #dc2626;
-  --awi-stack-amber: #f59e0b;
-  --awi-stack-green: #16a34a;
-  --awi-stack-blue: #2563eb;
-  --awi-stack-white: #f8fafc;
-  /* annunciator panel: dark hardware panel on light and dark hosts */
-  --awi-ann-bg: #111827;
-  --awi-ann-off: #374151;
-  --awi-ann-off-ink: #d1d5db;
-  --awi-ann-off-border: #4b5563;
-  --awi-ann-lit-border: #f9fafb;
-  --awi-ann-ink-light: #ffffff;
-  --awi-ann-ink-dark: #111827;
-  --awi-ann-horn: #fde68a;
-  --awi-ann-btn: #e5e7eb;
-  /* push button caps (BOOL-015, IEC 60073) and their text ink */
-  --awi-cap-green: #16a34a;
-  --awi-cap-red: #dc2626;
-  --awi-cap-black: #1f2937;
-  --awi-cap-yellow: #facc15;
-  --awi-cap-blue: #2563eb;
-  --awi-cap-white: #f9fafb;
-  --awi-ink-on-dark: #ffffff;
-  --awi-ink-on-light: #111827;
-  --awi-lamp-off: #374151;
-  --awi-lamp-ink-green: #111827;
-  --awi-lamp-ink-red: #ffffff;
-  --awi-lamp-ink-amber: #111827;
-  --awi-lamp-ink-blue: #ffffff;
-  --awi-lamp-ink-white: #111827;
-  /* device status symbols (IND-081): a distinct shape each, outlined in --awi-fg */
-  --awi-ne107-failure: #dc2626;
-  --awi-ne107-check: #ea580c;
-  --awi-ne107-out-of-spec: #facc15;
-  --awi-ne107-maintenance: #2563eb;
-  --awi-font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --awi-anim: 0ms;
-  --awi-blink-period: 0.5s;
-
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: 4px;
-  font-family: var(--awi-font);
-  color: var(--awi-fg);
-  background: var(--awi-bg);
-  box-sizing: border-box;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-/* classic: flat, low detail */
-.awi-root.awi-style-classic {
-  --awi-face: #ececec;
-  --awi-face-stroke: #7a7a7a;
-  --awi-knob: #c8c8c8;
-  --awi-knob-stroke: #7a7a7a;
-  --awi-fill: #4a6fa5;
-  --awi-track: #d4d4d4;
-  --awi-needle: #202020;
-  --awi-accent: #4a6fa5;
-  --awi-font: Tahoma, Verdana, sans-serif;
-}
-
-/* system: follow host theme variables (JupyterLab, VS Code) with fallbacks */
-.awi-root.awi-style-system {
-  --awi-fg: var(--jp-ui-font-color1, var(--vscode-editor-foreground, #1f2937));
-  --awi-muted: var(--jp-ui-font-color2, var(--vscode-descriptionForeground, #6b7280));
-  --awi-face: var(--jp-layout-color1, var(--vscode-editor-background, #ffffff));
-  --awi-face-stroke: var(--jp-border-color1, #9ca3af);
-  --awi-plot-bg: var(--jp-layout-color0, var(--vscode-editor-background, #ffffff));
-  --awi-grid: var(--jp-border-color2, #e5e7eb);
-  --awi-accent: var(--jp-brand-color1, var(--vscode-focusBorder, #2563eb));
-  --awi-fill: var(--jp-brand-color1, #2563eb);
-  --awi-track: var(--jp-layout-color3, #e5e7eb);
-  --awi-knob: var(--jp-layout-color2, #d1d5db);
-  --awi-pointer: var(--jp-ui-font-color0, #111827);
-  --awi-font: var(--jp-ui-font-family, system-ui, sans-serif);
-}
-
-/* STYLE-002: dark hosts */
-@media (prefers-color-scheme: dark) {
-  .awi-root.awi-style-system {
-    --awi-fg: var(--jp-ui-font-color1, var(--vscode-editor-foreground, #e5e7eb));
-    --awi-muted: var(--jp-ui-font-color2, #9ca3af);
-    --awi-face: var(--jp-layout-color1, var(--vscode-editor-background, #1f2937));
-    --awi-face-stroke: var(--jp-border-color1, #6b7280);
-    --awi-plot-bg: var(--jp-layout-color0, var(--vscode-editor-background, #111827));
-    --awi-grid: var(--jp-border-color2, #374151);
-    --awi-track: var(--jp-layout-color3, #374151);
-    --awi-knob: var(--jp-layout-color2, #4b5563);
-    --awi-pointer: var(--jp-ui-font-color0, #f9fafb);
-    --awi-alarm-lo: #fbbf24;
-    --awi-alarm-hi: #fbbf24;
-    --awi-alarm-lolo: #f87171;
-    --awi-alarm-hihi: #f87171;
-    --awi-fill: var(--jp-brand-color1, #60a5fa);
-    --awi-trace-6: #f472b6;
-    --awi-hp-track: #374151;
-    --awi-hp-normal: #6b7280;
-    --awi-hp-pointer: #e5e7eb;
-    --awi-stack-blue: #3b82f6;
-    --awi-ne107-maintenance: #3b82f6;
-    --awi-lamp-ink-blue: #111827;
-  }
-}
-:is([data-jp-theme-light="false"], .vscode-dark, .vscode-high-contrast, [data-theme="dark"], .dark-mode) .awi-root.awi-style-system {
-  --awi-fg: var(--jp-ui-font-color1, var(--vscode-editor-foreground, #e5e7eb));
-  --awi-muted: var(--jp-ui-font-color2, #9ca3af);
-  --awi-face: var(--jp-layout-color1, var(--vscode-editor-background, #1f2937));
-  --awi-face-stroke: var(--jp-border-color1, #6b7280);
-  --awi-plot-bg: var(--jp-layout-color0, var(--vscode-editor-background, #111827));
-  --awi-grid: var(--jp-border-color2, #374151);
-  --awi-track: var(--jp-layout-color3, #374151);
-  --awi-knob: var(--jp-layout-color2, #4b5563);
-  --awi-pointer: var(--jp-ui-font-color0, #f9fafb);
-  --awi-alarm-lo: #fbbf24;
-  --awi-alarm-hi: #fbbf24;
-  --awi-alarm-lolo: #f87171;
-  --awi-alarm-hihi: #f87171;
-  --awi-fill: var(--jp-brand-color1, #60a5fa);
-  --awi-trace-6: #f472b6;
-  --awi-hp-track: #374151;
-  --awi-hp-normal: #6b7280;
-  --awi-hp-pointer: #e5e7eb;
-  --awi-stack-blue: #3b82f6;
-  --awi-ne107-maintenance: #3b82f6;
-  --awi-lamp-ink-blue: #111827;
-}
-:is([data-jp-theme-light="true"], .vscode-light, [data-theme="light"]) .awi-root.awi-style-system {
-  --awi-fg: var(--jp-ui-font-color1, var(--vscode-editor-foreground, #1f2937));
-  --awi-face: var(--jp-layout-color1, var(--vscode-editor-background, #ffffff));
-  --awi-plot-bg: var(--jp-layout-color0, var(--vscode-editor-background, #ffffff));
-  --awi-grid: var(--jp-border-color2, #e5e7eb);
-  --awi-track: var(--jp-layout-color3, #e5e7eb);
-  --awi-knob: var(--jp-layout-color2, #d1d5db);
-  --awi-pointer: var(--jp-ui-font-color0, #111827);
-}
-
-/* STYLE-007: explicit theme, whatever the host (repeated class for precedence
- * over the host-theme rules above). Dark widgets get their own background. */
-.awi-root.awi-root.awi-root.awi-theme-dark {
-  --awi-bg: #111827;
-  --awi-fg: #e5e7eb;
-  --awi-muted: #9ca3af;
-  --awi-face: #1f2937;
-  --awi-face-stroke: #6b7280;
-  --awi-plot-bg: #111827;
-  --awi-grid: #374151;
-  --awi-accent: #60a5fa;
-  --awi-fill: #60a5fa;
-  --awi-track: #374151;
-  --awi-knob: #4b5563;
-  --awi-knob-stroke: #9ca3af;
-  --awi-pointer: #f9fafb;
-  --awi-alarm-lo: #fbbf24;
-  --awi-alarm-hi: #fbbf24;
-  --awi-alarm-lolo: #f87171;
-  --awi-alarm-hihi: #f87171;
-  --awi-trace-0: #60a5fa;
-  --awi-trace-6: #f472b6;
-  --awi-trace-7: #84cc16;
-  --awi-hp-track: #374151;
-  --awi-hp-normal: #6b7280;
-  --awi-hp-pointer: #e5e7eb;
-  --awi-stack-blue: #3b82f6;
-  --awi-ne107-maintenance: #3b82f6;
-  --awi-lamp-ink-blue: #111827;
-  --awi-proc-off: #1f2937;
-  --awi-pipe: #6b7280;
-}
-.awi-root.awi-root.awi-root.awi-theme-light {
-  --awi-bg: transparent;
-  --awi-fg: #1f2937;
-  --awi-muted: #6b7280;
-  --awi-face: #f9fafb;
-  --awi-face-stroke: #9ca3af;
-  --awi-plot-bg: #ffffff;
-  --awi-grid: #e5e7eb;
-  --awi-track: #e5e7eb;
-  --awi-knob: #d1d5db;
-  --awi-pointer: #111827;
-  --awi-alarm-lo: #b45309;
-  --awi-alarm-hi: #b45309;
-  --awi-alarm-lolo: #b91c1c;
-  --awi-alarm-hihi: #b91c1c;
-  --awi-hp-track: #e5e7eb;
-  --awi-hp-normal: #b6bcc6;
-  --awi-hp-pointer: #374151;
-  --awi-stack-blue: #2563eb;
-}
-.awi-root.awi-theme-dark { border-radius: 6px; }
+@import "anywidget-instruments/js/src/styles.css";
 
 /* ---- layout ------------------------------------------------------------ */
-/* the hidden attribute always wins over display rules below */
-.awi-root [hidden] { display: none !important; }
-.awi-root .awi-label { font-size: 12px; font-weight: 600; text-align: center; max-width: max(var(--awi-w), 120px); overflow-wrap: break-word; }
-.awi-root .awi-body { position: relative; outline: none; border-radius: 6px; touch-action: none; }
-.awi-root .awi-body:focus-visible { box-shadow: 0 0 0 2px var(--awi-accent); }
-.awi-root .awi-svg { width: 100%; height: 100%; display: block; overflow: visible; }
 .awi-root.awi-meter .awi-svg { overflow: hidden; border-radius: 6px; }
 .awi-root .awi-value-row { display: flex; gap: 6px; align-items: baseline; font-size: 13px; font-variant-numeric: tabular-nums; }
 /* form entry (API-014, NUM-010) */
@@ -275,11 +28,6 @@
 .awi-root .awi-faceplate .awi-entry { width: 5ch; }
 .awi-root .awi-entry-msg { font-size: 10px; font-weight: 700; color: var(--awi-alarm-hihi); max-width: max(var(--awi-w), 160px); text-align: center; }
 .awi-root .awi-badge { font-size: 10px; font-weight: 700; padding: 0 4px; border-radius: 3px; border: 1px solid currentColor; }
-.awi-root.awi-control .awi-body { cursor: grab; }
-.awi-root.awi-control.awi-dragging .awi-body { cursor: grabbing; }
-.awi-root.awi-indicator .awi-body { cursor: default; }
-.awi-root.awi-disabled { opacity: 0.45; filter: grayscale(1); }
-.awi-root.awi-disabled .awi-body { cursor: not-allowed; }
 
 /* alarm colors on the value (ALARM-002) */
 .awi-root.awi-alarm-lo .awi-value-row { color: var(--awi-alarm-lo); }
@@ -291,10 +39,6 @@
 .awi-root .awi-zone-lo, .awi-root .awi-zone-hi { fill: var(--awi-alarm-hi); opacity: 0.55; }
 .awi-root .awi-zone-lolo, .awi-root .awi-zone-hihi { fill: var(--awi-alarm-hihi); opacity: 0.7; }
 
-/* ---- stale data (ROB-001): hatched body + text badge, input rejected ---- */
-.awi-root { position: relative; }
-.awi-root.awi-stale .awi-body { opacity: 0.55; cursor: not-allowed !important; background-image: repeating-linear-gradient(45deg, transparent 0 6px, rgba(128, 128, 128, 0.25) 6px 8px); }
-.awi-root .awi-stale-badge { position: absolute; top: 2px; left: 50%; transform: translateX(-50%); z-index: 2; white-space: nowrap; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 3px; color: #1f2937; background: #fde68a; border: 1px solid #b45309; pointer-events: none; }
 
 /* ---- scales -------------------------------------------------------------- */
 .awi-root .awi-face { fill: var(--awi-face); stroke: var(--awi-face-stroke); stroke-width: 1.5; }
@@ -629,7 +373,6 @@
 
 /* ---- A11Y-005: reduced motion → no blinking/animation, steady distinct pattern ---- */
 @media (prefers-reduced-motion: reduce) {
-  .awi-root *, .awi-root { animation: none !important; transition: none !important; }
   .awi-root.awi-blink .awi-led { stroke: var(--awi-fg); stroke-width: 3; stroke-dasharray: 3 2; }
   .awi-root tr.awi-state-active_unacknowledged .awi-prio-chip { outline: 2px dashed var(--awi-fg); }
   .awi-root .awi-stack-blink { stroke-width: 3; stroke-dasharray: 3 2; }

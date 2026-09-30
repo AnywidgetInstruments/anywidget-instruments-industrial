@@ -1,11 +1,11 @@
 // WaveformChart: canvas strip chart fed with binary float32 buffers (CHART-001..009).
 import { Ring, valuesAt, viewWindow } from "../contract/waveform.js";
 import { type BufferLike, toFloat32 } from "../core/buffers.js";
-import { clear, html, safeColor, setAttr } from "../core/dom.js";
+import { clear, html, safeColor, setAttr } from "anywidget-instruments/js/src/core/dom.js";
 import { formatValue } from "../core/format.js";
-import type { AnyModel } from "../core/model.js";
+import type { AnyModel } from "anywidget-instruments/js/src/core/model.js";
 import { type Area, type Colors, linearYAt, PlotView, type Range, type Ranges, type SvgBuilder, zoomedRanges } from "../core/plot.js";
-import { autoscale, logAt, logFrac, logRange, logTicks, niceTicks } from "../core/scale.js";
+import { autoscale, logAt, logFrac, logRange, logTicks, niceTicks } from "anywidget-instruments/js/src/core/scale.js";
 import type { WaveformChartTraits } from "../generated/contract.js";
 
 export { Ring, viewWindow };

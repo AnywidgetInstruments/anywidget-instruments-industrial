@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anywidgetinstruments.github.io/anywidget-instruments-industrial/schema/kpitile.schema.json",
+  "title": "KPITile",
+  "description": "Key performance indicator tile: value, target, difference to the target, optional sparkline (IND-103).",
+  "type": "object",
+  "x-awi-class": "KPITile",
+  "allOf": [
+    {
+      "$ref": "https://anywidgetinstruments.github.io/anywidget-instruments/schema/instrument.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "kpitile",
+      "default": "kpitile",
+      "x-awi-writer": "host"
+    },
+    "mode": {
+      "default": "indicator"
+    },
+    "size": {
+      "default": [
+        190,
+        96
+      ]
+    },
+    "value": {
+      "$ref": "https://anywidgetinstruments.github.io/anywidget-instruments/schema/instrument.schema.json#/$defs/float",
+      "description": "Current value of the indicator.",
+      "default": "nan",
+      "x-awi-writer": "host"
+    },
+    "target": {
+      "$ref": "https://anywidgetinstruments.github.io/anywidget-instruments/schema/instrument.schema.json#/$defs/optionalNumber",
+      "description": "Target; null: no difference shown.",
+      "default": null,
+      "x-awi-writer": "host"
+    },
+    "higher_is_better": {
+      "type": "boolean",
+      "description": "Which side of the target is good (shown with ✓ / ✗).",
+      "default": true,
+      "x-awi-writer": "host"
+    },
+    "unit": {
+      "type": "string",
+      "default": "",
+      "x-awi-writer": "host"
+    },
+    "format": {
+      "type": "string",
+      "default": "%.1f",
+      "x-awi-writer": "host"
+    },
+    "show_sparkline": {
+      "type": "boolean",
+      "description": "Draw the history as a sparkline.",
+      "default": true,
+      "x-awi-writer": "host"
+    },
+    "history": {
+      "type": "integer",
+      "minimum": 2,
+      "description": "Number of values kept for the sparkline.",
+      "default": 30,
+      "x-awi-writer": "host"
+    }
+  },
+  "x-awi-messages": [
+    {
+      "type": "snapshot",
+      "direction": "host-to-front",
+      "description": "Whole kept history of the tile, oldest first; replaces the view's history. Sent in reply to sync_request and when history changes.",
+      "fields": {
+        "n": {
+          "type": "integer",
+          "description": "Number of values in the buffer."
+        }
+      },
+      "buffers": [
+        {
+          "dtype": "<f4",
+          "shape": [
+            "n"
+          ],
+          "description": "Values, oldest first."
+        }
+      ]
+    },
+    {
+      "type": "append",
+      "direction": "host-to-front",
+      "description": "New values appended to the history (the last one is the newest).",
+      "fields": {
+        "n": {
+          "type": "integer"
+        }
+      },
+      "buffers": [
+        {
+          "dtype": "<f4",
+          "shape": [
+            "n"
+          ],
+          "description": "Values, oldest first."
+        }
+      ]
+    },
+    {
+      "type": "sync_request",
+      "direction": "front-to-host",
+      "description": "Sent by each new view: the host answers with a snapshot. A host without history can ignore it.",
+      "fields": {},
+      "buffers": []
+    }
+  ]
+}

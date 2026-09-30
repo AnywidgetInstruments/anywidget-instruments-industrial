@@ -1,6 +1,6 @@
 // RecipeTable columns and cells (IND-113, IND-114): the front-end ports of
 // normalize_column, type_default and check_cell
-// (src/anywidget_instruments/_recipe.py), checked against
+// (src/anywidget_instruments_industrial/_recipe.py), checked against
 // tests/parity/recipe.json.
 import { parseEntry, radixOf } from "../core/format.js";
 

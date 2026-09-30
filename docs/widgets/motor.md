@@ -8,7 +8,7 @@ Motor with stopped, forward, reverse and fault states (SCADA-003).
 ![Motor, light theme](../img/widgets/motor-light.png#only-light){ width="98" }
 ![Motor, dark theme](../img/widgets/motor-dark.png#only-dark){ width="98" }
 
-**Process symbols** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.Motor) ·
+**Process symbols** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.Motor) ·
 schema [`motor.schema.json`](../trait-contract.md)
 
 ## Example

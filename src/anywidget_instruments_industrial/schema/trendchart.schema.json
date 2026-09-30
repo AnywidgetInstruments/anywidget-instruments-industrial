@@ -1,0 +1,226 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anywidgetinstruments.github.io/anywidget-instruments-industrial/schema/trendchart.schema.json",
+  "title": "TrendChart",
+  "description": "Trend of named pens against wall-clock time, live or browsing the history (IND-070 .. IND-075).",
+  "type": "object",
+  "x-awi-class": "TrendChart",
+  "allOf": [
+    {
+      "$ref": "graph.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "trendchart",
+      "default": "trendchart",
+      "x-awi-writer": "host"
+    },
+    "size": {
+      "default": [
+        560,
+        260
+      ]
+    },
+    "value": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "https://anywidgetinstruments.github.io/anywidget-instruments/schema/instrument.schema.json#/$defs/float"
+      },
+      "description": "Latest value of each pen, by pen name, written by the host with each append.",
+      "default": {},
+      "readOnly": true,
+      "x-awi-writer": "host"
+    },
+    "pens": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Unique, non-empty."
+          },
+          "unit": {
+            "type": "string"
+          },
+          "min": {
+            "type": "number",
+            "description": "Scale of the pen; max > min (default 0 .. 100)."
+          },
+          "max": {
+            "type": "number"
+          },
+          "color": {
+            "type": "string"
+          },
+          "lolo": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "lo": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "hi": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "hihi": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "setpoint": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Reference line (IND-073)."
+          },
+          "format": {
+            "type": "string",
+            "description": "printf-like spec of the values (default %.4g)."
+          }
+        }
+      },
+      "description": "Pens {name, unit, min, max, color, lolo, lo, hi, hihi, setpoint, format}. Python normalizes them (a string is a pen name, missing keys get their defaults) and rejects duplicate names, unknown keys and max <= min; the front end shows an invalid scale as 0 .. 100.",
+      "default": [],
+      "x-awi-writer": "host"
+    },
+    "span": {
+      "type": "number",
+      "minimum": 1,
+      "description": "Seconds shown; set by the operator with the span selector.",
+      "default": 600.0,
+      "x-awi-writer": "both"
+    },
+    "history": {
+      "type": "integer",
+      "minimum": 2,
+      "description": "Samples kept per pen (IND-074).",
+      "default": 10000,
+      "x-awi-writer": "host"
+    }
+  },
+  "x-awi-messages": [
+    {
+      "type": "append",
+      "direction": "host-to-front",
+      "description": "New samples of some pens. When more than history samples of a pen were added, only the last history are sent and total keeps the count right.",
+      "fields": {
+        "pens": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "integer",
+                "minimum": 0
+              }
+            ],
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "description": "One entry per pen with samples: [pen index in pens, n samples sent, total samples of the pen since the last clear]."
+        }
+      },
+      "repeat": "pens",
+      "buffers": [
+        {
+          "dtype": "<f8",
+          "shape": [
+            "n"
+          ],
+          "description": "Times of the samples of the entry, Unix seconds, chronological."
+        },
+        {
+          "dtype": "<f4",
+          "shape": [
+            "n"
+          ],
+          "description": "Values of the samples of the entry."
+        }
+      ]
+    },
+    {
+      "type": "snapshot",
+      "direction": "host-to-front",
+      "description": "Kept samples of every pen, in reply to sync_request and when pens or history change.",
+      "fields": {
+        "pens": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "integer",
+                "minimum": 0
+              }
+            ],
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "description": "One entry per pen with samples: [pen index in pens, n samples sent, total samples of the pen since the last clear]."
+        }
+      },
+      "repeat": "pens",
+      "buffers": [
+        {
+          "dtype": "<f8",
+          "shape": [
+            "n"
+          ],
+          "description": "Times of the samples of the entry, Unix seconds, chronological."
+        },
+        {
+          "dtype": "<f4",
+          "shape": [
+            "n"
+          ],
+          "description": "Values of the samples of the entry."
+        }
+      ]
+    },
+    {
+      "type": "clear",
+      "direction": "host-to-front",
+      "description": "Forget every sample.",
+      "fields": {},
+      "buffers": []
+    },
+    {
+      "type": "sync_request",
+      "direction": "front-to-host",
+      "description": "Sent by each new view: the host answers with a snapshot. A host without history can ignore it.",
+      "fields": {},
+      "buffers": []
+    }
+  ]
+}

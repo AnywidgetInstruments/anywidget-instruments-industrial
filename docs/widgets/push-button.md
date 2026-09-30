@@ -8,7 +8,7 @@ Push button with a caption, optionally illuminated (BOOL-006, BOOL-015).
 ![PushButton, light theme](../img/widgets/push-button-light.png#only-light){ width="118" }
 ![PushButton, dark theme](../img/widgets/push-button-dark.png#only-dark){ width="118" }
 
-**Controls, discrete** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.PushButton) ·
+**Controls, discrete** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.PushButton) ·
 schema [`pushbutton.schema.json`](../trait-contract.md)
 
 ## Example

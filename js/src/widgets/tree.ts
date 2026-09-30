@@ -1,8 +1,8 @@
 // EquipmentTree: a hierarchy of equipment with a status per node (IND-119).
 import { flattenTree, type NodeStatus, rollupStatus, type TreeNode, visibleIds } from "../contract/tree.js";
-import { clear, html, setAttr } from "../core/dom.js";
-import type { AnyModel } from "../core/model.js";
-import { BaseView } from "../core/view.js";
+import { clear, html, setAttr } from "anywidget-instruments/js/src/core/dom.js";
+import type { AnyModel } from "anywidget-instruments/js/src/core/model.js";
+import { BaseView } from "anywidget-instruments/js/src/core/view.js";
 import type { EquipmentTreeTraits } from "../generated/contract.js";
 
 const TRAITS = ["value", "nodes", "expanded", "show_level"];

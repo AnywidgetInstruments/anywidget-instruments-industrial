@@ -8,7 +8,7 @@ Scrolling multi-trace chart fed with binary samples (CHART-001 .. CHART-009).
 ![WaveformChart, light theme](../img/widgets/waveform-chart-light.png#only-light){ width="488" }
 ![WaveformChart, dark theme](../img/widgets/waveform-chart-dark.png#only-dark){ width="488" }
 
-**Graphs, time** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.WaveformChart) ·
+**Graphs, time** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.WaveformChart) ·
 schema [`waveformchart.schema.json`](../trait-contract.md)
 
 ## Example

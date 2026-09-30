@@ -2,7 +2,7 @@
 
 ## License
 
-anywidget-instruments is distributed under the
+anywidget-instruments-industrial is distributed under the
 [BSD 3-Clause license](https://github.com/AnywidgetInstruments/anywidget-instruments-industrial/blob/main/LICENSE):
 you may use, modify and redistribute it, including in commercial and closed
 products, provided that you keep the copyright notice and the license text,
@@ -26,16 +26,16 @@ ORCID [0000-0001-9987-4338](https://orcid.org/0000-0001-9987-4338).
 
 APA:
 
-> Celles, S. (2026). *anywidget-instruments: instrumentation widgets for
+> Celles, S. (2026). *anywidget-instruments-industrial: instrumentation widgets for
 > computational notebooks* (Version 0.1.0.dev0) [Computer software].
 > https://github.com/AnywidgetInstruments/anywidget-instruments-industrial
 
 BibTeX:
 
 ```bibtex
-@software{celles_anywidget_instruments,
+@software{celles_anywidget_instruments_industrial,
   author  = {Celles, Sébastien},
-  title   = {anywidget-instruments: instrumentation widgets for computational notebooks},
+  title   = {anywidget-instruments-industrial: instrumentation widgets for computational notebooks},
   year    = {2026},
   version = {0.1.0.dev0},
   license = {BSD-3-Clause},
@@ -44,4 +44,4 @@ BibTeX:
 ```
 
 Cite the version you used; the version number is in
-`anywidget_instruments.__version__`.
+`anywidget_instruments_industrial.__version__`.

@@ -8,7 +8,7 @@ Three-position switch for the theme: light, system, dark (STYLE-007, STYLE-008).
 ![ThemeSwitch, light theme](../img/widgets/theme-switch-light.png#only-light){ width="250" }
 ![ThemeSwitch, dark theme](../img/widgets/theme-switch-dark.png#only-dark){ width="250" }
 
-**Layout and session** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.ThemeSwitch) ·
+**Layout and session** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.ThemeSwitch) ·
 schema [`themeswitch.schema.json`](../trait-contract.md)
 
 ## Example

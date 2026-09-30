@@ -1,5 +1,5 @@
 // XYGraph cursor readout (IND-115, CHART-104): the front-end port of
-// xy_value_at (src/anywidget_instruments/_xygraph.py), checked against
+// xy_value_at (src/anywidget_instruments_industrial/_xygraph.py), checked against
 // tests/parity/xy.json.
 
 /**

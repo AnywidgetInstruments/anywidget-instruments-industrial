@@ -3,8 +3,8 @@
 ## Installation
 
 ```bash
-pip install anywidget-instruments            # when released (see below to install from source)
-pip install "anywidget-instruments[units]"   # + pint support
+pip install anywidget-instruments-industrial            # when released (see below to install from source)
+pip install "anywidget-instruments-industrial[units]"   # + pint support
 ```
 
 From a clone of the repository:
@@ -116,7 +116,7 @@ t = ai.Thermometer(unit="degC")
 t.value = ureg.Quantity(300, "kelvin")  # pint quantities are converted (26.85 °C)
 ```
 
-Install `pint` with `pip install "anywidget-instruments[units]"`.
+Install `pint` with `pip install "anywidget-instruments-industrial[units]"`.
 
 ## Styles and theming
 

@@ -14,7 +14,7 @@ else:  # pragma: no cover
 import pytest
 
 ROOT = pathlib.Path(__file__).parents[1]
-PACKAGE = ROOT / "src" / "anywidget_instruments"
+PACKAGE = ROOT / "src" / "anywidget_instruments_industrial"
 
 
 @pytest.mark.skipif(tomllib is None, reason="tomllib needs Python 3.11")

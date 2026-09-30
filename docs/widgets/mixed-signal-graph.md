@@ -8,7 +8,7 @@ Analog traces and digital lines on a shared time axis (CHART-103). Same traits a
 ![MixedSignalGraph, light theme](../img/widgets/mixed-signal-graph-light.png#only-light){ width="428" }
 ![MixedSignalGraph, dark theme](../img/widgets/mixed-signal-graph-dark.png#only-dark){ width="428" }
 
-**Graphs, time** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.MixedSignalGraph) ·
+**Graphs, time** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.MixedSignalGraph) ·
 schema [`mixedgraph.schema.json`](../trait-contract.md)
 
 ## Example

@@ -8,7 +8,7 @@ Chronological journal of events, shown newest first (IND-090 .. IND-093).
 ![EventLog, light theme](../img/widgets/event-log-light.png#only-light){ width="530" }
 ![EventLog, dark theme](../img/widgets/event-log-dark.png#only-dark){ width="530" }
 
-**Alarms and events** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.EventLog) ·
+**Alarms and events** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.EventLog) ·
 schema [`eventlog.schema.json`](../trait-contract.md)
 
 ## Example

@@ -1,6 +1,6 @@
 // PID faceplate operator rules (IND-030 .. IND-034): the front-end port of
 // PIDFaceplate.sp_limits, the sp / op validators, operator_set and the setpoint
-// tracking of _on_loop_mode (src/anywidget_instruments/_pid.py). Both are
+// tracking of _on_loop_mode (src/anywidget_instruments_industrial/_pid.py). Both are
 // checked against the shared cases of tests/parity/pid.json.
 
 export interface PIDState {

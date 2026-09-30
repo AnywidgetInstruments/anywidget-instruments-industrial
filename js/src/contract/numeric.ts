@@ -1,7 +1,7 @@
 // Numeric rules shared with the Python kernel (NUM-006, NUM-010, HOST-002).
 // Python: NumericWidget._coerce_value and _check_scale (_numeric.py); both
 // sides are checked against tests/parity/numeric.json.
-import { clamp } from "../core/scale.js";
+import { clamp } from "anywidget-instruments/js/src/core/scale.js";
 
 /**
  * Value as the kernel stores it: clamped to [min, max] when `coerce` is set
@@ -45,7 +45,7 @@ export class ScaleGuard {
     }
     if (!this.warned) {
       this.warned = true;
-      console.warn(`anywidget-instruments: ${where}: invalid scale (min ${s.min}, max ${s.max}, ${s.scale}); keeping min ${this.last.min}, max ${this.last.max}`);
+      console.warn(`anywidget-instruments-industrial: ${where}: invalid scale (min ${s.min}, max ${s.max}, ${s.scale}); keeping min ${this.last.min}, max ${this.last.max}`);
     }
     return this.last;
   }

@@ -1,7 +1,7 @@
 // STYLE-007 / STYLE-008: theme switch, "system" theme and the page theme.
 import { beforeEach, describe, expect, it } from "vitest";
 import widget from "../src/index.js";
-import { applyPageTheme, hostIsDark } from "../src/core/pagetheme.js";
+import { applyPageTheme, hostIsDark } from "anywidget-instruments/js/src/core/pagetheme.js";
 import { common, fakeModel } from "./helpers.js";
 
 const tick = () => new Promise((r) => setTimeout(r, 30));

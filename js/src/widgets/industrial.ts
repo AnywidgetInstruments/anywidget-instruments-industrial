@@ -1,11 +1,11 @@
 // Operator panel objects: AnalogIndicator (IND-001..003), SelectorSwitch
 // (IND-010..013) and StackLight (IND-020..022).
 import { selectorValue, stackStates } from "../contract/industrial.js";
-import { clear, html, svg, svgText } from "../core/dom.js";
+import { clear, html, svg, svgText } from "anywidget-instruments/js/src/core/dom.js";
 import { formatValue, tickFormat } from "../core/format.js";
-import { linearHit, parseNumber, ticks } from "../core/scale.js";
-import type { AnyModel } from "../core/model.js";
-import { BaseView } from "../core/view.js";
+import { linearHit, parseNumber, ticks } from "anywidget-instruments/js/src/core/scale.js";
+import type { AnyModel } from "anywidget-instruments/js/src/core/model.js";
+import { BaseView } from "anywidget-instruments/js/src/core/view.js";
 import type { AnalogIndicatorTraits, SelectorSwitchTraits, StackLightTraits } from "../generated/contract.js";
 import { NumericView, svgPoint } from "./numeric.js";
 

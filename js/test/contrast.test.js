@@ -4,7 +4,10 @@ import { readFileSync } from "node:fs";
 import { resolve as resolvePath } from "node:path";
 import { describe, expect, it } from "vitest";
 
-const css = readFileSync(resolvePath(process.cwd(), "js/src/styles.css"), "utf8");
+// the palettes come from the anywidget-instruments core, imported first by styles.css
+const css = ["node_modules/anywidget-instruments/js/src/styles.css", "js/src/styles.css"]
+  .map((f) => readFileSync(resolvePath(process.cwd(), f), "utf8"))
+  .join("\n");
 
 /** Custom properties declared in the first block whose selector matches `selector`. */
 function tokens(selector) {

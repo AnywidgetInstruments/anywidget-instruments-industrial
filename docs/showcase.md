@@ -67,7 +67,7 @@ Python runs afterwards. Until the package is published, set `AWI_PACKAGE`
 to a wheel of it:
 
 ```julia
-ENV["AWI_PACKAGE"] = "/path/to/anywidget_instruments-0.1.0.dev0-py3-none-any.whl"
+ENV["AWI_PACKAGE"] = "/path/to/anywidget_instruments_industrial-0.1.0.dev0-py3-none-any.whl"
 ```
 
 then open `examples/kaimonslate/batch_reactor.jl` in Kaimon Slate and press

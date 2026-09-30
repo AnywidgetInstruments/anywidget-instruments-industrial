@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 import traitlets as t
 
-import anywidget_instruments as ai
+import anywidget_instruments_industrial as ai
 
 NUMERIC = [
     ai.Knob,
@@ -143,7 +143,7 @@ def test_peak_hold():
 
 
 def test_peak_decay(monkeypatch):
-    import anywidget_instruments._numeric as mod
+    import anywidget_instruments_industrial._numeric as mod
 
     now = [100.0]
     monkeypatch.setattr(mod.time, "monotonic", lambda: now[0])

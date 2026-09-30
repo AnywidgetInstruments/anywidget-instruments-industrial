@@ -8,7 +8,7 @@ Two-position slide switch (BOOL-005).
 ![SlideSwitch, light theme](../img/widgets/slide-switch-light.png#only-light){ width="98" }
 ![SlideSwitch, dark theme](../img/widgets/slide-switch-dark.png#only-dark){ width="98" }
 
-**Controls, discrete** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.SlideSwitch) ·
+**Controls, discrete** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.SlideSwitch) ·
 schema [`slideswitch.schema.json`](../trait-contract.md)
 
 ## Example

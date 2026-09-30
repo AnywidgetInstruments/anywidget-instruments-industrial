@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anywidgetinstruments.github.io/anywidget-instruments-industrial/schema/stacklight.schema.json",
+  "title": "StackLight",
+  "description": "Signal tower with 1 to 5 tiers (IND-020 .. IND-022, IEC 60073 colors).",
+  "type": "object",
+  "x-awi-class": "StackLight",
+  "allOf": [
+    {
+      "$ref": "https://anywidgetinstruments.github.io/anywidget-instruments/schema/instrument.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "stacklight",
+      "default": "stacklight",
+      "x-awi-writer": "host"
+    },
+    "mode": {
+      "default": "indicator"
+    },
+    "size": {
+      "default": [
+        120,
+        200
+      ]
+    },
+    "tiers": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "red",
+          "amber",
+          "green",
+          "blue",
+          "white"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 5,
+      "description": "Tier colors from top to bottom.",
+      "default": [
+        "red",
+        "amber",
+        "green"
+      ],
+      "x-awi-writer": "host"
+    },
+    "labels": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Meaning of each tier, shown as text (A11Y-003).",
+      "default": [],
+      "x-awi-writer": "host"
+    },
+    "value": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "off",
+          "on",
+          "blink"
+        ]
+      },
+      "x-awi-item-default": "off",
+      "description": "State of each tier. Resolved to one state per tier: missing states are off, extra ones ignored, an unknown state reads as off (the Python class pads or cuts the list when the tiers change).",
+      "default": [],
+      "x-awi-resolved": true,
+      "x-awi-writer": "host"
+    },
+    "buzzer": {
+      "type": "boolean",
+      "description": "Show a sounding buzzer indicator (no sound is played).",
+      "default": false,
+      "x-awi-writer": "host"
+    }
+  }
+}

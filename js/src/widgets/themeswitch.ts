@@ -1,8 +1,8 @@
 // Light / system / dark theme switch (STYLE-007, STYLE-008).
-import { html } from "../core/dom.js";
-import type { AnyModel } from "../core/model.js";
-import { applyPageTheme } from "../core/pagetheme.js";
-import { BaseView } from "../core/view.js";
+import { html } from "anywidget-instruments/js/src/core/dom.js";
+import type { AnyModel } from "anywidget-instruments/js/src/core/model.js";
+import { applyPageTheme } from "anywidget-instruments/js/src/core/pagetheme.js";
+import { BaseView } from "anywidget-instruments/js/src/core/view.js";
 import type { ThemeSwitchTraits } from "../generated/contract.js";
 
 type Theme = ThemeSwitchTraits["value"];

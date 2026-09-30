@@ -19,8 +19,8 @@ import { dirname, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
-const STATIC = join(ROOT, "src/anywidget_instruments/static");
-const SCHEMAS = join(ROOT, "src/anywidget_instruments/schema");
+const STATIC = join(ROOT, "src/anywidget_instruments_industrial/static");
+const SCHEMAS = join(ROOT, "src/anywidget_instruments_industrial/schema");
 const PAGES = join(ROOT, "docs/widgets");
 const IMAGES = join(ROOT, "docs/img/widgets");
 const CATALOG = join(ROOT, "docs/widgets.md");
@@ -102,7 +102,7 @@ async function capture(browser, port, scheme) {
   // Transparent pictures: they sit on the light or the dark page of the site.
   await page.addStyleTag({ content: "body, body.dark { background: transparent !important; }" });
   await page.evaluate(async ({ extra }) => {
-    const { default: widget } = await import("/src/anywidget_instruments/static/index.js");
+    const { default: widget } = await import("/src/anywidget_instruments_industrial/static/index.js");
     const grid = document.getElementById("grid");
     for (const { spec, draw } of Object.values(extra)) {
       const handlers = {};
@@ -325,7 +325,7 @@ function page(w, shot) {
     `![${w.class}, light theme](../img/widgets/${name}-light.png#only-light)${width}`,
     `![${w.class}, dark theme](../img/widgets/${name}-dark.png#only-dark)${width}`,
     "",
-    `**${family}** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.${w.class}) ·`,
+    `**${family}** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.${w.class}) ·`,
     `schema [\`${w.schema.replace(/^schema\//, "")}\`](../trait-contract.md)`,
     "",
     "## Example",

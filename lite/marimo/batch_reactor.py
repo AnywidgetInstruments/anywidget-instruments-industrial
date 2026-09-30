@@ -16,15 +16,16 @@ def _():
 
 @app.cell(hide_code=True)
 async def _(mo, sys):
-    # In the browser the package is not on the package index: install the
-    # wheel built with the site. Locally it is already installed.
+    # In the browser the packages are not on the package index: install the
+    # wheels built with the site, the anywidget-instruments core first.
+    # Locally they are already installed.
     if sys.platform == "emscripten":
         import micropip
         from pyodide.http import pyfetch
 
         _base = mo.notebook_location() / "public"
-        _wheel = (await (await pyfetch(str(_base / "wheel.txt"))).string()).strip()
-        await micropip.install(str(_base / _wheel))
+        _wheels = (await (await pyfetch(str(_base / "wheel.txt"))).string()).split()
+        await micropip.install([str(_base / _w) for _w in _wheels])
     installed = True
     return (installed,)
 
@@ -34,7 +35,7 @@ def _(installed):
     assert installed
     import time
 
-    import anywidget_instruments as ai
+    import anywidget_instruments_industrial as ai
 
     return ai, time
 

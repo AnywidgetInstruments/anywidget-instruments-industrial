@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 import traitlets as t
 
-import anywidget_instruments as ai
+import anywidget_instruments_industrial as ai
 
 SVG = """<svg xmlns="http://www.w3.org/2000/svg"
   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" viewBox="0 0 100 100">

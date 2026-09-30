@@ -4,7 +4,7 @@
 // a thousand DOM updates a second.
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import widget from "../src/index.js";
-import { BaseView, OFFSCREEN_MS } from "../src/core/view.js";
+import { BaseView, OFFSCREEN_MS } from "anywidget-instruments/js/src/core/view.js";
 import { CONTRACTS } from "../src/generated/contract.js";
 
 let observers: Array<(entries: Array<{ isIntersecting: boolean }>) => void> = [];

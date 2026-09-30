@@ -1,8 +1,8 @@
 // TrendChart pens and history (IND-070 .. IND-075, CHART-104): the
 // front-end ports of TrendChart._check_pens (for valid pens), of the pen
-// buffers and of TrendChart.values_at (src/anywidget_instruments/_trend.py),
+// buffers and of TrendChart.values_at (src/anywidget_instruments_industrial/_trend.py),
 // checked against tests/parity/trend.json.
-import { parseNumber } from "../core/scale.js";
+import { parseNumber } from "anywidget-instruments/js/src/core/scale.js";
 
 export interface Pen {
   name: string;

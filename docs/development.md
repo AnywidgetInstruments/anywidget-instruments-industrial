@@ -3,11 +3,12 @@
 Contributor conventions are in `AGENTS.md` at the repository root.
 
 ```bash
-npm install
+npm install                # also installs the anywidget-instruments core, at the commit package.json pins
 npm run build              # front-end bundle (esbuild, js/build.mjs)
 npm test                   # front-end unit tests (vitest), including the WCAG contrast audit
 npm run lint               # eslint, including the SEC-001 rules (no eval / innerHTML)
 npm run check:reproducible # byte-identical rebuild (SEC-004)
+pip install "anywidget-instruments @ git+https://github.com/AnywidgetInstruments/anywidget-instruments@<commit of package.json>"
 pip install -e ".[dev]"
 pytest                     # Python unit tests + headless execution of the example notebooks
 ruff check . && ruff format --check . && mypy src
@@ -20,18 +21,29 @@ The documentation is built with `pip install -e ".[docs]"` and
 
 ## Front end and trait contract
 
+The widgets derive from the
+[anywidget-instruments](https://github.com/AnywidgetInstruments/anywidget-instruments)
+core, which holds the base view (`BaseView`), the model interface, the
+schema-driven trait reading, the contract generator (`js/scripts/contract.mjs`),
+the palettes and themes (its `styles.css`, imported first), the liveness and
+the Python base class. Its TypeScript sources are bundled with the widgets of
+this library; `js/src/index.js` registers the contracts of the widgets with
+the base view (`registerContracts`). The base schema
+(`instrument.schema.json`) comes from the core too, by its `$id`
+`https://anywidgetinstruments.github.io/anywidget-instruments/schema/instrument.schema.json`.
+
 The front end is written in TypeScript (`js/src/`), bundled by esbuild into
 one unminified ES module with its source map (HOST-006). It depends on no
 Python code: any anywidget host can run it with a dictionary of traits (see
 [Hosts](hosts.md) and the [trait contract](trait-contract.md)).
 
-- **Schemas.** `src/anywidget_instruments/schema/*.schema.json` describe the
+- **Schemas.** `src/anywidget_instruments_industrial/schema/*.schema.json` describe the
   traits and messages of every widget: they are the single source of truth.
   `npm run gen` (also run by `npm run build`, `npm run typecheck` and
   `npm test`) generates `js/src/generated/contract.ts` (TypeScript types and
   specs) and `static/contract.json` (for hosts).
 - **Reading traits.** `BaseView.get` reads each trait through its spec
-  (`js/src/contract/traits.ts`): wrong types give the default, numbers are
+  (`js/src/contract/traits.ts` of the core): wrong types give the default, numbers are
   clamped, `"nan"` is decoded. Reads are cached per raw value.
 - **Authority.** `js/src/contract/derived.ts` computes the derived traits
   (alarm levels, peaks, states) when no host owns the state (empty

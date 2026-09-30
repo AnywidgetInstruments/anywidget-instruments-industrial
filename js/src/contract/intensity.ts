@@ -1,6 +1,6 @@
 // IntensityChart history and cursor row (CHART-101, CHART-104): the
 // front-end port of the row buffer and of IntensityChart.values_at
-// (src/anywidget_instruments/_graphs.py), checked against
+// (src/anywidget_instruments_industrial/_graphs.py), checked against
 // tests/parity/intensity.json.
 
 /** Python's round(): halves go to the even integer. */

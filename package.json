@@ -1,14 +1,14 @@
 {
-  "name": "anywidget-instruments",
+  "name": "anywidget-instruments-industrial",
   "private": true,
   "version": "0.1.0",
-  "description": "Front-end ES modules of anywidget-instruments (AFM compliant).",
+  "description": "Front-end ES modules of anywidget-instruments-industrial, built on the anywidget-instruments core.",
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {
     "gen": "node js/scripts/gen-contract.mjs",
     "build": "node js/build.mjs",
-    "dev": "node js/scripts/gen-contract.mjs && esbuild js/src/index.js --bundle --format=esm --target=es2020 --sourcemap --outfile=src/anywidget_instruments/static/index.js --watch",
+    "dev": "node js/scripts/gen-contract.mjs && esbuild js/src/index.js --bundle --format=esm --target=es2020 --sourcemap --outfile=src/anywidget_instruments_industrial/static/index.js --watch",
     "typecheck": "node js/scripts/gen-contract.mjs && tsc -p .",
     "pretest": "node js/scripts/gen-contract.mjs",
     "test": "vitest run",
@@ -20,6 +20,7 @@
   "devDependencies": {
     "@eslint/js": "^9.0.0",
     "@playwright/test": "^1.56.1",
+    "anywidget-instruments": "git+https://github.com/AnywidgetInstruments/anywidget-instruments.git#516d3967f186a5bbc03f54454e44656a8288a5be",
     "esbuild": "^0.25.0",
     "eslint": "^9.0.0",
     "globals": "^16.0.0",

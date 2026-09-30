@@ -8,7 +8,7 @@ Multi-axis (spider) chart (SPEC-004).
 ![RadarChart, light theme](../img/widgets/radar-chart-light.png#only-light){ width="228" }
 ![RadarChart, dark theme](../img/widgets/radar-chart-dark.png#only-dark){ width="228" }
 
-**Graphs, specialized** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.RadarChart) ·
+**Graphs, specialized** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.RadarChart) ·
 schema [`radar.schema.json`](../trait-contract.md)
 
 ## Example

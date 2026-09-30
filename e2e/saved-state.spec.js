@@ -5,7 +5,7 @@ import { runNotebook, widget } from "./helpers.js";
 
 const NB = "saved-state.ipynb";
 const notebook = {
-  cells: [{ cell_type: "code", execution_count: null, id: "s0", metadata: {}, outputs: [], source: "import anywidget_instruments as ai\nai.set_heartbeat(1)\nai.Knob(33, label='Saved knob')" }],
+  cells: [{ cell_type: "code", execution_count: null, id: "s0", metadata: {}, outputs: [], source: "import anywidget_instruments_industrial as ai\nai.set_heartbeat(1)\nai.Knob(33, label='Saved knob')" }],
   metadata: { kernelspec: { display_name: "Python 3", language: "python", name: "python3" }, language_info: { name: "python" } },
   nbformat: 4,
   nbformat_minor: 5,

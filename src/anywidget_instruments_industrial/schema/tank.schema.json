@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anywidgetinstruments.github.io/anywidget-instruments-industrial/schema/tank.schema.json",
+  "title": "Tank",
+  "description": "Vertical level indicator with optional level markers (NUM-106).",
+  "type": "object",
+  "x-awi-class": "Tank",
+  "allOf": [{ "$ref": "numeric.schema.json" }],
+  "properties": {
+    "_kind": { "const": "tank", "default": "tank", "x-awi-writer": "host" },
+    "mode": { "default": "indicator" },
+    "size": { "default": [120, 200] },
+    "fill_color": {
+      "type": "string",
+      "description": "CSS color of the liquid; empty: the theme color. Unsafe colors are ignored (SEC-002).",
+      "default": "",
+      "x-awi-writer": "host"
+    },
+    "markers": {
+      "type": "array",
+      "items": { "type": "number" },
+      "description": "Level markers drawn on the tank, in scale units.",
+      "default": [],
+      "x-awi-writer": "host"
+    }
+  }
+}

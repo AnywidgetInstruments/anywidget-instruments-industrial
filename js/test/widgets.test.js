@@ -3,7 +3,7 @@ import { mechanicalTransition } from "../src/widgets/boolean.js";
 import { Ring, viewWindow } from "../src/widgets/chart.js";
 import { sevenSegmentText } from "../src/widgets/sevensegment.js";
 import widget from "../src/index.js";
-import { parseSkin } from "../src/core/dom.js";
+import { parseSkin } from "anywidget-instruments/js/src/core/dom.js";
 import { common, fakeModel } from "./helpers.js";
 
 describe("mechanical actions", () => {
@@ -166,7 +166,7 @@ describe("stale data (ROB-001)", () => {
     const model = fakeModel({ ...common, _kind: "knob", _session: "dead-session", _heartbeat: 0.001, value: 50, min: 0, max: 100, step: 5, unit: "", scale: "linear", ticks: 5, minor_ticks: 4, format: "%.1f", alarm_level: "normal", angle_range: 270, update_rate: 30 });
     const el = document.createElement("div");
     widget.render({ model, el });
-    const { markDead } = await import("../src/core/liveness.js");
+    const { markDead } = await import("anywidget-instruments/js/src/core/liveness.js");
     markDead("dead-session");
     await new Promise((r) => setTimeout(r, 1100));
     await new Promise((r) => setTimeout(r, 30));

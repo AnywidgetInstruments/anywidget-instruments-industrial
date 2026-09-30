@@ -1,6 +1,6 @@
 // Transmitter: instrument bubble, value and device status (IND-080..083).
-import { clear, html, svg, svgText } from "../core/dom.js";
-import type { AnyModel } from "../core/model.js";
+import { clear, html, svg, svgText } from "anywidget-instruments/js/src/core/dom.js";
+import type { AnyModel } from "anywidget-instruments/js/src/core/model.js";
 import type { TransmitterTraits } from "../generated/contract.js";
 import { NumericView } from "./numeric.js";
 

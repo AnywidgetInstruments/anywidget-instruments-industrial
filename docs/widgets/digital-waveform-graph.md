@@ -8,7 +8,7 @@ Logic timing diagram with bus grouping (CHART-102).
 ![DigitalWaveformGraph, light theme](../img/widgets/digital-waveform-graph-light.png#only-light){ width="428" }
 ![DigitalWaveformGraph, dark theme](../img/widgets/digital-waveform-graph-dark.png#only-dark){ width="428" }
 
-**Graphs, time** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.DigitalWaveformGraph) ·
+**Graphs, time** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.DigitalWaveformGraph) ·
 schema [`digitalgraph.schema.json`](../trait-contract.md)
 
 ## Example

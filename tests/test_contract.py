@@ -1,6 +1,6 @@
 """Conformance of the Python widgets with the trait contract (HOST-001, HOST-007).
 
-The JSON Schemas in ``src/anywidget_instruments/schema/`` are the single source
+The JSON Schemas in ``src/anywidget_instruments_industrial/schema/`` are the single source
 of truth. ``npm run build`` (or ``npm run gen``) flattens them into
 ``static/contract.json``, the file also used by the TypeScript front end and
 published for host authors. These tests fail when a traitlets declaration,
@@ -15,12 +15,13 @@ import math
 import pathlib
 from typing import Any
 
+import anywidget_instruments as awi
 import numpy as np
 import pytest
 import traitlets as t
 
-import anywidget_instruments as ai
-from anywidget_instruments import _base, _boolean, _graph, _numeric, _polar, _process
+import anywidget_instruments_industrial as ai
+from anywidget_instruments_industrial import _base, _boolean, _graph, _numeric, _polar, _process
 
 PKG = pathlib.Path(ai.__file__).parent
 SCHEMA_DIR = PKG / "schema"
@@ -186,12 +187,16 @@ def _validator(schema_file: str) -> Any:
     jsonschema = pytest.importorskip("jsonschema")
     referencing = pytest.importorskip("referencing")
     resources = []
-    for f in SCHEMA_DIR.glob("*.schema.json"):
+    # the base schema of the anywidget-instruments core, which ours extend by $id
+    for f in [*SCHEMA_DIR.glob("*.schema.json"), *awi.SCHEMA_DIR.glob("*.schema.json")]:
         doc = json.loads(f.read_text())
         resource = referencing.Resource.from_contents(doc)
         resources += [(doc["$id"], resource), (f.name, resource)]
     registry = referencing.Registry().with_resources(resources)
-    schema = json.loads((SCHEMA_DIR / schema_file).read_text())
+    path = SCHEMA_DIR / schema_file
+    if not path.exists():  # a base schema, listed by the contract with its $id
+        path = awi.SCHEMA_DIR / schema_file
+    schema = json.loads(path.read_text())
     return jsonschema.Draft202012Validator(schema, registry=registry)
 
 
@@ -213,7 +218,7 @@ def test_schemas_are_valid_json_schemas() -> None:
 
 def test_transition_tables() -> None:
     """x-awi-transitions of a schema equal the table of the Python class."""
-    from anywidget_instruments import _scada
+    from anywidget_instruments_industrial import _scada
 
     table = CONTRACT["widgets"]["AlarmIndicator"]["traits"]["value"]["transitions"]
     assert {(a, e): b for a, e, b in table} == _scada._TRANSITIONS

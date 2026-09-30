@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: >-
   If you use this software in teaching material, a publication or a
   product, please cite it as below.
-title: "anywidget-instruments: instrumentation widgets for computational notebooks"
+title: "anywidget-instruments-industrial: instrumentation widgets for computational notebooks"
 type: software
 authors:
   - family-names: Celles

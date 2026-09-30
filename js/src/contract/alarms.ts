@@ -1,7 +1,7 @@
 // Alarm banner and alarm list operator actions (SCADA-006, SCADA-007,
 // IND-050 .. IND-053): the front-end port of AlarmBanner._apply and
 // AlarmList.acknowledge / shelve / unshelve / refresh
-// (src/anywidget_instruments/_scada.py, _alarmlist.py), applied when no host
+// (src/anywidget_instruments_industrial/_scada.py, _alarmlist.py), applied when no host
 // owns the state. Checked against the shared cases of tests/parity/alarms.json.
 import { applyTransition, type Transitions } from "./transitions.js";
 

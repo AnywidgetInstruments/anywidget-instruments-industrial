@@ -8,7 +8,7 @@ import { build } from "esbuild";
 import { fileURLToPath } from "node:url";
 import { generate } from "./scripts/gen-contract.mjs";
 
-const OUT = "src/anywidget_instruments/static";
+const OUT = "src/anywidget_instruments_industrial/static";
 
 export const targets = [
   { entryPoints: ["js/src/index.js"], outfile: `${OUT}/index.js`, bundle: true, format: "esm", minify: false, sourcemap: "linked", sourcesContent: true, legalComments: "inline", target: "es2020", charset: "utf8" },

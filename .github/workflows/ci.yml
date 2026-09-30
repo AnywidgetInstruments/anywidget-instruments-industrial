@@ -32,13 +32,13 @@ jobs:
         run: npm run check:reproducible
       - name: Bundle size budget (PERF-004, 150 kB gzipped)
         run: |
-          size=$(cat src/anywidget_instruments/static/index.js src/anywidget_instruments/static/index.css | gzip -9 | wc -c)
+          size=$(cat src/anywidget_instruments_industrial/static/index.js src/anywidget_instruments_industrial/static/index.css | gzip -9 | wc -c)
           echo "bundle: $size bytes gzipped"
           test "$size" -le 153600
       - uses: actions/upload-artifact@v4
         with:
           name: bundle
-          path: src/anywidget_instruments/static/
+          path: src/anywidget_instruments_industrial/static/
 
   python:
     needs: frontend
@@ -52,15 +52,17 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: bundle
-          path: src/anywidget_instruments/static/
+          path: src/anywidget_instruments_industrial/static/
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      - name: The anywidget-instruments core, at the commit of package.json (not on the package index yet)
+        run: pip install "anywidget-instruments @ git+https://github.com/AnywidgetInstruments/anywidget-instruments@$(node -p "require('./package.json').devDependencies['anywidget-instruments'].split('#')[1]")"
       - run: pip install -e ".[dev]"
       - run: ruff check .
       - run: ruff format --check .
       - run: mypy src
-      - run: pytest --cov=anywidget_instruments
+      - run: pytest --cov=anywidget_instruments_industrial
 
   e2e:
     needs: frontend
@@ -70,7 +72,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: bundle
-          path: src/anywidget_instruments/static/
+          path: src/anywidget_instruments_industrial/static/
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -78,6 +80,8 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - name: The anywidget-instruments core, at the commit of package.json (not on the package index yet)
+        run: pip install "anywidget-instruments @ git+https://github.com/AnywidgetInstruments/anywidget-instruments@$(node -p "require('./package.json').devDependencies['anywidget-instruments'].split('#')[1]")"
       - run: pip install -e ".[dev]"
       - run: npm ci
       - run: npx playwright install --with-deps chromium

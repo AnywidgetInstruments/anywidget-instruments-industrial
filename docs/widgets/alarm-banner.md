@@ -11,7 +11,7 @@ List of active alarms with time, source, priority and message (SCADA-006, SCADA-
 ![AlarmBanner, light theme](../img/widgets/alarm-banner-light.png#only-light){ width="530" }
 ![AlarmBanner, dark theme](../img/widgets/alarm-banner-dark.png#only-dark){ width="530" }
 
-**Alarms and events** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.AlarmBanner) ·
+**Alarms and events** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.AlarmBanner) ·
 schema [`alarmbanner.schema.json`](../trait-contract.md)
 
 ## Example

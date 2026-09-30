@@ -8,7 +8,7 @@ Rocker switch with I/O marks (BOOL-004).
 ![RockerSwitch, light theme](../img/widgets/rocker-switch-light.png#only-light){ width="68" }
 ![RockerSwitch, dark theme](../img/widgets/rocker-switch-dark.png#only-dark){ width="68" }
 
-**Controls, discrete** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.RockerSwitch) ·
+**Controls, discrete** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.RockerSwitch) ·
 schema [`rockerswitch.schema.json`](../trait-contract.md)
 
 ## Example

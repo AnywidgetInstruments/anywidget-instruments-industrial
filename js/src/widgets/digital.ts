@@ -1,11 +1,11 @@
 // DigitalWaveformGraph (CHART-102) and MixedSignalGraph (CHART-103).
 import { busLines, busValue, decodeDigital, type DigitalData, EMPTY_DATA, hex, runs, sampleAt } from "../contract/digital.js";
 import type { BufferLike } from "../core/buffers.js";
-import { setAttr } from "../core/dom.js";
+import { setAttr } from "anywidget-instruments/js/src/core/dom.js";
 import { formatValue } from "../core/format.js";
-import type { AnyModel } from "../core/model.js";
+import type { AnyModel } from "anywidget-instruments/js/src/core/model.js";
 import { type Area, type Colors, PlotView, type Range, type Ranges, type SvgBuilder } from "../core/plot.js";
-import { autoscale, niceTicks } from "../core/scale.js";
+import { autoscale, niceTicks } from "anywidget-instruments/js/src/core/scale.js";
 import type { DigitalWaveformGraphTraits, MixedSignalGraphTraits } from "../generated/contract.js";
 import { drawLegend, traceStyle } from "./chart.js";
 

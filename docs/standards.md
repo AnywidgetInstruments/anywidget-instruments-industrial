@@ -1,11 +1,11 @@
 # Standards and references
 
-The design of anywidget-instruments draws on the standards and methods listed
+The design of anywidget-instruments-industrial draws on the standards and methods listed
 below: they shaped the behaviour, the colors and the vocabulary of the widgets.
 This page names them so that readers can go to the original texts.
 
 !!! warning "Disclaimer"
-    * **No claim of conformity.** anywidget-instruments does not claim to
+    * **No claim of conformity.** anywidget-instruments-industrial does not claim to
       conform to, comply with, or implement any of these standards, in whole
       or in part. It has not been assessed, tested or certified against them
       by anyone, and the organizations that publish them have neither reviewed

@@ -190,7 +190,7 @@ ISA-18.1 (annunciator sequences), ISA-18.2 / IEC 62682 (alarm management),
 IEC 60073 (indicator colors) and ISA-TR88.00.02 (machine state model).
 
 ```python
-import anywidget_instruments as ai
+import anywidget_instruments_industrial as ai
 
 # high-performance bar: normal band, limits and target; color only in alarm
 weight = ai.AnalogIndicator(
@@ -666,7 +666,7 @@ panel.on_change(lambda change: print(change["new"]))  # controls report here
 
 Five drawings ship with the package, with the same behavior and different
 looks. Load one with `SvgPanel.template(name)`, or copy it from
-`anywidget_instruments/templates/` as a starting point for your own:
+`anywidget_instruments_industrial/templates/` as a starting point for your own:
 
 | Template | Values |
 |---|---|

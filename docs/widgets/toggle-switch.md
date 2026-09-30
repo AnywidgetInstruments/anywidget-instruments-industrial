@@ -8,7 +8,7 @@ Toggle (bat-handle) switch (BOOL-003).
 ![ToggleSwitch, light theme](../img/widgets/toggle-switch-light.png#only-light){ width="68" }
 ![ToggleSwitch, dark theme](../img/widgets/toggle-switch-dark.png#only-dark){ width="68" }
 
-**Controls, discrete** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.ToggleSwitch) ·
+**Controls, discrete** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.ToggleSwitch) ·
 schema [`toggleswitch.schema.json`](../trait-contract.md)
 
 ## Example

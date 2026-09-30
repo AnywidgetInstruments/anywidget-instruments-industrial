@@ -1,5 +1,5 @@
 // Peak hold (NUM-110): the front-end port of _PeakMixin._track_peak
-// (src/anywidget_instruments/_numeric.py). Both are checked against the
+// (src/anywidget_instruments_industrial/_numeric.py). Both are checked against the
 // shared cases of tests/parity/peak.json.
 
 export interface PeakState {

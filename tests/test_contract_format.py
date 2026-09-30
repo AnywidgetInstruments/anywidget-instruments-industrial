@@ -9,9 +9,10 @@ from __future__ import annotations
 import json
 import pathlib
 
+import anywidget_instruments as awi
 import pytest
 
-STATIC = pathlib.Path(__file__).parents[1] / "src" / "anywidget_instruments" / "static"
+STATIC = pathlib.Path(__file__).parents[1] / "src" / "anywidget_instruments_industrial" / "static"
 CONTRACT = STATIC / "contract.json"
 FORMAT = 1
 TOP_KEYS = {"$comment", "format", "version", "encoding", "frameworkTraits", "widgets"}
@@ -25,5 +26,8 @@ def test_contract_layout_is_stable() -> None:
     assert set(contract) == TOP_KEYS
     for name, widget in contract["widgets"].items():
         assert set(widget) == WIDGET_KEYS, name
-        assert (STATIC.parent / widget["schema"]).exists(), name
+        if widget["schema"].startswith(awi.SCHEMA_ID):  # a base schema of the core, by $id
+            assert (awi.SCHEMA_DIR / widget["schema"].removeprefix(awi.SCHEMA_ID)).exists()
+        else:
+            assert (STATIC.parent / widget["schema"]).exists(), name
     assert (STATIC / "index.js").exists() and (STATIC / "index.css").exists()

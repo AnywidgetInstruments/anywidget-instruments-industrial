@@ -17,8 +17,8 @@ import numpy as np
 import pytest
 import traitlets as t
 
-import anywidget_instruments as ai
-from anywidget_instruments._alarm_logic import compute_alarm_level
+import anywidget_instruments_industrial as ai
+from anywidget_instruments_industrial._alarm_logic import compute_alarm_level
 
 PARITY = pathlib.Path(__file__).parent / "parity"
 
@@ -111,7 +111,7 @@ PEAK = _load("peak.json")["cases"]
 
 @pytest.mark.parametrize("case", PEAK, ids=[c["name"] for c in PEAK])
 def test_peak_hold(case: dict[str, Any], monkeypatch: pytest.MonkeyPatch) -> None:
-    from anywidget_instruments import _numeric
+    from anywidget_instruments_industrial import _numeric
 
     clock = {"now": 0.0}
     monkeypatch.setattr(_numeric.time, "monotonic", lambda: clock["now"])
@@ -221,7 +221,7 @@ ANN = _load("annunciator.json")
 
 
 def test_annunciator_transition_table() -> None:
-    from anywidget_instruments._annunciator import annunciator_transition
+    from anywidget_instruments_industrial._annunciator import annunciator_transition
 
     for state, active, event, sequence, expected in ANN["transitions"]:
         assert annunciator_transition(state, active, event, sequence) == expected
@@ -420,7 +420,7 @@ RECIPE = _load("recipe.json")
 
 @pytest.mark.parametrize("case", RECIPE["normalize"])
 def test_recipe_columns_normalized(case: dict[str, Any]) -> None:
-    from anywidget_instruments._recipe import normalize_column
+    from anywidget_instruments_industrial._recipe import normalize_column
 
     assert normalize_column(case["raw"]) == case["expected"]
 
@@ -429,7 +429,7 @@ def test_recipe_columns_normalized(case: dict[str, Any]) -> None:
     "case", RECIPE["cells"], ids=[c["column"]["name"] for c in RECIPE["cells"]]
 )
 def test_recipe_cells(case: dict[str, Any]) -> None:
-    from anywidget_instruments._recipe import check_cell, normalize_column
+    from anywidget_instruments_industrial._recipe import check_cell, normalize_column
 
     col = normalize_column(case["column"])
     for value, ok, *stored in case["checks"]:
@@ -457,7 +457,7 @@ VALUE_LABELS = _load("value_labels.json")["cases"]
 
 @pytest.mark.parametrize("case", VALUE_LABELS)
 def test_value_labels(case: dict[str, Any]) -> None:
-    from anywidget_instruments._numeric import value_label_of, value_of_label
+    from anywidget_instruments_industrial._numeric import value_label_of, value_of_label
 
     k = ai.Knob(min=case["min"], max=case["max"], value_labels=case["labels"])
     assert [it["label"] for it in k.value_labels] == case["sorted"]
@@ -486,13 +486,13 @@ SVGP = _load("svgpanel.json")
 
 @pytest.mark.parametrize("label,expected", SVGP["roles"])
 def test_svgpanel_roles(label: str, expected: Any) -> None:
-    from anywidget_instruments._svgpanel import parse_role
+    from anywidget_instruments_industrial._svgpanel import parse_role
 
     assert parse_role(label) == expected
 
 
 def test_svgpanel_value_rules() -> None:
-    from anywidget_instruments._svgpanel import (
+    from anywidget_instruments_industrial._svgpanel import (
         matches,
         option_value,
         rotate_angle,

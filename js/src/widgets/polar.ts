@@ -1,11 +1,11 @@
 // PolarPlot, SmithChart, RadarChart (SPEC-002..004). SVG rendering.
 import { gammaToZ, radarRange, screenAngle, type AngleConvention } from "../contract/polar.js";
-import { clear, html, safeColor, setAttr, setHidden, svg, svgText } from "../core/dom.js";
+import { clear, html, safeColor, setAttr, setHidden, svg, svgText } from "anywidget-instruments/js/src/core/dom.js";
 import { checkEntry } from "../core/entry.js";
 import { formatValue } from "../core/format.js";
-import type { AnyModel } from "../core/model.js";
-import { niceTicks, parseNumber } from "../core/scale.js";
-import { BaseView } from "../core/view.js";
+import type { AnyModel } from "anywidget-instruments/js/src/core/model.js";
+import { niceTicks, parseNumber } from "anywidget-instruments/js/src/core/scale.js";
+import { BaseView } from "anywidget-instruments/js/src/core/view.js";
 import type { PolarPlotTraits, RadarChartTraits, SeriesWidgetTraits, SmithChartTraits } from "../generated/contract.js";
 
 export { gammaToZ, screenAngle };

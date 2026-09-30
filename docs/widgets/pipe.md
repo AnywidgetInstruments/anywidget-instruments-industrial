@@ -8,7 +8,7 @@ Pipe segment: straight, elbow, tee or cross, rotated by 0, 90, 180 or 270 degree
 ![Pipe, light theme](../img/widgets/pipe-light.png#only-light){ width="88" }
 ![Pipe, dark theme](../img/widgets/pipe-dark.png#only-dark){ width="88" }
 
-**Process symbols** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.Pipe) ·
+**Process symbols** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.Pipe) ·
 schema [`pipe.schema.json`](../trait-contract.md)
 
 ## Example

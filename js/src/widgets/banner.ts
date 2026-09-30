@@ -1,9 +1,9 @@
 // AlarmBanner (SCADA-006, SCADA-007).
 import type { AlarmRow } from "../contract/alarms.js";
 import { alarmAction } from "../contract/derived.js";
-import { clear, html } from "../core/dom.js";
-import type { AnyModel } from "../core/model.js";
-import { BaseView } from "../core/view.js";
+import { clear, html } from "anywidget-instruments/js/src/core/dom.js";
+import type { AnyModel } from "anywidget-instruments/js/src/core/model.js";
+import { BaseView } from "anywidget-instruments/js/src/core/view.js";
 import type { AlarmBannerTraits } from "../generated/contract.js";
 
 const RANK: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 };

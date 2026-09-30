@@ -8,7 +8,7 @@ Compact trend of the last values, without axes (IND-101).
 ![Sparkline, light theme](../img/widgets/sparkline-light.png#only-light){ width="168" }
 ![Sparkline, dark theme](../img/widgets/sparkline-dark.png#only-dark){ width="168" }
 
-**Graphs, trends** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.Sparkline) ·
+**Graphs, trends** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.Sparkline) ·
 schema [`sparkline.schema.json`](../trait-contract.md)
 
 ## Example

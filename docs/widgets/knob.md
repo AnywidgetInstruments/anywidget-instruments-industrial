@@ -8,7 +8,7 @@ Rotary control with a pointer (NUM-101).
 ![Knob, light theme](../img/widgets/knob-light.png#only-light){ width="168" }
 ![Knob, dark theme](../img/widgets/knob-dark.png#only-dark){ width="168" }
 
-**Controls, continuous** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.Knob) ·
+**Controls, continuous** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.Knob) ·
 schema [`knob.schema.json`](../trait-contract.md)
 
 ## Example

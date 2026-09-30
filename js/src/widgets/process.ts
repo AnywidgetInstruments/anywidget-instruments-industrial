@@ -3,10 +3,10 @@
 import { hostOwnsState } from "../contract/derived.js";
 import { type ProcessChanges, positionDemand, processCommand, type ProcessState } from "../contract/process.js";
 import { imageMime } from "../contract/synoptic.js";
-import { clear, html, safeColor, svg, svgText } from "../core/dom.js";
+import { clear, html, safeColor, svg, svgText } from "anywidget-instruments/js/src/core/dom.js";
 import { checkEntry } from "../core/entry.js";
-import type { AnyModel, Traits } from "../core/model.js";
-import { BaseView } from "../core/view.js";
+import type { AnyModel, Traits } from "anywidget-instruments/js/src/core/model.js";
+import { BaseView } from "anywidget-instruments/js/src/core/view.js";
 import type { PipeTraits, ProcessTraits, PumpTraits, SynopticCanvasTraits, ValveTraits } from "../generated/contract.js";
 
 /** Traits of Valve, Pump and Motor, from their schemas. */

@@ -8,7 +8,7 @@ Rotary selector with 2 to 5 labelled positions, optionally a key switch (IND-010
 ![SelectorSwitch, light theme](../img/widgets/selector-switch-light.png#only-light){ width="148" }
 ![SelectorSwitch, dark theme](../img/widgets/selector-switch-dark.png#only-dark){ width="148" }
 
-**Controls, discrete** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.SelectorSwitch) ·
+**Controls, discrete** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.SelectorSwitch) ·
 schema [`selectorswitch.schema.json`](../trait-contract.md)
 
 ## Example

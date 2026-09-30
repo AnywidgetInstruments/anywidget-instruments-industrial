@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from traitlets import TraitError
 
-import anywidget_instruments as ai
+import anywidget_instruments_industrial as ai
 
 
 def capture(chart):

@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anywidgetinstruments.github.io/anywidget-instruments-industrial/schema/vumeter.schema.json",
+  "title": "VUMeter",
+  "description": "Segmented bar graph with peak-hold marker (NUM-105).",
+  "type": "object",
+  "x-awi-class": "VUMeter",
+  "allOf": [
+    {
+      "$ref": "peakhold.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "vumeter",
+      "default": "vumeter",
+      "x-awi-writer": "host"
+    },
+    "mode": {
+      "default": "indicator"
+    },
+    "size": {
+      "default": [
+        60,
+        200
+      ]
+    },
+    "segments": {
+      "type": "integer",
+      "minimum": 2,
+      "description": "Number of segments.",
+      "default": 20,
+      "x-awi-writer": "host"
+    },
+    "orientation": {
+      "enum": [
+        "vertical",
+        "horizontal"
+      ],
+      "default": "vertical",
+      "x-awi-writer": "host"
+    }
+  }
+}

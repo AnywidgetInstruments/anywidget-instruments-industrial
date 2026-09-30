@@ -8,7 +8,7 @@ Circular or semicircular gauge with needle and colored ranges (NUM-103).
 ![Gauge, light theme](../img/widgets/gauge-light.png#only-light){ width="188" }
 ![Gauge, dark theme](../img/widgets/gauge-dark.png#only-dark){ width="188" }
 
-**Indicators, analog** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.Gauge) ·
+**Indicators, analog** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.Gauge) ·
 schema [`gauge.schema.json`](../trait-contract.md)
 
 ## Example

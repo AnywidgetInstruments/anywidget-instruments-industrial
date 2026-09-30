@@ -2,11 +2,11 @@
 // operator entries with mode rules and confirmation of large changes.
 import { hostOwnsState, pidState } from "../contract/derived.js";
 import { loopModeChange, operatorSet, type PIDState } from "../contract/pid.js";
-import { clear, html, svg, svgText } from "../core/dom.js";
+import { clear, html, svg, svgText } from "anywidget-instruments/js/src/core/dom.js";
 import { formatValue, tickFormat, withUnit } from "../core/format.js";
-import { fromFraction, linearHit, parseNumber, ticks, toFraction } from "../core/scale.js";
-import type { AnyModel } from "../core/model.js";
-import { BaseView } from "../core/view.js";
+import { fromFraction, linearHit, parseNumber, ticks, toFraction } from "anywidget-instruments/js/src/core/scale.js";
+import type { AnyModel } from "anywidget-instruments/js/src/core/model.js";
+import { BaseView } from "anywidget-instruments/js/src/core/view.js";
 import type { PIDFaceplateTraits } from "../generated/contract.js";
 import { svgPoint } from "./numeric.js";
 

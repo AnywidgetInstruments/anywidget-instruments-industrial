@@ -8,7 +8,7 @@ Data sets of (x, y) pairs with arbitrary spacing: characteristic curves, scatter
 ![XYGraph, light theme](../img/widgets/xy-graph-light.png#only-light){ width="428" }
 ![XYGraph, dark theme](../img/widgets/xy-graph-dark.png#only-dark){ width="428" }
 
-**Recipes and plant structure** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.XYGraph) ·
+**Recipes and plant structure** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.XYGraph) ·
 schema [`xygraph.schema.json`](../trait-contract.md)
 
 ## Example

@@ -11,7 +11,7 @@ Grid of alarm windows following an ISA-18.1 sequence (IND-040 .. IND-043).
 ![Annunciator, light theme](../img/widgets/annunciator-light.png#only-light){ width="448" }
 ![Annunciator, dark theme](../img/widgets/annunciator-dark.png#only-dark){ width="448" }
 
-**Alarms and events** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.Annunciator) ·
+**Alarms and events** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.Annunciator) ·
 schema [`annunciator.schema.json`](../trait-contract.md)
 
 ## Example

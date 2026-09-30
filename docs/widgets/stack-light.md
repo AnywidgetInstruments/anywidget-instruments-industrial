@@ -8,7 +8,7 @@ Signal tower with 1 to 5 tiers (IND-020 .. IND-022, IEC 60073 colors).
 ![StackLight, light theme](../img/widgets/stack-light-light.png#only-light){ width="148" }
 ![StackLight, dark theme](../img/widgets/stack-light-dark.png#only-dark){ width="148" }
 
-**Indicators, discrete** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.StackLight) ·
+**Indicators, discrete** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.StackLight) ·
 schema [`stacklight.schema.json`](../trait-contract.md)
 
 ## Example

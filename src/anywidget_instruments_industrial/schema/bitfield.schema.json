@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anywidgetinstruments.github.io/anywidget-instruments-industrial/schema/bitfield.schema.json",
+  "title": "BitField",
+  "description": "Integer word (status or fault word, register) shown as a row of indicators, one per bit (IND-111, IND-112).",
+  "type": "object",
+  "x-awi-class": "BitField",
+  "allOf": [
+    {
+      "$ref": "https://anywidgetinstruments.github.io/anywidget-instruments/schema/instrument.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "bitfield",
+      "default": "bitfield",
+      "x-awi-writer": "host"
+    },
+    "mode": {
+      "default": "indicator"
+    },
+    "size": {
+      "default": [
+        520,
+        76
+      ]
+    },
+    "value": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "The word; bit 0 is the least significant bit. Must be below 2**bits (Python rejects larger values; the front end shows only the bits of the word). Set by the host, or by the user toggling a bit in control mode (IND-112).",
+      "default": 0,
+      "x-awi-writer": "both"
+    },
+    "bits": {
+      "enum": [
+        8,
+        16,
+        32
+      ],
+      "description": "Word size.",
+      "default": 16,
+      "x-awi-writer": "host"
+    },
+    "labels": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Label of each bit, bit 0 first; a bit without a label is shown dimmed.",
+      "default": [],
+      "x-awi-writer": "host"
+    },
+    "colors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "CSS on color of each bit, bit 0 first; empty or missing: on_color.",
+      "default": [],
+      "x-awi-writer": "host"
+    },
+    "on_color": {
+      "type": "string",
+      "description": "CSS color of a set bit.",
+      "default": "#22c55e",
+      "x-awi-writer": "host"
+    },
+    "msb_first": {
+      "type": "boolean",
+      "description": "Draw the most significant bit on the left, as the word is written.",
+      "default": true,
+      "x-awi-writer": "host"
+    },
+    "show_hex": {
+      "type": "boolean",
+      "description": "Also show the word in hexadecimal.",
+      "default": true,
+      "x-awi-writer": "host"
+    }
+  }
+}

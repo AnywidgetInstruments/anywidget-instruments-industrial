@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anywidgetinstruments.github.io/anywidget-instruments-industrial/schema/rockerswitch.schema.json",
+  "title": "RockerSwitch",
+  "description": "Rocker switch with I/O marks (BOOL-004).",
+  "type": "object",
+  "x-awi-class": "RockerSwitch",
+  "allOf": [
+    {
+      "$ref": "boolean.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "rockerswitch",
+      "default": "rockerswitch",
+      "x-awi-writer": "host"
+    },
+    "size": {
+      "default": [
+        60,
+        100
+      ]
+    }
+  }
+}

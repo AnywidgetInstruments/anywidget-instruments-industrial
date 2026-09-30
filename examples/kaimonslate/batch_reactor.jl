@@ -2,13 +2,13 @@ try; import KaimonSlate; catch; error("This is a Kaimon Slate notebook — runni
 
 #%% md id=intro
 @md"""
-# Batch reactor R-101 — anywidget-instruments in Julia
+# Batch reactor R-101 — anywidget-instruments-industrial in Julia
 
 The same operator station as the Python showcase, driven by **Julia**: a jacketed batch reactor
 (feed pump and valve, agitator, jacket heating under PID control, drain pump) runs a batch
 through the phases of a **recipe** under a **PackML state machine**.
 
-The widgets are the front-end modules of the Python package `anywidget-instruments`, hosted by
+The widgets are the front-end modules of the Python package `anywidget-instruments-industrial`, hosted by
 the **SlateAFM** extension: no Python kernel runs. Julia owns the process: it computes the level
 and the temperature, runs the PI controller, completes the acting states, raises the alarms and
 feeds the trend. The widgets apply the operator actions themselves (commands, recipe edits,
@@ -39,8 +39,8 @@ one served with the documentation site).
 using SlateAFM
 import Dates
 
-const AWI = get(ENV, "AWI_PACKAGE", "anywidget-instruments")
-awi(class; traits...) = pypi_afm(AWI; import_as = "anywidget_instruments", class = class, traits...)
+const AWI = get(ENV, "AWI_PACKAGE", "anywidget-instruments-industrial")
+awi(class; traits...) = pypi_afm(AWI; import_as = "anywidget_instruments_industrial", class = class, traits...)
 
 "Current traits of the bound widget `name` (a handle or a Dict), as a plain Dict."
 traits(name::Symbol) = Dict{String,Any}(String(k) => v for (k, v) in getfield(@__MODULE__, name))

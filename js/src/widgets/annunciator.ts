@@ -2,9 +2,9 @@
 // sequence, first-out mark, horn indicator and operator push buttons.
 import type { AnnWindow } from "../contract/annunciator.js";
 import { annunciatorAction, hostOwnsState } from "../contract/derived.js";
-import { clear, html } from "../core/dom.js";
-import type { AnyModel } from "../core/model.js";
-import { BaseView } from "../core/view.js";
+import { clear, html } from "anywidget-instruments/js/src/core/dom.js";
+import type { AnyModel } from "anywidget-instruments/js/src/core/model.js";
+import { BaseView } from "anywidget-instruments/js/src/core/view.js";
 import type { AnnunciatorTraits } from "../generated/contract.js";
 
 // State conveyed by text as well as by light and flash pattern (A11Y-003).

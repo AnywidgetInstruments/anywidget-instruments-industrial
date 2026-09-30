@@ -2,8 +2,8 @@ import math
 
 import pytest
 
-import anywidget_instruments as ai
-from anywidget_instruments import compute_alarm_level as level
+import anywidget_instruments_industrial as ai
+from anywidget_instruments_industrial import compute_alarm_level as level
 
 LIMITS = {"lolo": 5, "lo": 10, "hi": 80, "hihi": 90}
 

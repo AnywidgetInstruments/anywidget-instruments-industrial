@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anywidgetinstruments.github.io/anywidget-instruments-industrial/schema/pump.schema.json",
+  "title": "Pump",
+  "description": "Pump with stopped, running and fault states and a rotation animation (SCADA-002).",
+  "type": "object",
+  "x-awi-class": "Pump",
+  "allOf": [
+    {
+      "$ref": "process.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "pump",
+      "default": "pump",
+      "x-awi-writer": "host"
+    },
+    "commands": {
+      "default": [
+        "start",
+        "stop"
+      ],
+      "x-awi-simulated": {
+        "start": "running",
+        "stop": "stopped"
+      }
+    },
+    "value": {
+      "enum": [
+        "stopped",
+        "running",
+        "fault"
+      ],
+      "description": "Pump state (feedback from the process).",
+      "default": "stopped",
+      "x-awi-writer": "host"
+    },
+    "animate": {
+      "type": "boolean",
+      "description": "Rotate while running (off when reduced motion is requested).",
+      "default": true,
+      "x-awi-writer": "host"
+    },
+    "direction": {
+      "enum": [
+        "right",
+        "left",
+        "up",
+        "down"
+      ],
+      "description": "Discharge direction of the symbol.",
+      "default": "right",
+      "x-awi-writer": "host"
+    }
+  }
+}

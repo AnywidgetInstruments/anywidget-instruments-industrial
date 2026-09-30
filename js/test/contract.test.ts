@@ -3,15 +3,17 @@
 import { describe, expect, test, vi } from "vitest";
 import { attachDerived, hostOwnsState } from "../src/contract/derived.js";
 import { ScaleGuard } from "../src/contract/numeric.js";
-import type { TraitSpec } from "../src/contract/spec.js";
-import * as traits from "../src/contract/traits.js";
-import { defaultOf, readTrait, readValue } from "../src/contract/traits.js";
-import { announcedInterval, liveness } from "../src/core/liveness.js";
-import type { AnyModel } from "../src/core/model.js";
-import { BaseView } from "../src/core/view.js";
+import type { TraitSpec } from "anywidget-instruments/js/src/contract/spec.js";
+import * as traits from "anywidget-instruments/js/src/contract/traits.js";
+import { defaultOf, readTrait, readValue } from "anywidget-instruments/js/src/contract/traits.js";
+import { announcedInterval, liveness } from "anywidget-instruments/js/src/core/liveness.js";
+import type { AnyModel } from "anywidget-instruments/js/src/core/model.js";
+import { BaseView, registerContracts } from "anywidget-instruments/js/src/core/view.js";
 import { BY_KIND, CONTRACTS } from "../src/generated/contract.js";
 // @ts-expect-error: JavaScript test helper
 import { fakeModel } from "./helpers.js";
+
+registerContracts(BY_KIND);
 
 const knob = CONTRACTS.Knob.traits;
 const tank = CONTRACTS.Tank.traits;

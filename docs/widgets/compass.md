@@ -8,7 +8,7 @@ Heading display in degrees with cardinal labels (SPEC-001).
 ![Compass, light theme](../img/widgets/compass-light.png#only-light){ width="168" }
 ![Compass, dark theme](../img/widgets/compass-dark.png#only-dark){ width="168" }
 
-**Indicators, analog** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.Compass) ·
+**Indicators, analog** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.Compass) ·
 schema [`compass.schema.json`](../trait-contract.md)
 
 ## Example

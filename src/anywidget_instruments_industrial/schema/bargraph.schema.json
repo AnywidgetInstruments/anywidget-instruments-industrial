@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anywidgetinstruments.github.io/anywidget-instruments-industrial/schema/bargraph.schema.json",
+  "title": "BarGraph",
+  "description": "Group of aligned bars on a shared scale with per-bar alarm levels (IND-102).",
+  "type": "object",
+  "x-awi-class": "BarGraph",
+  "allOf": [
+    {
+      "$ref": "https://anywidgetinstruments.github.io/anywidget-instruments/schema/instrument.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "bargraph",
+      "default": "bargraph",
+      "x-awi-writer": "host"
+    },
+    "mode": {
+      "default": "indicator"
+    },
+    "size": {
+      "default": [
+        260,
+        160
+      ]
+    },
+    "value": {
+      "type": "array",
+      "items": {
+        "$ref": "https://anywidgetinstruments.github.io/anywidget-instruments/schema/instrument.schema.json#/$defs/float"
+      },
+      "description": "One value per bar.",
+      "default": [],
+      "x-awi-writer": "host"
+    },
+    "bars": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "normal_lo": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "normal_hi": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "lolo": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "lo": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "hi": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "hihi": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        ]
+      },
+      "description": "Bars: a label, or {label, normal_lo, normal_hi, lolo, lo, hi, hihi}; only label is required, missing limits are null.",
+      "default": [],
+      "x-awi-writer": "host"
+    },
+    "min": {
+      "type": "number",
+      "description": "Lower end of the shared scale.",
+      "default": 0,
+      "x-awi-writer": "host"
+    },
+    "max": {
+      "type": "number",
+      "description": "Upper end of the shared scale.",
+      "default": 100,
+      "x-awi-writer": "host"
+    },
+    "unit": {
+      "type": "string",
+      "default": "",
+      "x-awi-writer": "host"
+    },
+    "format": {
+      "type": "string",
+      "default": "%.1f",
+      "x-awi-writer": "host"
+    },
+    "deadband": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Hysteresis of the bar alarm levels (ALARM-003).",
+      "default": 0,
+      "x-awi-writer": "host"
+    },
+    "alarm_levels": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "normal",
+          "lo",
+          "lolo",
+          "hi",
+          "hihi"
+        ]
+      },
+      "description": "Alarm level of each bar (a bar without a value is normal). Derived: by the host when it owns the state, otherwise by the front end (HOST-004).",
+      "default": [],
+      "readOnly": true,
+      "x-awi-writer": "derived"
+    }
+  }
+}

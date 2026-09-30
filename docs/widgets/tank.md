@@ -8,7 +8,7 @@ Vertical level indicator with optional level markers (NUM-106).
 ![Tank, light theme](../img/widgets/tank-light.png#only-light){ width="128" }
 ![Tank, dark theme](../img/widgets/tank-dark.png#only-dark){ width="128" }
 
-**Indicators, analog** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments.Tank) ·
+**Indicators, analog** · [Widget catalog](../widgets.md) · [API reference](../api.md#anywidget_instruments_industrial.Tank) ·
 schema [`tank.schema.json`](../trait-contract.md)
 
 ## Example

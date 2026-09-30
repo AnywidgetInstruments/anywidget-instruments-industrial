@@ -1,5 +1,5 @@
 // BitField word (IND-111, IND-112): the front-end port of BitField.toggle_bit
-// and BitField.active_bits (src/anywidget_instruments/_bitfield.py), checked
+// and BitField.active_bits (src/anywidget_instruments_industrial/_bitfield.py), checked
 // against tests/parity/bitfield.json.
 
 /** The word limited to its `bits` (unsigned; a host may send a larger value). */

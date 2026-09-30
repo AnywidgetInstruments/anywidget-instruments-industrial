@@ -2,11 +2,11 @@
 // KPI tile.
 import { type Bar, normalizeBars } from "../contract/bars.js";
 import { type BufferLike, toFloat32 } from "../core/buffers.js";
-import { clear, html, svg, svgText } from "../core/dom.js";
+import { clear, html, svg, svgText } from "anywidget-instruments/js/src/core/dom.js";
 import { formatValue, withUnit } from "../core/format.js";
-import { clamp, parseNumber } from "../core/scale.js";
-import type { AnyModel } from "../core/model.js";
-import { BaseView } from "../core/view.js";
+import { clamp, parseNumber } from "anywidget-instruments/js/src/core/scale.js";
+import type { AnyModel } from "anywidget-instruments/js/src/core/model.js";
+import { BaseView } from "anywidget-instruments/js/src/core/view.js";
 import type { BarGraphTraits, DeviationIndicatorTraits, KPITileTraits, SparklineTraits } from "../generated/contract.js";
 
 const LEVEL_TEXT: Record<string, string> = { lolo: "LOLO", lo: "LO", hi: "HI", hihi: "HIHI" };

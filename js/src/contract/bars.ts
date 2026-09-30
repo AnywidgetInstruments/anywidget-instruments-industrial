@@ -1,5 +1,5 @@
 // Bar graph rules (IND-102): the front-end port of BarGraph._check_bars and
-// BarGraph._update_levels (src/anywidget_instruments/_compact.py). Both are
+// BarGraph._update_levels (src/anywidget_instruments_industrial/_compact.py). Both are
 // checked against the shared cases of tests/parity/bars.json.
 import { type AlarmLevel, computeAlarmLevel } from "./alarm.js";
 

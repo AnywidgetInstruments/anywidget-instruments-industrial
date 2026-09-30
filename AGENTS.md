@@ -4,9 +4,14 @@ Guidance for AI coding agents (and humans) working on this repository.
 
 ## Project
 
-`anywidget-instruments`: instrumentation widgets (knobs, gauges, LEDs, charts,
+`anywidget-instruments-industrial`: instrumentation widgets (knobs, gauges, LEDs, charts,
 alarms, supervisory objects) for computational notebooks, built on
-[anywidget](https://anywidget.dev). Requirements come from the EARS
+[anywidget](https://anywidget.dev) and on the
+[anywidget-instruments](https://github.com/AnywidgetInstruments/anywidget-instruments)
+core: base view (`BaseView`), base trait contract and its generator, themes and
+palettes, liveness, the widget frame CSS and the Python base class come from it,
+pinned at a commit in `package.json`. Anything general enough to serve another
+instrument family belongs in the core. Requirements come from the EARS
 specification in `docs/specification.md`; `docs/requirements-status.md` tracks
 them. Changes to requirements go through that file (bump its version and
 revision history).
@@ -15,14 +20,14 @@ revision history).
 
 | Path | Content |
 |---|---|
-| `src/anywidget_instruments/` | Python package (one module per widget family, private `_*.py`) |
-| `src/anywidget_instruments/schema/` | Trait contract: one JSON Schema per widget, single source of truth for Python, TypeScript and hosts |
-| `src/anywidget_instruments/static/` | Built front-end bundle (not minified, with source map) and `contract.json`: generated, never edited, not committed |
-| `js/src/core/` | Shared front end (TypeScript): `view.ts` (base view), `plot.ts` (graphs), `model.ts` (AFM model), `scale.ts`, `format.ts`, `dom.ts`, `buffers.ts`, `liveness.ts` |
-| `js/src/contract/` | Trait contract runtime: schema-driven reading, derived traits, and the logic shared with Python (checked by `tests/parity/`) |
+| `src/anywidget_instruments_industrial/` | Python package (one module per widget family, private `_*.py`) |
+| `src/anywidget_instruments_industrial/schema/` | Trait contract: one JSON Schema per widget, single source of truth for Python, TypeScript and hosts |
+| `src/anywidget_instruments_industrial/static/` | Built front-end bundle (not minified, with source map) and `contract.json`: generated, never edited, not committed |
+| `js/src/core/` | Front end shared by the industrial widgets (TypeScript): `plot.ts` (graphs), `format.ts`, `entry.ts`, `buffers.ts`; the base view, model, DOM helpers, scales and liveness are imported from `anywidget-instruments/js/src/core/` |
+| `js/src/contract/` | Derived traits and the logic shared with Python (checked by `tests/parity/`); schema-driven reading comes from `anywidget-instruments/js/src/contract/` |
 | `js/src/generated/` | `contract.ts`, generated from the schemas by `npm run gen`: not committed |
 | `js/src/widgets/` | One view per widget family (TypeScript); registered by `_kind` in `js/src/index.js` |
-| `js/src/styles.css` | All styles, scoped under `.awi-root`, colors as `--awi-*` custom properties |
+| `js/src/styles.css` | Styles of the industrial widgets, scoped under `.awi-root`; imports the core styles first (palettes, themes, widget frame), whose `--awi-*` custom properties it uses |
 | `js/test/` | vitest unit tests (jsdom) |
 | `tests/` | pytest unit tests, including headless execution of `examples/*.ipynb`; `test_contract.py` (Python against the schemas) and `parity/*.json` (cases shared with vitest) |
 | `e2e/` | Playwright end-to-end tests (JupyterLab, Notebook 7, marimo, visual, performance) |
@@ -39,6 +44,7 @@ npm run typecheck                   # tsc --noEmit
 npm test                            # vitest
 npm run lint                        # eslint (js/, e2e/ and e2e-site/)
 npm run check:reproducible          # byte-identical rebuild
+pip install "anywidget-instruments @ git+https://github.com/AnywidgetInstruments/anywidget-instruments@<commit of package.json>"
 pip install -e ".[dev]"             # add ".[docs]" for the documentation
 pytest                              # Python tests + example notebooks
 ruff check . && ruff format --check . && mypy src
@@ -56,7 +62,7 @@ pushing changes to the front end or to the kernel/front-end protocol.
    `_default_size` (with `mode_trait` / `size_trait` so that the class
    defaults match), and declare synced traits with `.tag(sync=True)`.
    Use `float_serializers` for traits that may hold NaN/inf.
-2. Schema: add `src/anywidget_instruments/schema/<kind>.schema.json` with every
+2. Schema: add `src/anywidget_instruments_industrial/schema/<kind>.schema.json` with every
    synced trait (type, bounds, default, `x-awi-writer`) and the custom
    messages with their buffers (`x-awi-messages`). `tests/test_contract.py`
    fails until Python and the schema agree.
@@ -66,7 +72,7 @@ pushing changes to the front end or to the kernel/front-end protocol.
    `_kind` in `js/src/index.js`. Rules also implemented in Python go to
    `js/src/contract/` with parity cases in `tests/parity/`; derived traits
    are computed in `contract/derived.ts` when no host owns the state.
-4. Export the class in `src/anywidget_instruments/__init__.py` (`__all__`).
+4. Export the class in `src/anywidget_instruments_industrial/__init__.py` (`__all__`).
 5. Tests: pytest for kernel logic, vitest for pure front-end logic, a
    host-less test in `js/test/hostless.test.ts` (plain trait dictionary), and an
    entry in `e2e/allwidgets.spec.js` (kernel → front end and front end → kernel).
@@ -83,20 +89,20 @@ pushing changes to the front end or to the kernel/front-end protocol.
 ### Python
 - Python ≥ 3.10, `from __future__ import annotations`, full type hints, `mypy src` clean.
 - ruff (line length 100) for lint and format; numpy-style docstrings.
-- Runtime dependencies are limited to `anywidget`, `traitlets`, `numpy`.
+- Runtime dependencies are limited to `anywidget-instruments` (the core), `anywidget`, `traitlets`, `numpy`.
 - Validation errors raise `traitlets.TraitError` naming the widget and the trait.
 - User callbacks go through the dispatcher (`_dispatch.call`): exceptions are
   logged, never propagated; front-end updates are processed as a batch.
 - Bulk data (samples, images) travels as binary buffers via `self.send(..., buffers=...)`,
   never as JSON lists; new views fetch state with a `sync_request` message.
 - No threads without a fallback: Pyodide cannot start them; in marimo use
-  `mo.Thread` (see `_liveness.py`).
+  `mo.Thread` (see `_liveness.py` of the anywidget-instruments core).
 
 ### Front end
 - TypeScript (new and converted code; JavaScript files are converted when
   touched), bundled by esbuild (`js/build.mjs`) into one readable ES module
   with a source map; no runtime dependency, no network access, no CDN.
-- Traits come from the JSON Schemas in `src/anywidget_instruments/schema/`:
+- Traits come from the JSON Schemas in `src/anywidget_instruments_industrial/schema/`:
   change a trait there first; `tests/test_contract.py` fails when Python
   diverges, `tsc` when TypeScript does.
 - Only the AFM model API (`get`, `set`, `save_changes`, `on`, `off`, `send`);
@@ -110,7 +116,7 @@ pushing changes to the front end or to the kernel/front-end protocol.
   text or shape as well as color, `prefers-reduced-motion` respected. Focusable
   elements carry `data-lm-suppress-shortcuts` (automatic for `html("button")`
   and widget bodies).
-- New colors are `--awi-*` tokens in `styles.css`, defined for light and dark
+- New colors are `--awi-*` tokens (in the core when every family can use them, else in `styles.css`), defined for light and dark
   hosts, and must pass `js/test/contrast.test.js`.
 - The bundle budget is 150 kB gzipped (checked in CI).
 

@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anywidgetinstruments.github.io/anywidget-instruments-industrial/schema/digitalgraph.schema.json",
+  "title": "DigitalWaveformGraph",
+  "description": "Logic timing diagram with bus grouping (CHART-102).",
+  "type": "object",
+  "x-awi-class": "DigitalWaveformGraph",
+  "allOf": [
+    {
+      "$ref": "graph.schema.json"
+    }
+  ],
+  "properties": {
+    "_kind": {
+      "const": "digitalgraph",
+      "default": "digitalgraph",
+      "x-awi-writer": "host"
+    },
+    "value": {
+      "type": "object",
+      "properties": {
+        "n_samples": {
+          "type": "integer"
+        },
+        "n_lines": {
+          "type": "integer"
+        }
+      },
+      "description": "Size of the data {n_samples, n_lines}, written by the host with each data message.",
+      "default": {},
+      "readOnly": true,
+      "x-awi-writer": "host"
+    },
+    "lines": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Line names; a missing name is shown as D<k>. Python names the lines D0, D1, ... when their number changes.",
+      "default": [],
+      "x-awi-writer": "host"
+    },
+    "buses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "lines"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "lines": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "Line indices, most significant first."
+          }
+        }
+      },
+      "description": "Groups of lines {name, lines} shown as one hexadecimal value (first listed line = MSB). Python rejects buses naming a missing line; the front end ignores such lines.",
+      "default": [],
+      "x-awi-writer": "host"
+    },
+    "dt": {
+      "type": "number",
+      "description": "Sample interval in x-axis units; 0 is shown as 1.",
+      "default": 1.0,
+      "x-awi-writer": "host"
+    },
+    "x0": {
+      "type": "number",
+      "description": "x-axis position of the first sample.",
+      "default": 0.0,
+      "x-awi-writer": "host"
+    },
+    "show_lines_in_bus": {
+      "type": "boolean",
+      "description": "Also draw the lines of each bus under it.",
+      "default": true,
+      "x-awi-writer": "host"
+    }
+  },
+  "x-awi-messages": [
+    {
+      "type": "data",
+      "direction": "host-to-front",
+      "description": "The whole data (this is not a chart: each message replaces the previous data). Sent when the data changes and in reply to sync_request.",
+      "fields": {
+        "n_samples": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "n_lines": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "n_analog": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "n_traces": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "buffers": [
+        {
+          "dtype": "uint8",
+          "shape": [
+            "n_samples",
+            "n_lines"
+          ],
+          "order": "C",
+          "description": "Logic levels, 0 or 1, one byte per line (not bit-packed)."
+        },
+        {
+          "dtype": "<f4",
+          "shape": [
+            "n_analog",
+            "n_traces"
+          ],
+          "order": "C",
+          "description": "Analog samples of a mixed-signal graph; empty for a digital graph."
+        }
+      ]
+    },
+    {
+      "type": "sync_request",
+      "direction": "front-to-host",
+      "description": "Sent by each new view: the host answers with a data message. A host without data can ignore it.",
+      "fields": {},
+      "buffers": []
+    }
+  ]
+}
