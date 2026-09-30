@@ -283,6 +283,29 @@ function table(w, names) {
   return ["| Trait | Type | Default | Set by | Description |", "|---|---|---|---|---|", ...rows].join("\n");
 }
 
+// DOC-007: the page of a safety-related widget warns before anything else.
+const NOT_SAFETY_SYSTEM =
+  "It is for visualization, teaching, simulation and supervision; it is not a safety-related system and must not perform a safety function.";
+const SAFETY = {
+  EmergencyStop: [
+    "Not an emergency stop device",
+    "This widget draws an emergency stop button on a screen; it is not an emergency stop device. A real emergency stop is a hardwired device that stops the machine through a safety-rated circuit, independently of any software. Use the widget to represent or simulate an emergency stop, never as the means of stopping a machine.",
+  ],
+  AlarmIndicator: ["Not a safety-related system", `The alarm shown here may be delayed, lost or stale. ${NOT_SAFETY_SYSTEM}`],
+  AlarmBanner: ["Not a safety-related system", `The alarms shown here may be delayed, lost or stale. ${NOT_SAFETY_SYSTEM}`],
+  AlarmList: ["Not a safety-related system", `The alarms shown here may be delayed, lost or stale. ${NOT_SAFETY_SYSTEM}`],
+  Annunciator: ["Not a safety-related system", `The alarms shown here may be delayed, lost or stale. ${NOT_SAFETY_SYSTEM}`],
+  PIDFaceplate: ["Not a safety-related system", `A controller in a notebook runs with no timing guarantee. ${NOT_SAFETY_SYSTEM}`],
+  StateMachine: ["Not a safety-related system", `A state model in a notebook runs with no timing guarantee. ${NOT_SAFETY_SYSTEM}`],
+};
+
+function safetyNotice(cls) {
+  const notice = SAFETY[cls];
+  if (!notice) return [];
+  const [title, text] = notice;
+  return [`!!! danger "${title}"`, `    ${text} See the [safety notice](../safety.md).`, ""];
+}
+
 function page(w, shot) {
   const schema = JSON.parse(readFileSync(join(SCHEMAS, w.schema.replace(/^schema\//, "")), "utf8"));
   const own = Object.keys(schema.properties ?? {}).filter((n) => !n.startsWith("_") && w.traits[n]);
@@ -298,6 +321,7 @@ function page(w, shot) {
     "",
     schema.description ?? "",
     "",
+    ...safetyNotice(w.class),
     `![${w.class}, light theme](../img/widgets/${name}-light.png#only-light)${width}`,
     `![${w.class}, dark theme](../img/widgets/${name}-dark.png#only-dark)${width}`,
     "",

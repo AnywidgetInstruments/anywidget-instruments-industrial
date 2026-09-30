@@ -5,6 +5,9 @@
 
 List of active alarms with time, source, priority and message (SCADA-006, SCADA-007).
 
+!!! danger "Not a safety-related system"
+    The alarms shown here may be delayed, lost or stale. It is for visualization, teaching, simulation and supervision; it is not a safety-related system and must not perform a safety function. See the [safety notice](../safety.md).
+
 ![AlarmBanner, light theme](../img/widgets/alarm-banner-light.png#only-light){ width="530" }
 ![AlarmBanner, dark theme](../img/widgets/alarm-banner-dark.png#only-dark){ width="530" }
 

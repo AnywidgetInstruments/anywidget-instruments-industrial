@@ -5,6 +5,9 @@
 
 Machine state model with operator commands, PackML (ISA-TR88.00.02) by default (IND-060 .. IND-063).
 
+!!! danger "Not a safety-related system"
+    A state model in a notebook runs with no timing guarantee. It is for visualization, teaching, simulation and supervision; it is not a safety-related system and must not perform a safety function. See the [safety notice](../safety.md).
+
 ![StateMachine, light theme](../img/widgets/state-machine-light.png#only-light){ width="728" }
 ![StateMachine, dark theme](../img/widgets/state-machine-dark.png#only-dark){ width="728" }
 

@@ -5,6 +5,9 @@
 
 Red mushroom emergency stop button (BOOL-012); a drawing, not an emergency stop device.
 
+!!! danger "Not an emergency stop device"
+    This widget draws an emergency stop button on a screen; it is not an emergency stop device. A real emergency stop is a hardwired device that stops the machine through a safety-rated circuit, independently of any software. Use the widget to represent or simulate an emergency stop, never as the means of stopping a machine. See the [safety notice](../safety.md).
+
 ![EmergencyStop, light theme](../img/widgets/emergency-stop-light.png#only-light){ width="118" }
 ![EmergencyStop, dark theme](../img/widgets/emergency-stop-dark.png#only-dark){ width="118" }
 

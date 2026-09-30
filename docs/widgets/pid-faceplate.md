@@ -5,6 +5,9 @@
 
 Operator faceplate of a control loop (IND-030 .. IND-034).
 
+!!! danger "Not a safety-related system"
+    A controller in a notebook runs with no timing guarantee. It is for visualization, teaching, simulation and supervision; it is not a safety-related system and must not perform a safety function. See the [safety notice](../safety.md).
+
 ![PIDFaceplate, light theme](../img/widgets/pid-faceplate-light.png#only-light){ width="248" }
 ![PIDFaceplate, dark theme](../img/widgets/pid-faceplate-dark.png#only-dark){ width="248" }
 

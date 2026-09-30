@@ -5,6 +5,9 @@
 
 Single alarm annunciator with the ISA-18.2 alarm states (SCADA-005, SCADA-007).
 
+!!! danger "Not a safety-related system"
+    The alarm shown here may be delayed, lost or stale. It is for visualization, teaching, simulation and supervision; it is not a safety-related system and must not perform a safety function. See the [safety notice](../safety.md).
+
 ![AlarmIndicator, light theme](../img/widgets/alarm-indicator-light.png#only-light){ width="288" }
 ![AlarmIndicator, dark theme](../img/widgets/alarm-indicator-dark.png#only-dark){ width="288" }
 

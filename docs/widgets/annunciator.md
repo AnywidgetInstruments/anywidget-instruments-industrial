@@ -5,6 +5,9 @@
 
 Grid of alarm windows following an ISA-18.1 sequence (IND-040 .. IND-043).
 
+!!! danger "Not a safety-related system"
+    The alarms shown here may be delayed, lost or stale. It is for visualization, teaching, simulation and supervision; it is not a safety-related system and must not perform a safety function. See the [safety notice](../safety.md).
+
 ![Annunciator, light theme](../img/widgets/annunciator-light.png#only-light){ width="448" }
 ![Annunciator, dark theme](../img/widgets/annunciator-dark.png#only-dark){ width="448" }
 

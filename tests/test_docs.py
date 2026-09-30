@@ -119,3 +119,24 @@ def test_every_widget_has_a_page_and_pictures() -> None:
         if page.exists() and f"# {name}\n" not in page.read_text(encoding="utf-8"):
             missing.append(f"{page.relative_to(ROOT)}: title")
     assert missing == []
+
+
+#: Pages of the safety-related widgets and the notice each must show (DOC-007).
+SAFETY_PAGES = {
+    "EmergencyStop": "not an emergency stop device",
+    "AlarmIndicator": "not a safety-related system",
+    "AlarmBanner": "not a safety-related system",
+    "Annunciator": "not a safety-related system",
+    "AlarmList": "not a safety-related system",
+    "PIDFaceplate": "not a safety-related system",
+    "StateMachine": "not a safety-related system",
+}
+
+
+@pytest.mark.parametrize("name", sorted(SAFETY_PAGES))
+def test_safety_related_widget_pages_show_the_safety_notice(name: str) -> None:
+    """DOC-007: the page of a safety-related widget warns before its example."""
+    text = (ROOT / "docs" / "widgets" / f"{page_name(name)}.md").read_text(encoding="utf-8")
+    notice = text.split("## Example")[0].lower()
+    assert "!!! danger" in notice and SAFETY_PAGES[name] in notice
+    assert "(../safety.md)" in notice

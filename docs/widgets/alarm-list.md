@@ -5,6 +5,9 @@
 
 Alarm summary table with shelving, suppression and out-of-service states (IND-050 .. IND-053).
 
+!!! danger "Not a safety-related system"
+    The alarms shown here may be delayed, lost or stale. It is for visualization, teaching, simulation and supervision; it is not a safety-related system and must not perform a safety function. See the [safety notice](../safety.md).
+
 ![AlarmList, light theme](../img/widgets/alarm-list-light.png#only-light){ width="650" }
 ![AlarmList, dark theme](../img/widgets/alarm-list-dark.png#only-dark){ width="650" }
 

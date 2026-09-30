@@ -8,8 +8,8 @@
 | Author | Sébastien Celles |
 | Document type | Software requirements specification |
 | Notation | EARS (Easy Approach to Requirements Syntax) |
-| Version | 0.15 |
-| Date | 2026-09-29 |
+| Version | 0.16 |
+| Date | 2026-09-30 |
 | Status | Baseline for version 1.0 |
 
 ---
@@ -334,7 +334,7 @@ Requirements use identifiers `<GROUP>-<NNN>` with priorities:
 | DOC-004 | S | The documentation shall include at least three complete example panels: a first-order process simulation with PID tuning, a tank level supervision with alarms, and a real-time signal acquisition display. |
 | DOC-005 | S | The documentation shall be buildable offline and deployable as a static site. |
 | DOC-006 | C | The documentation shall include live examples running in the browser (JupyterLite or marimo WASM). |
-| DOC-007 | M | The documentation shall state that the library is not a safety-related system, that the EmergencyStop widget is not an emergency stop device, and that safety functions must be implemented independently of the library; the README and the docstrings of the EmergencyStop, alarm, controller and state model classes shall refer to this statement. |
+| DOC-007 | M | The documentation shall state that the library is not a safety-related system, that the EmergencyStop widget is not an emergency stop device, and that safety functions must be implemented independently of the library; the README and the docstrings of the EmergencyStop, alarm, controller and state model classes shall refer to this statement, and the documentation page of each of these widgets shall show it before its example. |
 | DOC-008 | S | The documentation shall give every widget a page with its picture in the light and in the dark theme, the one matching the reader's theme shown, captured from the widget itself by an automated run, with the traits of the widget and an example that sets them. |
 
 ---
@@ -622,3 +622,4 @@ authors in the documentation.
 | 0.13 | IND-067: state diagram with right-angle labelled arrows, acting and wait states told apart, dashed zones whose commands leave as one arrow, waypoints; IND-066 notes limited to the global commands no zone draws. |
 | 0.14 | GEN-006: BSD 3-Clause license (was MIT) with citation metadata and a request to cite. |
 | 0.15 | DOC-008: a page per widget, pictured in the light and the dark theme. |
+| 0.16 | DOC-007: the page of each safety-related widget (EmergencyStop, alarms, PID faceplate, state machine) shows the safety notice before its example. |
