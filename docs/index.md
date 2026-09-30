@@ -5,6 +5,10 @@ meters, tanks, LEDs, switches with mechanical actions, emergency stop,
 strip charts, spectrograms, logic analyzers, polar and Smith charts, and
 SCADA objects (valves, pumps, motors, pipes, alarm banner, synoptic).
 
+Part of the [anywidget instruments family](https://anywidgetinstruments.github.io/):
+the core, the industrial, automotive and aeronautics widget libraries, their
+hosts (Python, Julia, Grafana) and their live demos.
+
 Built on [anywidget](https://anywidget.dev), the widgets run in **JupyterLab,
 Jupyter Notebook 7 and marimo** (tested) and in the other anywidget hosts
 such as VS Code and Google Colab, with no JavaScript toolchain and no network

@@ -110,6 +110,7 @@ nav:
       - Front-end migration inventory: dev/frontend-migration-inventory.md
   - Requirements status: requirements-status.md
   - License and citation: citing.md
+  - The anywidget instruments family: https://anywidgetinstruments.github.io/
 plugins:
   - search
   - mkdocstrings:
