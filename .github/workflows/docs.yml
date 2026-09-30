@@ -48,7 +48,7 @@ jobs:
         run: mkdocs build --strict -d site
       - name: JupyterLite with the package wheel
         working-directory: lite
-        run: jupyter lite build --contents content --piplite-wheels ../dist/*.whl --output-dir ../site/lite
+        run: jupyter lite build --contents content --piplite-wheels ../dist/anywidget_instruments-*.whl --piplite-wheels ../dist/anywidget_instruments_industrial-*.whl --output-dir ../site/lite
       - name: marimo WebAssembly exports with the package wheel
         run: |
           mkdir -p lite/marimo/public
